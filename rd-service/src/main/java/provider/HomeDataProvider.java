@@ -45,10 +45,6 @@ public class HomeDataProvider implements DataProvider {
 
 	}
 
-	public static void main(String[] args) {
-		DataProvider dp = new HomeDataProvider();
-		dp.getExchanges();
 
-	}
 
 }

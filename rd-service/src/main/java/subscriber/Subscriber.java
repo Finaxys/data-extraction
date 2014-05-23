@@ -84,30 +84,4 @@ public class Subscriber {
 
 	}
 
-	public static void main(String[] args) {
-
-		Thread optThread = new Thread() {
-			public void run() {
-				HConnection hConnection;
-				try {
-					ConnectionFactory factory = new ConnectionFactory();
-					factory.setHost("localhost");
-					Connection connection = factory.newConnection();
-					hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
-//					Receiver receiver = new ExchangeReceiver(new ExchangeDaoImpl(hConnection));
-//					Subscriber subscriber = new Subscriber(connection, receiver);
-//					subscriber.receive(ExchangeReceiver.ROUTING_KEY);
-					
-					Receiver receiver = new StockSummaryReceiver(new StockSummaryDaoImpl(hConnection));
-					Subscriber subscriber = new Subscriber(connection, receiver);
-					subscriber.receive(StockSummaryReceiver.ROUTING_KEY);
-				} catch (Exception e) {
-
-					e.printStackTrace();
-				}
-			}
-		};
-		optThread.start();
-
-	}
 }

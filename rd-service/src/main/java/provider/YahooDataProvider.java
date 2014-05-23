@@ -188,15 +188,4 @@ public class YahooDataProvider implements DataProvider {
 		}
 	}
 
-	public static void main(String[] args) {
-
-		DataProvider yql = new YahooDataProvider();
-		try {
-			// yql.getHistData("YHOO", "2009-09-11", "2010-03-10", "json");
-			yql.getStockSummaries("json");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 }

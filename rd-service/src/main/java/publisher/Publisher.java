@@ -20,8 +20,7 @@ public class Publisher {
 
 
 	public void publish(byte[] data, String routingKey) throws IOException {
-
-//		dp.getExchanges();
+		
 		// create a connection to rabitmq server
 		logger.info("creating a connection to rabitmq server");
 		ConnectionFactory factory = new ConnectionFactory();
@@ -48,13 +47,4 @@ public class Publisher {
 
 	}
 
-	public static void main(String[] args) {
-//		ExchangesProducer producer = new ExchangesProducer();
-//		try {
-//			producer.publishXml();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-	}
 }
