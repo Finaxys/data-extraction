@@ -121,8 +121,5 @@ public class HomeExchangeConverter implements Converter {
 
 	}
 
-	public byte[] stockSummariesToXml(File f){
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 }

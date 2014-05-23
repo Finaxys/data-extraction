@@ -9,7 +9,7 @@
 	<modules>
 		<module>rd-dao</module>
 		<module>rd-domain</module>
-		<module>rd-mom</module>
+		<module>rd-service</module>
 	</modules>
 
 
