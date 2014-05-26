@@ -26,17 +26,16 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 
 	// static Logger logger = Logger.getLogger(StockSummaryDaoImpl.class);
 
+	public static final byte[] SYMBOL_COL = Bytes.toBytes("symbol");
+	public static final byte[] CN_COL = Bytes.toBytes("company_name");
+	public static final byte[] START_COL = Bytes.toBytes("start");
+	public static final byte[] END_COL = Bytes.toBytes("end");
+	public static final byte[] SECTOR_COL = Bytes.toBytes("sector");
+	public static final byte[] INDUSTRY_COL = Bytes.toBytes("industry");
+	public static final byte[] FTE_COL = Bytes.toBytes("full_time_employees");
+
 	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_summary");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
-	public static final byte[] MIC_COL = Bytes.toBytes("symbol");
-	public static final byte[] NAME_COL = Bytes.toBytes("company_name");
-	public static final byte[] TYPE_COL = Bytes.toBytes("start");
-	public static final byte[] CONTINENT_COL = Bytes.toBytes("end");
-	public static final byte[] COUNTRY_COL = Bytes.toBytes("sector");
-	public static final byte[] CURRENCY_COL = Bytes.toBytes("industry");
-	public static final byte[] OPEN_TIME_COL = Bytes.toBytes("full_time_employees");
-
-	// private static final int longLength = 8; // bytes
 
 	private HConnection connection;
 
@@ -49,7 +48,7 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 
 	// Helpers
 
-	private StockSummary resultToStockSummary(Result r) {
+	private StockSummary toStockSummary(Result r) {
 		return null;// ToDo
 	}
 
@@ -106,14 +105,11 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 	}
 
 	private Scan mkScan() {
-
 		Scan scan = new Scan();
-
 		return scan;
 	}
 
 	private Scan mkScan(String prefix) {
-
 		Scan scan = new Scan();
 		org.apache.hadoop.hbase.filter.RegexStringComparator prefixFilter = new org.apache.hadoop.hbase.filter.RegexStringComparator(
 				"^" + prefix + "*");
@@ -148,46 +144,35 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 	}
 
 	public StockSummary get(Integer provider, String exchSymb, String symbol) throws IOException {
-
 		HTableInterface table = connection.getTable(TABLE_NAME);
-
 		Get g = mkGet(provider, exchSymb, symbol);
 		Result result = table.get(g);
-
 		if (result.isEmpty())
 			return null;
-
-		StockSummary stock = new StockSummary();// ToDo
+		StockSummary stock = toStockSummary(result);
 		table.close();
 		return stock;
 	}
 
 	public List<StockSummary> list(String prefix) throws IOException {
-
 		HTableInterface table = connection.getTable(TABLE_NAME);
-
 		ResultScanner results = table.getScanner(mkScan(prefix));
 		List<StockSummary> ret = new ArrayList<StockSummary>();
 		for (Result r : results) {
-			ret.add(resultToStockSummary(r));
+			ret.add(toStockSummary(r));
 		}
-
 		table.close();
 		return ret;
 	}
 
 	public List<StockSummary> listAll() throws IOException {
-
 		HTableInterface table = connection.getTable(TABLE_NAME);
-
 		ResultScanner results = table.getScanner(mkScan());
 		List<StockSummary> ret = new ArrayList<StockSummary>();
 		for (Result r : results) {
-			ret.add(resultToStockSummary(r));
+			ret.add(toStockSummary(r));
 		}
-
 		table.close();
 		return ret;
 	}
-
 }

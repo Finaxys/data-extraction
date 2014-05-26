@@ -15,7 +15,7 @@ public class StockSummary {
 	private String companyName;
 	private Date start;
 	private Date end;
-	private String Sector;
+	private String sector;
 	private String industry;
 	private Integer fullTimeEmployees;
 
@@ -32,7 +32,7 @@ public class StockSummary {
 		this.companyName = companyName;
 		this.start = start;
 		this.end = end;
-		Sector = sector;
+		this.sector = sector;
 		this.industry = industry;
 		this.fullTimeEmployees = fullTimeEmployees;
 	}
@@ -70,11 +70,11 @@ public class StockSummary {
 	}
 	@XmlElement(name = "Sector")
 	public String getSector() {
-		return Sector;
+		return sector;
 	}
 
 	public void setSector(String sector) {
-		Sector = sector;
+		sector = sector;
 	}
 	@XmlElement(name = "Industry")
 	public String getIndustry() {

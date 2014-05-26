@@ -48,7 +48,7 @@ public class ExchangeReceiver implements Receiver {
 			});
 
 			Exchanges exchanges = (Exchanges) um.unmarshal(is);
-			List<Exchange> list = exchanges.getExchangeList();
+			List<Exchange> list = exchanges.getExchangesList();
 			if (list != null) {
 				logger.info("exchanges size " + list.size());
 				for (Exchange exchange : list) {

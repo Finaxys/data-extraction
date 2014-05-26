@@ -1,8 +1,10 @@
-package converter;
+package converter.yahoo;
 
 import java.io.File;
 
-public class YahooHistDataConverter implements Converter{
+import converter.Converter;
+
+public class HistDataConverter implements Converter{
 
 	public byte[] convert(File f) throws Exception {
 		// TODO Auto-generated method stub

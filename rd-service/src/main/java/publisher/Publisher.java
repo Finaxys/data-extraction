@@ -14,8 +14,9 @@ public class Publisher {
 	public static final String DIRECT_QUEUE = "direct";
 	public static final String DIRECT_EXCHANGE_NAME = "myDExch";
 	public static final String EXCHANGES_ROUTING_KEY = "exchanges";
-	public static final String STOCKS_SUMMARY_ROUTING_KEY = "stockSummaries";
+	public static final String STOCK_SUMMARIES_ROUTING_KEY = "stockSummaries";
 	public static final String HIST_DATA_ROUTING_KEY = "histData";
+	public static final String CURRENCY_PAIRS_ROUTING_KEY = "currencyPairs";
 
 
 
@@ -46,5 +47,6 @@ public class Publisher {
 		logger.info("connection closed");
 
 	}
+
 
 }

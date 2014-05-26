@@ -4,25 +4,15 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HConnection;
-import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.log4j.Logger;
-
 import receiver.Receiver;
-import receiver.StockSummaryReceiver;
-
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
-
-import dao.impl.ExchangeDaoImpl;
-import dao.impl.StockSummaryDaoImpl;
 
 public class Subscriber {
 
@@ -30,9 +20,6 @@ public class Subscriber {
 
 	public static final String DIRECT_QUEUE = "direct";
 	public static final String DIRECT_EXCHANGE_NAME = "myDExch";
-	// public static final String EXCHANGES_ROUTING_KEY = "exchanges";
-	// public static final String STOCKS_SUMMARY_ROUTING_KEY = "stocksSummary";
-	// public static final String HIST_DATA_ROUTING_KEY = "histData";
 
 	private Connection connection;
 	private Receiver receiver;
@@ -59,7 +46,7 @@ public class Subscriber {
 		this.receiver = receiver;
 	}
 
-	public void receive(String bindingKey) throws IOException, ShutdownSignalException, ConsumerCancelledException,
+	public void subscribe(String bindingKey) throws IOException, ShutdownSignalException, ConsumerCancelledException,
 			InterruptedException, JAXBException {
 
 		logger.info("creating a channel...");
@@ -83,5 +70,6 @@ public class Subscriber {
 		});
 
 	}
+
 
 }

@@ -12,7 +12,7 @@ public class StockSummaries {
 
 	private List<StockSummary> stocksList;
 
-	@XmlElementWrapper
+	@XmlElementWrapper(name = "stocksList")
 	@XmlElement(name = "stock")
 	public List<StockSummary> getStocksList() {
 		if (stocksList == null)
@@ -20,7 +20,7 @@ public class StockSummaries {
 		return stocksList;
 	}
 
-	public void setExchangeList(List<StockSummary> stocksList) {
+	public void setStocksList(List<StockSummary> stocksList) {
 		this.stocksList = stocksList;
 	}
 }
