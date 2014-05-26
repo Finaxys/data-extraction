@@ -48,7 +48,6 @@ public class YahooDataProvider implements DataProvider {
 		client = HttpAsyncClients.createDefault();
 	}
 
-
 	public CloseableHttpAsyncClient getClient() {
 		return client;
 	}
@@ -86,7 +85,8 @@ public class YahooDataProvider implements DataProvider {
 			// create a temp file
 			File tfile = File.createTempFile("histDataTemp", "." + format);
 
-			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile, new HistDataConverter(), Publisher.HIST_DATA_ROUTING_KEY), null);
+			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
+					new HistDataConverter(), Publisher.HIST_DATA_ROUTING_KEY), null);
 			Boolean result = future.get();
 			if (result != null && result.booleanValue()) {
 				System.out.println("Request successfully executed");
@@ -101,7 +101,7 @@ public class YahooDataProvider implements DataProvider {
 
 	}
 
-	public void getStockSummaries(String format) throws Exception{
+	public void getStockSummaries(String format) throws Exception {
 
 		try {
 
@@ -133,13 +133,20 @@ public class YahooDataProvider implements DataProvider {
 		}
 	}
 
-	public void getExchanges(String format) {
+	public void getExchanges(String format) throws Exception {
 		// TODO Auto-generated method stub
 	}
 
+	public void getCurrencyPairs(String format) throws Exception {
+		// TODO Auto-generated method stub
 
+	}
 
-	
+	public void getIndexInfos(String format) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
 	static class HttpResponseConsumer extends ZeroCopyConsumer<Boolean> {
 		Converter converter;
 		String routingKey;
@@ -179,12 +186,15 @@ public class YahooDataProvider implements DataProvider {
 		}
 	}
 
+	public static void main(String[] args) {
 
-
-
-	public void getCurrencyPairs(String format) throws Exception {
-		// TODO Auto-generated method stub
-		
+		DataProvider yql = new YahooDataProvider();
+		try {
+			// yql.getHistData("YHOO", "2009-09-11", "2010-03-10", "xml");
+			yql.getStockSummaries("xml");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

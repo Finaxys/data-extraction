@@ -55,8 +55,8 @@ public class CurrencyPairReceiver implements Receiver{
 				List<CurrencyPair> list = currencyPairs.getCurrencyPairsList();
 				if (list != null) {
 					logger.info("currency pairs size " + list.size());
-					for (CurrencyPair exchange : list) {
-						currencyPairDao.add(exchange);
+					for (CurrencyPair currencyPair : list) {
+						currencyPairDao.add(currencyPair);
 					}
 				} else
 					logger.info("null currency pairs");

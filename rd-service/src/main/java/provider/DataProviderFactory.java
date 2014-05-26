@@ -1,7 +1,5 @@
 package provider;
 
-import converter.home.ExchangesConverter;
-import converter.yahoo.StockSummariesConverter;
 
 public class DataProviderFactory {
 

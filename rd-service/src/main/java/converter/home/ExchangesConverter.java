@@ -88,7 +88,6 @@ public class ExchangesConverter implements Converter {
 		writer.writeEndElement();
 		writer.writeEndElement();
 		writer.writeEndDocument();
-		System.out.println(os);
 		return os.toByteArray();
 
 	}

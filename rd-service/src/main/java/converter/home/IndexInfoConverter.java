@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Row;
 
 import converter.Converter;
 
-public class CurrencyPairsConverter implements Converter {
+public class IndexInfoConverter implements Converter{
 
 	public byte[] convert(File f) throws Exception {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -23,8 +23,8 @@ public class CurrencyPairsConverter implements Converter {
 		XMLStreamWriter writer = factory.createXMLStreamWriter(os);
 
 		writer.writeStartDocument();
-		writer.writeStartElement("currencyPairs");
-		writer.writeStartElement("currencyPairsList");
+		writer.writeStartElement("indexInfos");
+		writer.writeStartElement("indexInfosList");
 
 		FileInputStream file = new FileInputStream(f);
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
@@ -36,22 +36,22 @@ public class CurrencyPairsConverter implements Converter {
 		Row row = rowIterator.next();
 		while (rowIterator.hasNext()) {
 			row = rowIterator.next();
-			writer.writeStartElement("currencyPair");
+			writer.writeStartElement("indexInfo");
 			Iterator<Cell> cellIterator = row.cellIterator();
-			String sym = cellIterator.next().toString();
-			String[] symbol =( sym.split(" ")[0]).split("/");
-		
-			
 			writer.writeStartElement("symbol");
-			writer.writeCharacters(symbol[0] + symbol[1]);
+			writer.writeCharacters(cellIterator.next().toString());
 			writer.writeEndElement();
 
-			writer.writeStartElement("base");
-			writer.writeCharacters(symbol[0]);
+			writer.writeStartElement("name");
+			writer.writeCharacters(cellIterator.next().toString());
 			writer.writeEndElement();
 
-			writer.writeStartElement("quote");
-			writer.writeCharacters(symbol[1]);
+			writer.writeStartElement("exchSymb");
+			writer.writeCharacters(cellIterator.next().toString());
+			writer.writeEndElement();
+			
+			writer.writeStartElement("provider");
+			writer.writeCharacters(((Double)cellIterator.next().getNumericCellValue()).intValue()+"");
 			writer.writeEndElement();
 
 
@@ -63,6 +63,6 @@ public class CurrencyPairsConverter implements Converter {
 		writer.writeEndElement();
 		writer.writeEndDocument();
 		return os.toByteArray();
-
 	}
+
 }

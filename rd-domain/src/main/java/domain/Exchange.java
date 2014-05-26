@@ -9,10 +9,10 @@ public class Exchange {
 
 	private String mic;
 	private String symbol;
+	private String suffix;
 	private Integer provider;
 	private String name;
 	private String type;
-	// private Map<String,String> dataProviderSymbol;
 	private String continent;
 	private String country;
 	private String currency;
@@ -30,11 +30,12 @@ public class Exchange {
 	// String currency, long openTime, long closeTime, long inputDate, boolean
 	// status, Map<String,String> dataProviderSymbol) {
 	//
-	public Exchange(String mic, String symbol, Integer provider, String name, String type, String continent,
+	public Exchange(String mic, String symbol, String suffix, Integer provider, String name, String type, String continent,
 			String country, String currency, long openTime, long closeTime, boolean status) {
 		super();
 		this.mic = mic;
 		this.symbol = symbol;
+		this.suffix = suffix;
 		this.name = name;
 		this.type = type;
 		this.continent = continent;
@@ -46,9 +47,9 @@ public class Exchange {
 		this.status = status;
 	}
 
-	public Exchange(byte[] mic, byte[] symbol, byte[] provider, byte[] name, byte[] type, byte[] continent,
+	public Exchange(byte[] mic, byte[] symbol, byte[] suffix, byte[] provider, byte[] name, byte[] type, byte[] continent,
 			byte[] country, byte[] currency, byte[] openTime, byte[] closeTime, byte[] status) {
-		this(Bytes.toString(mic), Bytes.toString(symbol), Bytes.toInt(provider), Bytes.toString(name), Bytes
+		this(Bytes.toString(mic), Bytes.toString(symbol), Bytes.toString(suffix), Bytes.toInt(provider), Bytes.toString(name), Bytes
 				.toString(type), Bytes.toString(continent), Bytes.toString(country), Bytes.toString(currency), Bytes
 				.toLong(openTime), Bytes.toLong(closeTime), Bytes.toBoolean(status));
 	}
@@ -154,5 +155,15 @@ public class Exchange {
 	public void setProvider(Integer provider) {
 		this.provider = provider;
 	}
+
+	public String getSuffix() {
+		return suffix;
+	}
+
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+	}
+	
+	
 
 }
