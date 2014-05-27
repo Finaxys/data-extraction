@@ -48,10 +48,8 @@ public class ExchangeDaoImpl implements ExchangeDao {
 	private HConnection connection;
 
 	// Constructor
-
 	public ExchangeDaoImpl(HConnection connection) {
 		this.connection = connection;
-
 	}
 
 	// Helpers
@@ -135,8 +133,7 @@ public class ExchangeDaoImpl implements ExchangeDao {
 		return scan;
 	}
 
-	// CRUD
-
+	// CRUD	
 	public boolean add(Exchange exchange) {
 
 		try {
