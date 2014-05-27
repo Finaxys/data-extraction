@@ -4,7 +4,6 @@
 package dao;
 
 import junit.framework.TestCase;
-import static org.junit.Assert.*;  
 import static org.mockito.Mockito.*;  
   
 import org.junit.After;  

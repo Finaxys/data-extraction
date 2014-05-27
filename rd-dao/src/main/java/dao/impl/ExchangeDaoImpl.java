@@ -125,7 +125,7 @@ public class ExchangeDaoImpl implements ExchangeDao {
 		return scan;
 	}
 
-	// CRUD	
+	// CRUDmi	
 	public boolean add(Exchange exchange) {
 		try {
 			HTableInterface table = connection.getTable(TABLE_NAME);
