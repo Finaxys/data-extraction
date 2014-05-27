@@ -1,9 +1,7 @@
 package publisher;
 
 import java.io.IOException;
-
 import org.apache.log4j.Logger;
-
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -14,8 +12,10 @@ public class Publisher {
 	public static final String DIRECT_QUEUE = "direct";
 	public static final String DIRECT_EXCHANGE_NAME = "myDExch";
 	public static final String EXCHANGES_ROUTING_KEY = "exchanges";
-	public static final String STOCKS_SUMMARY_ROUTING_KEY = "stockSummaries";
+	public static final String STOCK_SUMMARIES_ROUTING_KEY = "stockSummaries";
 	public static final String HIST_DATA_ROUTING_KEY = "histData";
+	public static final String CURRENCY_PAIRS_ROUTING_KEY = "currencyPairs";
+	public static final String INDEX_INFOS_ROUTING_KEY = "indexInfos";
 
 
 
@@ -46,5 +46,6 @@ public class Publisher {
 		logger.info("connection closed");
 
 	}
+
 
 }

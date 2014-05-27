@@ -1,12 +1,8 @@
 package dao.impl;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -14,48 +10,38 @@ import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
+import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
-
 import utils.Md5Utils;
-import dao.StockSummaryDao;
-import domain.StockSummary;
+import dao.IndexInfoDao;
+import domain.IndexInfo;
 
-public class StockSummaryDaoImpl implements StockSummaryDao {
-
-	// static Logger logger = Logger.getLogger(StockSummaryDaoImpl.class);
+public class IndexInfoDaoImpl implements IndexInfoDao {
 
 	public static final byte[] SYMBOL_COL = Bytes.toBytes("symbol");
+	public static final byte[] NAME_COL = Bytes.toBytes("name");
 	public static final byte[] EXCH_SYMB_COL = Bytes.toBytes("exchSymb");
 	public static final byte[] PROVIDER_COL = Bytes.toBytes("provider");
-	public static final byte[] CN_COL = Bytes.toBytes("company_name");
-	public static final byte[] START_COL = Bytes.toBytes("start");
-	public static final byte[] END_COL = Bytes.toBytes("end");
-	public static final byte[] SECTOR_COL = Bytes.toBytes("sector");
-	public static final byte[] INDUSTRY_COL = Bytes.toBytes("industry");
-	public static final byte[] FTE_COL = Bytes.toBytes("full_time_employees");
 
-	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_summary");
+	public static final byte[] TABLE_NAME = Bytes.toBytes("index_info");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
-	
+
 	private HConnection connection;
 
-	// Constructor
-
-	public StockSummaryDaoImpl(HConnection connection) {
+	public IndexInfoDaoImpl(HConnection connection) {
+		super();
 		this.connection = connection;
-
 	}
 
 	// Helpers
 
-	private StockSummary toStockSummary(Result r) {
+	private IndexInfo toIndexInfo(Result r) {
 		return null;// ToDo
 	}
 
-	private byte[] mkRowKey(StockSummary stock) {
-		return mkRowKey(stock.getProvider(), stock.getExchSymb(), stock.getSymbol());
+	private byte[] mkRowKey(IndexInfo index) {
+		return mkRowKey(index.getProvider(), index.getExchSymb(), index.getSymbol());
 	}
 
 	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol) {
@@ -77,32 +63,12 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 		return g;
 	}
 
-	private Put mkPut(StockSummary stock) {
-		Put p = new Put(mkRowKey(stock));
-
-		// Load all fields in the class (private included)
-		Field[] stockAttributes = StockSummary.class.getDeclaredFields();
-		Field[] stockCols = StockSummaryDaoImpl.class.getDeclaredFields();
-		int i = 0;
-		Object value;
-		for (Field field : stockAttributes) {
-
-			try {
-				if ((value = PropertyUtils.getSimpleProperty(stock, field.getName())) != null) {
-					if (field.getType().equals(String.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((String) value));
-					if (field.getType().equals(Date.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes(((Date) value).getTime()));
-					if (field.getType().equals(Integer.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Integer) value));
-				}
-				i++;
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
+	private Put mkPut(IndexInfo indexInfo) {
+		Put p = new Put(mkRowKey(indexInfo));
+		p.add(INFO_FAM, SYMBOL_COL, Bytes.toBytes(indexInfo.getSymbol()));
+		p.add(INFO_FAM, EXCH_SYMB_COL, Bytes.toBytes(indexInfo.getExchSymb()));
+		p.add(INFO_FAM, PROVIDER_COL, Bytes.toBytes(indexInfo.getProvider()));
+		p.add(INFO_FAM, NAME_COL, Bytes.toBytes(indexInfo.getName()));
 		return p;
 	}
 
@@ -121,12 +87,10 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 		return scan;
 	}
 
-	// CRUD
-
-	public boolean add(StockSummary stock) {
+	public boolean add(IndexInfo indexInfo) {
 		try {
 			HTableInterface table = connection.getTable(TABLE_NAME);
-			Put p = mkPut(stock);
+			Put p = mkPut(indexInfo);
 			table.put(p);
 			table.close();
 			return true;
@@ -139,42 +103,36 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 			// logger.info(e.toString());
 			return false;
 		}
-
 	}
 
-	public StockSummary get(Integer provider, String exchSymb, String symbol) throws IOException {
+	public IndexInfo get(Integer provider, String exchSymb, String symbol) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		Get g = mkGet(provider, exchSymb, symbol);
 		Result result = table.get(g);
 		if (result.isEmpty())
 			return null;
-		StockSummary stock = toStockSummary(result);
+		IndexInfo index = toIndexInfo(result);
 		table.close();
-		return stock;
+		return index;
 	}
 
-	public List<StockSummary> list(String prefix) throws IOException {
+	public List<IndexInfo> list(String prefix) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
-<<<<<<< HEAD
-		
-
-=======
->>>>>>> 9ca18945fd4fba833de4a8ca111a9be7074235dd
 		ResultScanner results = table.getScanner(mkScan(prefix));
-		List<StockSummary> ret = new ArrayList<StockSummary>();
+		List<IndexInfo> ret = new ArrayList<IndexInfo>();
 		for (Result r : results) {
-			ret.add(toStockSummary(r));
+			ret.add(toIndexInfo(r));
 		}
 		table.close();
 		return ret;
 	}
 
-	public List<StockSummary> listAll() throws IOException {
+	public List<IndexInfo> listAll() throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		ResultScanner results = table.getScanner(mkScan());
-		List<StockSummary> ret = new ArrayList<StockSummary>();
+		List<IndexInfo> ret = new ArrayList<IndexInfo>();
 		for (Result r : results) {
-			ret.add(toStockSummary(r));
+			ret.add(toIndexInfo(r));
 		}
 		table.close();
 		return ret;

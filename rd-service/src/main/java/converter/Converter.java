@@ -12,6 +12,5 @@ import javax.xml.transform.TransformerException;
 import org.jdom.JDOMException;
 
 public interface Converter {
-
 	public byte[] convert(File f) throws Exception;
 }

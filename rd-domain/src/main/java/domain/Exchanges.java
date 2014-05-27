@@ -7,20 +7,20 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
+@XmlRootElement(name = "exchanges")
 public class Exchanges {
 
-	private List<Exchange> exchangeList;
+	private List<Exchange> exchangesList;
 
-	@XmlElementWrapper
+	@XmlElementWrapper(name = "exchangesList")
 	@XmlElement(name = "exchange")
-	public List<Exchange> getExchangeList() {
-		if (exchangeList == null)
-			exchangeList = new ArrayList<Exchange>();
-		return exchangeList;
+	public List<Exchange> getExchangesList() {
+		if (exchangesList == null)
+			exchangesList = new ArrayList<Exchange>();
+		return exchangesList;
 	}
 
-	public void setExchangeList(List<Exchange> exchangeList) {
-		this.exchangeList = exchangeList;
+	public void setExchangesList(List<Exchange> exchangesList) {
+		this.exchangesList = exchangesList;
 	}
 }

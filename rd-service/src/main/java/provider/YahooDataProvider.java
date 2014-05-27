@@ -1,15 +1,12 @@
 package provider;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -17,24 +14,18 @@ import java.util.concurrent.Future;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.nio.IOControl;
-import org.apache.http.nio.client.methods.AsyncCharConsumer;
 import org.apache.http.nio.client.methods.HttpAsyncMethods;
 import org.apache.http.nio.client.methods.ZeroCopyConsumer;
-import org.apache.http.protocol.HttpContext;
 
 import publisher.Publisher;
 import converter.Converter;
-import converter.YahooHistDataConverter;
-import converter.YahooStockSummariesConverter;
+import converter.yahoo.HistDataConverter;
+import converter.yahoo.StockSummariesConverter;
 
 public class YahooDataProvider implements DataProvider {
 
@@ -56,7 +47,6 @@ public class YahooDataProvider implements DataProvider {
 	public YahooDataProvider() {
 		client = HttpAsyncClients.createDefault();
 	}
-
 
 	public CloseableHttpAsyncClient getClient() {
 		return client;
@@ -95,7 +85,8 @@ public class YahooDataProvider implements DataProvider {
 			// create a temp file
 			File tfile = File.createTempFile("histDataTemp", "." + format);
 
-			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile, new YahooHistDataConverter(), Publisher.HIST_DATA_ROUTING_KEY), null);
+			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
+					new HistDataConverter(), Publisher.HIST_DATA_ROUTING_KEY), null);
 			Boolean result = future.get();
 			if (result != null && result.booleanValue()) {
 				System.out.println("Request successfully executed");
@@ -110,7 +101,7 @@ public class YahooDataProvider implements DataProvider {
 
 	}
 
-	public void getStockSummaries(String format) throws Exception{
+	public void getStockSummaries(String format) throws Exception {
 
 		try {
 
@@ -128,7 +119,7 @@ public class YahooDataProvider implements DataProvider {
 			File tfile = File.createTempFile("stockSummariesTemp", "." + format);
 
 			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
-					new YahooStockSummariesConverter(), Publisher.STOCKS_SUMMARY_ROUTING_KEY), null);
+					new StockSummariesConverter(), Publisher.STOCK_SUMMARIES_ROUTING_KEY), null);
 			Boolean result = future.get();
 			if (result != null && result.booleanValue()) {
 				System.out.println("Request successfully executed");
@@ -142,13 +133,20 @@ public class YahooDataProvider implements DataProvider {
 		}
 	}
 
-	public File getExchanges() {
-		return null;
+	public void getExchanges(String format) throws Exception {
+		// TODO Auto-generated method stub
 	}
 
+	public void getCurrencyPairs(String format) throws Exception {
+		// TODO Auto-generated method stub
 
+	}
 
-	
+	public void getIndexInfos(String format) throws Exception {
+		// TODO Auto-generated method stub
+
+	}
+
 	static class HttpResponseConsumer extends ZeroCopyConsumer<Boolean> {
 		Converter converter;
 		String routingKey;
@@ -185,6 +183,17 @@ public class YahooDataProvider implements DataProvider {
 				return false;
 			}
 
+		}
+	}
+
+	public static void main(String[] args) {
+
+		DataProvider yql = new YahooDataProvider();
+		try {
+			// yql.getHistData("YHOO", "2009-09-11", "2010-03-10", "xml");
+			yql.getStockSummaries("xml");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
