@@ -4,12 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Iterator;
+
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+
+import provider.HomeDataProvider;
 import converter.Converter;
 
 public class ExchangesConverter implements Converter {
@@ -46,7 +50,7 @@ public class ExchangesConverter implements Converter {
 			writer.writeEndElement();
 
 			writer.writeStartElement("provider");
-			writer.writeCharacters(cellIterator.next().toString());
+			writer.writeCharacters(HomeDataProvider.H_PROVIDER_SYMB+"");
 			writer.writeEndElement();
 
 			writer.writeStartElement("name");

@@ -10,8 +10,11 @@ import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.log4j.Logger;
 
 import receiver.CurrencyPairReceiver;
+import receiver.FXRateReceiver;
 import receiver.IndexInfoReceiver;
 import receiver.Receiver;
+import receiver.StockQuoteReceiver;
+import receiver.StockReceiver;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -23,7 +26,10 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
 import dao.impl.CurrencyPairDaoImpl;
+import dao.impl.FXRateDaoImpl;
 import dao.impl.IndexInfoDaoImpl;
+import dao.impl.StockDaoImpl;
+import dao.impl.StockQuoteDaoImpl;
 
 public class Subscriber {
 
@@ -96,17 +102,25 @@ public class Subscriber {
 //					Subscriber subscriber = new Subscriber(connection, receiver);
 //					subscriber.subscribe(ExchangeReceiver.ROUTING_KEY);
 					
-//					Receiver receiver = new StockSummaryReceiver(new StockSummaryDaoImpl(hConnection));
+//					Receiver receiver = new StockReceiver(new StockDaoImpl(hConnection));
 //					Subscriber subscriber = new Subscriber(connection, receiver);
-//					subscriber.subscribe(StockSummaryReceiver.ROUTING_KEY);
+//					subscriber.subscribe(StockReceiver.ROUTING_KEY);
+					
+//					Receiver receiver = new StockQuoteReceiver(new StockQuoteDaoImpl(hConnection));
+//					Subscriber subscriber = new Subscriber(connection, receiver);
+//					subscriber.subscribe(StockQuoteReceiver.ROUTING_KEY);
+					
+					Receiver receiver = new FXRateReceiver(new FXRateDaoImpl(hConnection));
+					Subscriber subscriber = new Subscriber(connection, receiver);
+					subscriber.subscribe(FXRateReceiver.ROUTING_KEY);
 					
 //					Receiver receiver = new CurrencyPairReceiver(new CurrencyPairDaoImpl(hConnection));
 //					Subscriber subscriber = new Subscriber(connection, receiver);
 //					subscriber.subscribe(CurrencyPairReceiver.ROUTING_KEY);
 			
-					Receiver receiver = new IndexInfoReceiver(new IndexInfoDaoImpl(hConnection));
-					Subscriber subscriber = new Subscriber(connection, receiver);
-					subscriber.subscribe(IndexInfoReceiver.ROUTING_KEY);
+//					Receiver receiver = new IndexInfoReceiver(new IndexInfoDaoImpl(hConnection));
+//					Subscriber subscriber = new Subscriber(connection, receiver);
+//					subscriber.subscribe(IndexInfoReceiver.ROUTING_KEY);
 			} catch (Exception e) {
 					e.printStackTrace();
 				}

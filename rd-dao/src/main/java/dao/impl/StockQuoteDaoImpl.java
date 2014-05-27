@@ -2,6 +2,7 @@ package dao.impl;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,82 +20,94 @@ import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import utils.Md5Utils;
-import dao.StockSummaryDao;
-import domain.StockSummary;
+import dao.StockQuoteDao;
+import domain.StockQuote;
+import domain.StockQuote;
+import domain.StockQuote;
 
-public class StockSummaryDaoImpl implements StockSummaryDao {
+public class StockQuoteDaoImpl implements StockQuoteDao {
 
-	// static Logger logger = Logger.getLogger(StockSummaryDaoImpl.class);
+	// static Logger logger = Logger.getLogger(StockDaoImpl.class);
 
 	public static final byte[] SYMBOL_COL = Bytes.toBytes("symbol");
 	public static final byte[] EXCH_SYMB_COL = Bytes.toBytes("exchSymb");
 	public static final byte[] PROVIDER_COL = Bytes.toBytes("provider");
-	public static final byte[] CN_COL = Bytes.toBytes("company_name");
-	public static final byte[] START_COL = Bytes.toBytes("start");
-	public static final byte[] END_COL = Bytes.toBytes("end");
-	public static final byte[] SECTOR_COL = Bytes.toBytes("sector");
-	public static final byte[] INDUSTRY_COL = Bytes.toBytes("industry");
-	public static final byte[] FTE_COL = Bytes.toBytes("full_time_employees");
+	public static final byte[] ADV_COL = Bytes.toBytes("avd");
+	public static final byte[] CHANGE_COL = Bytes.toBytes("change");
+	public static final byte[] DAYS_LOW_COL = Bytes.toBytes("dl");
+	public static final byte[] DAYS_HIGH_COL = Bytes.toBytes("dh");
+	public static final byte[] YEARS_LOW_COL = Bytes.toBytes("yl");
+	public static final byte[] MC_HIGH_COL = Bytes.toBytes("mc");
+	public static final byte[] LTPO_COL = Bytes.toBytes("ltpo");
+	public static final byte[] DAYS_RANG_COL = Bytes.toBytes("dr");
+	public static final byte[] NAME_COL = Bytes.toBytes("name");
+	public static final byte[] VOLUME_COL = Bytes.toBytes("volume");
+	public static final byte[] TS_COL = Bytes.toBytes("ts");
 
-	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_summary");
+	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_quote");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
+
+	private static final int longLength = 8;
 	
 	private HConnection connection;
 
 	// Constructor
 
-	public StockSummaryDaoImpl(HConnection connection) {
+	public StockQuoteDaoImpl(HConnection connection) {
 		this.connection = connection;
 
 	}
 
 	// Helpers
 
-	private StockSummary toStockSummary(Result r) {
+	private StockQuote toStock(Result r) {
 		return null;// ToDo
 	}
 
-	private byte[] mkRowKey(StockSummary stock) {
-		return mkRowKey(stock.getProvider(), stock.getExchSymb(), stock.getSymbol());
+	private byte[] mkRowKey(StockQuote stockQuote) {
+		return mkRowKey(stockQuote.getProvider(), stockQuote.getExchSymb(), stockQuote.getSymbol(), stockQuote.getTs());
 	}
 
-	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol) {
+	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol, Long ts) {
 		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
 		byte[] provHash = Md5Utils.md5sum(provider + exchSymbHash.toString());
 		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH]; // mic code length =
-															// 4
+		byte[] timestamp = Bytes.toBytes(ts);
+		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH + longLength]; 
 
 		int offset = 0;
 		offset = Bytes.putBytes(rowkey, offset, provHash, 0, Md5Utils.MD5_LENGTH);
-		Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		Bytes.putBytes(rowkey, offset, timestamp, 0, timestamp.length);
 
 		return rowkey;
 	}
 
-	private Get mkGet(Integer provider, String exchSymb, String symbol) {
-		Get g = new Get(mkRowKey(provider, exchSymb, symbol));
+	private Get mkGet(Integer provider, String exchSymb, String symbol, Long ts) {
+		Get g = new Get(mkRowKey(provider, exchSymb, symbol, ts));
 		return g;
 	}
 
-	private Put mkPut(StockSummary stock) {
-		Put p = new Put(mkRowKey(stock));
+	private Put mkPut(StockQuote stockQuote) {
+		Put p = new Put(mkRowKey(stockQuote));
 
 		// Load all fields in the class (private included)
-		Field[] stockAttributes = StockSummary.class.getDeclaredFields();
-		Field[] stockCols = StockSummaryDaoImpl.class.getDeclaredFields();
+		Field[] stockAttributes = StockQuote.class.getDeclaredFields();
+		Field[] stockCols = StockQuoteDaoImpl.class.getDeclaredFields();
 		int i = 0;
 		Object value;
 		for (Field field : stockAttributes) {
 
 			try {
-				if ((value = PropertyUtils.getSimpleProperty(stock, field.getName())) != null) {
+				if ((value = PropertyUtils.getSimpleProperty(stockQuote, field.getName())) != null) {
 					if (field.getType().equals(String.class))
 						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((String) value));
-					if (field.getType().equals(Date.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes(((Date) value).getTime()));
-					if (field.getType().equals(Integer.class))
+					else if (field.getType().equals(BigDecimal.class))
+						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((BigDecimal) value));
+					else if (field.getType().equals(Integer.class))
 						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Integer) value));
+					else if (field.getType().equals(Long.class))
+						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Long) value));
 				}
 				i++;
 
@@ -121,12 +134,10 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 		return scan;
 	}
 
-	// CRUD
-
-	public boolean add(StockSummary stock) {
+	public boolean add(StockQuote stockQuote) {
 		try {
 			HTableInterface table = connection.getTable(TABLE_NAME);
-			Put p = mkPut(stock);
+			Put p = mkPut(stockQuote);
 			table.put(p);
 			table.close();
 			return true;
@@ -142,34 +153,34 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 
 	}
 
-	public StockSummary get(Integer provider, String exchSymb, String symbol) throws IOException {
+	public StockQuote get(Integer provider, String exchSymb, String symbol, Long ts) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
-		Get g = mkGet(provider, exchSymb, symbol);
+		Get g = mkGet(provider, exchSymb, symbol, ts);
 		Result result = table.get(g);
 		if (result.isEmpty())
 			return null;
-		StockSummary stock = toStockSummary(result);
+		StockQuote stockQuote = toStock(result);
 		table.close();
-		return stock;
+		return stockQuote;
 	}
 
-	public List<StockSummary> list(String prefix) throws IOException {
+	public List<StockQuote> list(String prefix) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		ResultScanner results = table.getScanner(mkScan(prefix));
-		List<StockSummary> ret = new ArrayList<StockSummary>();
+		List<StockQuote> ret = new ArrayList<StockQuote>();
 		for (Result r : results) {
-			ret.add(toStockSummary(r));
+			ret.add(toStock(r));
 		}
 		table.close();
 		return ret;
 	}
 
-	public List<StockSummary> listAll() throws IOException {
+	public List<StockQuote> listAll() throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		ResultScanner results = table.getScanner(mkScan());
-		List<StockSummary> ret = new ArrayList<StockSummary>();
+		List<StockQuote> ret = new ArrayList<StockQuote>();
 		for (Result r : results) {
-			ret.add(toStockSummary(r));
+			ret.add(toStock(r));
 		}
 		table.close();
 		return ret;

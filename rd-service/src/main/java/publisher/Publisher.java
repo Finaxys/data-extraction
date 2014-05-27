@@ -12,10 +12,12 @@ public class Publisher {
 	public static final String DIRECT_QUEUE = "direct";
 	public static final String DIRECT_EXCHANGE_NAME = "myDExch";
 	public static final String EXCHANGES_ROUTING_KEY = "exchanges";
-	public static final String STOCK_SUMMARIES_ROUTING_KEY = "stockSummaries";
+	public static final String STOCKS_ROUTING_KEY = "stocks";
 	public static final String HIST_DATA_ROUTING_KEY = "histData";
 	public static final String CURRENCY_PAIRS_ROUTING_KEY = "currencyPairs";
 	public static final String INDEX_INFOS_ROUTING_KEY = "indexInfos";
+	public static final String STOCKS_QUOTES_ROUTING_KEY = "stocksQuotes";
+	public static final String FXRATES_ROUTING_KEY = "fxRates";
 
 
 

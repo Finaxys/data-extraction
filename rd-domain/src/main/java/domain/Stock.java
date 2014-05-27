@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "stock")
-public class StockSummary {
+public class Stock {
 
 	
 	private String symbol;
@@ -19,11 +19,11 @@ public class StockSummary {
 	private String industry;
 	private Integer fullTimeEmployees;
 
-	public StockSummary() {
+	public Stock() {
 		super();
 	}
 
-	public StockSummary(String symbol, String exchSymb, Integer provider, String companyName, Date start, Date end, String sector, String industry,
+	public Stock(String symbol, String exchSymb, Integer provider, String companyName, Date start, Date end, String sector, String industry,
 			Integer fullTimeEmployees) {
 		super();
 		this.exchSymb = exchSymb;

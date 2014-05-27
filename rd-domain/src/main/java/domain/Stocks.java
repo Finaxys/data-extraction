@@ -7,20 +7,20 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name="stockSummaries")
-public class StockSummaries {
+@XmlRootElement(name="stocks")
+public class Stocks {
 
-	private List<StockSummary> stocksList;
+	private List<Stock> stocksList;
 
 	@XmlElementWrapper(name = "stocksList")
 	@XmlElement(name = "stock")
-	public List<StockSummary> getStocksList() {
+	public List<Stock> getStocksList() {
 		if (stocksList == null)
-			stocksList = new ArrayList<StockSummary>();
+			stocksList = new ArrayList<Stock>();
 		return stocksList;
 	}
 
-	public void setStocksList(List<StockSummary> stocksList) {
+	public void setStocksList(List<Stock> stocksList) {
 		this.stocksList = stocksList;
 	}
 }

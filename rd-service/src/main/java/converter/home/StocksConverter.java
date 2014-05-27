@@ -14,9 +14,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 import provider.HomeDataProvider;
-import converter.Converter;
 
-public class IndexInfoConverter implements Converter{
+public class StocksConverter {
 
 	public byte[] convert(File f) throws Exception {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
@@ -24,8 +23,8 @@ public class IndexInfoConverter implements Converter{
 		XMLStreamWriter writer = factory.createXMLStreamWriter(os);
 
 		writer.writeStartDocument();
-		writer.writeStartElement("indexInfos");
-		writer.writeStartElement("indexInfosList");
+		writer.writeStartElement("stocks");
+		writer.writeStartElement("stocksList");
 
 		FileInputStream file = new FileInputStream(f);
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
@@ -37,24 +36,27 @@ public class IndexInfoConverter implements Converter{
 		Row row = rowIterator.next();
 		while (rowIterator.hasNext()) {
 			row = rowIterator.next();
-			writer.writeStartElement("indexInfo");
+			writer.writeStartElement("stock");
 			Iterator<Cell> cellIterator = row.cellIterator();
-			writer.writeStartElement("symbol");
+			writer.writeStartElement("Symbol");
+			String symbol = cellIterator.next().toString();
+			writer.writeCharacters(symbol);
+			writer.writeEndElement();
+
+			writer.writeStartElement("CompanyName");
 			writer.writeCharacters(cellIterator.next().toString());
 			writer.writeEndElement();
 
-			writer.writeStartElement("name");
-			writer.writeCharacters(cellIterator.next().toString());
+			writer.writeStartElement("Provider");
+			writer.writeCharacters(HomeDataProvider.H_PROVIDER_SYMB + "");
 			writer.writeEndElement();
 
-			writer.writeStartElement("exchSymb");
-			writer.writeCharacters(cellIterator.next().toString());
+			writer.writeStartElement("ExchSymb");
+			String exch = "NY";
+			if (symbol.indexOf('.') != -1)
+				exch = symbol.substring(symbol.indexOf('.') + 1);
+			writer.writeCharacters(exch);
 			writer.writeEndElement();
-			
-			writer.writeStartElement("provider");
-			writer.writeCharacters(HomeDataProvider.H_PROVIDER_SYMB+"");
-			writer.writeEndElement();
-
 
 			writer.writeEndElement();
 

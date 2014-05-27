@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HConnection;
+import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -22,10 +25,21 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.nio.client.methods.HttpAsyncMethods;
 import org.apache.http.nio.client.methods.ZeroCopyConsumer;
 
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+
 import publisher.Publisher;
 import converter.Converter;
+import converter.yahoo.FXRatesConverter;
 import converter.yahoo.HistDataConverter;
-import converter.yahoo.StockSummariesConverter;
+import converter.yahoo.StocksConverter;
+import converter.yahoo.StocksQuotesConverter;
+import dao.CurrencyPairDao;
+import dao.FXRateDao;
+import dao.StockDao;
+import dao.impl.CurrencyPairDaoImpl;
+import dao.impl.FXRateDaoImpl;
+import dao.impl.StockDaoImpl;
 
 public class YahooDataProvider implements DataProvider {
 
@@ -41,6 +55,8 @@ public class YahooDataProvider implements DataProvider {
 	private static final String YQL_STOCK_SUMMARY_QUERY = "select * from yahoo.finance.stocks" + "where symbol in "
 			+ "(select company.symbol from yahoo.finance.industry" + "where id in "
 			+ "(select industry.id from yahoo.finance.sectors))";
+	private static final String YQL_QUOTE_QUERY = "select * from yahoo.finance.quote where symbol in (?)";
+	private static final String YQL_FXRATE_QUERY = "select * from yahoo.finance.xchange where pair in (?)";
 
 	private CloseableHttpAsyncClient client;
 
@@ -101,7 +117,7 @@ public class YahooDataProvider implements DataProvider {
 
 	}
 
-	public void getStockSummaries(String format) throws Exception {
+	public void getStocks(String format) throws Exception {
 
 		try {
 
@@ -116,10 +132,10 @@ public class YahooDataProvider implements DataProvider {
 					.build();
 
 			// create a temp file
-			File tfile = File.createTempFile("stockSummariesTemp", "." + format);
+			File tfile = File.createTempFile("stocksTemp", "." + format);
 
 			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
-					new StockSummariesConverter(), Publisher.STOCK_SUMMARIES_ROUTING_KEY), null);
+					new StocksConverter(), Publisher.STOCKS_ROUTING_KEY), null);
 			Boolean result = future.get();
 			if (result != null && result.booleanValue()) {
 				System.out.println("Request successfully executed");
@@ -147,6 +163,61 @@ public class YahooDataProvider implements DataProvider {
 
 	}
 
+	public void getStocksQuotes(String format) throws Exception {
+		try {
+			HConnection hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
+			StockDao d = new StockDaoImpl(hConnection);
+			client.start();
+			List<String> symbList = d.listAllSymbols();
+			String query ="";
+			for(String symbs : symbList){
+			 query = YQL_QUOTE_QUERY.replaceFirst("\\?", symbs);
+			URI uri = contructUri(query, format, YQL_DEFAULT_ENV);
+			// create a temp file
+			File tfile = File.createTempFile("stocksQuotesTemp", "." + format);
+			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
+					new StocksQuotesConverter(), Publisher.STOCKS_QUOTES_ROUTING_KEY), null);
+			Boolean result = future.get();
+			if (result != null && result.booleanValue()) {
+				System.out.println("Request successfully executed");
+			} else {
+				System.out.println("Request failed");
+			}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
+		}
+	}
+
+	public void getFXRates(String format) throws Exception {
+		try {
+			HConnection hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
+			CurrencyPairDao d = new CurrencyPairDaoImpl(hConnection);
+			client.start();
+			List<String> symbList = d.listAllSymbols();
+			String query ="";
+			for(String symbs : symbList){
+			 query = YQL_FXRATE_QUERY.replaceFirst("\\?", symbs);
+			URI uri = contructUri(query, format, YQL_DEFAULT_ENV);
+			// create a temp file
+			File tfile = File.createTempFile("fxRatesTemp", "." + format);
+			Future<Boolean> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile,
+					new FXRatesConverter(), Publisher.FXRATES_ROUTING_KEY), null);
+			Boolean result = future.get();
+			if (result != null && result.booleanValue()) {
+				System.out.println("Request successfully executed");
+			} else {
+				System.out.println("Request failed");
+			}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			client.close();
+		}
+	}
 	static class HttpResponseConsumer extends ZeroCopyConsumer<Boolean> {
 		Converter converter;
 		String routingKey;
@@ -164,14 +235,14 @@ public class YahooDataProvider implements DataProvider {
 		@Override
 		protected Boolean process(HttpResponse response, File file, ContentType contentType) throws Exception {
 
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
-			StringBuilder builder = new StringBuilder();
-
-			for (String line = null; (line = reader.readLine()) != null;) {
-				builder.append(line).append("\n");
-			}
-			System.out.println(builder);
+//			BufferedReader reader = new BufferedReader(
+//					new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+//			StringBuilder builder = new StringBuilder();
+//
+//			for (String line = null; (line = reader.readLine()) != null;) {
+//				builder.append(line).append("\n");
+//			}
+//			System.out.println(builder);
 			try {
 				Publisher publisher = new Publisher();
 
@@ -191,10 +262,14 @@ public class YahooDataProvider implements DataProvider {
 		DataProvider yql = new YahooDataProvider();
 		try {
 			// yql.getHistData("YHOO", "2009-09-11", "2010-03-10", "xml");
-			yql.getStockSummaries("xml");
+//			yql.getStocksQuotes("xml");
+//			yql.getStocks("xml");
+			yql.getFXRates("xml");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+
+
 
 }

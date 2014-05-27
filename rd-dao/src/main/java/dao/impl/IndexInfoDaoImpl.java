@@ -48,8 +48,7 @@ public class IndexInfoDaoImpl implements IndexInfoDao {
 		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
 		byte[] provHash = Md5Utils.md5sum(provider + exchSymbHash.toString());
 		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH]; // mic code length =
-															// 4
+		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH]; 
 
 		int offset = 0;
 		offset = Bytes.putBytes(rowkey, offset, provHash, 0, Md5Utils.MD5_LENGTH);

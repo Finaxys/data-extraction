@@ -8,6 +8,7 @@ import publisher.Publisher;
 import converter.home.CurrencyPairsConverter;
 import converter.home.ExchangesConverter;
 import converter.home.IndexInfoConverter;
+import converter.home.StocksConverter;
 
 public class HomeDataProvider implements DataProvider {
 
@@ -17,6 +18,7 @@ public class HomeDataProvider implements DataProvider {
 	public static final String EXCHANGES_FILE = "exchanges.xls";
 	public static final String CURRENCY_PAIRS_FILE = "currency_pairs.xls";
 	public static final String INDEX_INFOS_FILE = "index_infos.xls";
+	public static final String 	STOCKS_FILE = "stocks.xls";
 
 	public HomeDataProvider() {
 		super();
@@ -40,8 +42,12 @@ public class HomeDataProvider implements DataProvider {
 		
 	}
 
-	public void getStockSummaries(String format) throws Exception {
-		// TODO Auto-generated method stub
+	public void getStocks(String format) throws Exception {
+		File f = getFile(HOME_DATA_FOLDER + "/" + STOCKS_FILE);
+		logger.info("publishing stocks list...");
+		Publisher publisher = new Publisher();
+		publisher.publish(new StocksConverter().convert(f), Publisher.STOCKS_ROUTING_KEY);
+		logger.info("stocks published");
 
 	}
 
@@ -70,8 +76,19 @@ public class HomeDataProvider implements DataProvider {
 		DataProvider dp = new HomeDataProvider();
 		// dp.getExchanges("");
 //		dp.getCurrencyPairs("");
-		dp.getIndexInfos("");
+//		dp.getIndexInfos("");
+		dp.getStocks("");
 
+	}
+
+	public void getStocksQuotes(String format) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void getFXRates(String format) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
