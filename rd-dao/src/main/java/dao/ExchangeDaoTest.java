@@ -3,6 +3,7 @@ package dao;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.HConnection;
@@ -11,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+import utils.Md5Utils;
 import dao.impl.ExchangeDaoImpl;
 import domain.Exchange;
 
@@ -42,25 +44,19 @@ public class ExchangeDaoTest
 	{
 		Exchange e1 = new Exchange("", "", "", 0, "", "", "", "", "", 0, 0, false);
 		System.out.println("Add exchange with only provider = 0, closeTime = 0 and openTime = 0 and all strings parameters are empty strings --> exDao.add(exchange) == True ?");
-		assertTrue(exDao.add(e1));
-		
-		e1 = new Exchange("mic_add", "symbol_add", "suffixe_add", 0, "Test Exchange add", "Interne Type add", "Europe", "France", "USD/EUR", 1, 10, false);
-		System.out.println("Try to add an exchange already in the table --> exDao.add(exchange) == False ?");
-		assertFalse(exDao.add(e1));
-		
-		System.out.println("				________________________________________");
+		assertTrue(exDao.add(e1));	
 	}
 	
-	@Test
+	/*@Test
 	public final void testExistingValueAdd() throws IOException
 	{
 		Exchange e1 = new Exchange("mic_add", "symbol_add", "suffixe_add", 0, "Test Exchange add", "Interne Type add", "Europe", "France", "USD/EUR", 1, 10, false);
 		
-		System.out.println("Try to add an exchange already in the table --> exDao.add(exchange) == False ?");
-		assertFalse(exDao.add(e1));
+		System.out.println("Try to add an exchange already in the table --> exDao.add(exchange) == True ?");
+		assertTrue(exDao.add(e1));
 		
 		System.out.println("				________________________________________");
-	}
+	}*/
 
 	@Test
 	public final void testNormalGet() throws IOException
@@ -103,7 +99,7 @@ public class ExchangeDaoTest
 	}
 	
 	@Test
-	public final void testList()
+	public final void testList() throws IOException
 	{
 		Exchange e1 = new Exchange("mic_list1", "symbol_get", "suffixe_get", 20, "Test Exchange list", "Interne Type list", "Europe", "France", "USD/EUR", 5, 6, true);
 		exDao.add(e1);
@@ -119,8 +115,15 @@ public class ExchangeDaoTest
 		exDao.add(e1);
 		
 		System.out.println("Unit test for list : ");
+		//String prefix = Md5Utils.md5sum(20 + Md5Utils.md5sum("suffixe_get").toString()).toString();
 		
-		//List<Exchange> result = exDao.list(prefix)
+		List<Exchange> result = exDao.list("");
+		assertNotNull(result);
+		assertTrue(result.size() > 0);
+		
+		/**
+		 *  TODO : Add some list test
+		 */
 	}
 
 }
