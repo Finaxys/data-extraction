@@ -155,11 +155,7 @@ public class StockSummaryDaoImpl implements StockSummaryDao {
 
 	public List<StockSummary> list(String prefix) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
-<<<<<<< HEAD
-		
 
-=======
->>>>>>> 9ca18945fd4fba833de4a8ca111a9be7074235dd
 		ResultScanner results = table.getScanner(mkScan(prefix));
 		List<StockSummary> ret = new ArrayList<StockSummary>();
 		for (Result r : results) {

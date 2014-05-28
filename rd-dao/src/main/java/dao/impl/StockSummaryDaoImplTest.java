@@ -3,15 +3,17 @@
  */
 package dao.impl;
 
+import org.apache.hadoop.hbase.ZooKeeperConnectionException;
+
 import junit.framework.TestCase;
 
-import org.apache.hadoop.hbase.HBaseConfiguration;
+/*import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HConnectionManager;
 import org.mockito.MockitoAnnotations;
 
-import dao.StockSummaryDao;
+import dao.StockSummaryDao;*/
 /**
  * @author finaxys
  *
@@ -19,8 +21,8 @@ import dao.StockSummaryDao;
 public class StockSummaryDaoImplTest extends TestCase 
 {
 
-	private StockSummaryDaoImpl testStock;
-	private StockSummaryDao testStockI;
+	//private StockSummaryDaoImpl testStock;
+	//private StockSummaryDao testStockI;
 	
 	/** 
 	 * @throws 
@@ -28,9 +30,9 @@ public class StockSummaryDaoImplTest extends TestCase
 	 */
 	public void setUp() throws ZooKeeperConnectionException
 	{
-		MockitoAnnotations.initMocks(this);
-		HConnection hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
-		testStock = new StockSummaryDaoImpl(hConnection);
+		//MockitoAnnotations.initMocks(this);
+		//HConnection hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
+		//testStock = new StockSummaryDaoImpl(hConnection);
 		
 	}
 	
@@ -39,7 +41,7 @@ public class StockSummaryDaoImplTest extends TestCase
 	 */
 	public void testAdd()
 	{
-		testStock.add(stock);
+		//testStock.add(stock);
 		fail("Not yet implemented");
 	}
 
