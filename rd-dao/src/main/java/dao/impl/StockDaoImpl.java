@@ -159,6 +159,7 @@ public class StockDaoImpl implements StockDao {
 
 	public List<Stock> list(String prefix) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
+
 		ResultScanner results = table.getScanner(mkScan(prefix));
 		List<Stock> ret = new ArrayList<Stock>();
 		for (Result r : results) {

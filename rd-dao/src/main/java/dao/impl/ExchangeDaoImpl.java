@@ -46,10 +46,8 @@ public class ExchangeDaoImpl implements ExchangeDao {
 	private HConnection connection;
 
 	// Constructor
-
 	public ExchangeDaoImpl(HConnection connection) {
 		this.connection = connection;
-
 	}
 
 	// Helpers
@@ -130,8 +128,7 @@ public class ExchangeDaoImpl implements ExchangeDao {
 		return scan;
 	}
 
-	// CRUD
-
+	// CRUDmi	
 	public boolean add(Exchange exchange) {
 		try {
 			HTableInterface table = connection.getTable(TABLE_NAME);

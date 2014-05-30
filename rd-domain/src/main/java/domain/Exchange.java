@@ -164,6 +164,11 @@ public class Exchange {
 		this.suffix = suffix;
 	}
 	
-	
+	public boolean equals(Exchange e)
+	{
+		if (this.provider == e.getProvider() && this.mic == e.getMic() && this.suffix == e.getSuffix())
+			return (true);
+		return (false);
+	}
 
 }
