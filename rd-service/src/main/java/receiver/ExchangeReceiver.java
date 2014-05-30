@@ -1,6 +1,7 @@
 package receiver;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+
+import msg.Message;
 
 import org.apache.log4j.Logger;
 
@@ -17,7 +20,7 @@ import domain.Exchanges;
 
 public class ExchangeReceiver implements Receiver {
 	static Logger logger = Logger.getLogger(ExchangeReceiver.class);
-	public static final String ROUTING_KEY = "exchanges";
+	public static final String BINDING_KEY = "exchanges";
 	private ExchangeDao exchangeDao;
 
 	public ExchangeReceiver(ExchangeDao exchangeDao) {
@@ -32,12 +35,11 @@ public class ExchangeReceiver implements Receiver {
 	public void setExchangeDao(ExchangeDao exchangeDao) {
 		this.exchangeDao = exchangeDao;
 	}
-
-	public boolean receive(byte[] msg) {
-		logger.info("msg received: " + new String(msg));
+	
+	public boolean receive(Message msg) {
 		try {
-			InputStream is = new ByteArrayInputStream(msg);
-
+			InputStream is = new ByteArrayInputStream(msg.getBody().getContent());
+			
 			JAXBContext context = JAXBContext.newInstance(Exchanges.class);
 			Unmarshaller um = context.createUnmarshaller();
 
@@ -49,15 +51,16 @@ public class ExchangeReceiver implements Receiver {
 
 			Exchanges exchanges = (Exchanges) um.unmarshal(is);
 			List<Exchange> list = exchanges.getExchangesList();
+			boolean resp = true;
 			if (list != null) {
 				logger.info("exchanges size " + list.size());
 				for (Exchange exchange : list) {
-					exchangeDao.add(exchange);
+					resp  = resp && exchangeDao.add(exchange);
 				}
 			} else
 				logger.info("null exchanges");
 
-			return true;
+			return resp;
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();

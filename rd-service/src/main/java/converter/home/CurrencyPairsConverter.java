@@ -1,12 +1,18 @@
 package converter.home;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.Iterator;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
+
+import msg.Document;
+import msg.Message;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -17,7 +23,7 @@ import converter.Converter;
 
 public class CurrencyPairsConverter implements Converter {
 
-	public byte[] convert(File f) throws Exception {
+	public void convert(Message message) throws Exception {
 		XMLOutputFactory factory = XMLOutputFactory.newInstance();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		XMLStreamWriter writer = factory.createXMLStreamWriter(os);
@@ -26,11 +32,9 @@ public class CurrencyPairsConverter implements Converter {
 		writer.writeStartElement("currencyPairs");
 		writer.writeStartElement("currencyPairsList");
 
-		FileInputStream file = new FileInputStream(f);
-		HSSFWorkbook workbook = new HSSFWorkbook(file);
-		// Get first sheet from the workbook
+		InputStream is = new ByteArrayInputStream(message.getBody().getContent());
+		HSSFWorkbook workbook = new HSSFWorkbook(is);
 		HSSFSheet sheet = workbook.getSheetAt(0);
-		// Iterate through each rows from first sheet
 		Iterator<Row> rowIterator = sheet.iterator();
 
 		Row row = rowIterator.next();
@@ -39,9 +43,8 @@ public class CurrencyPairsConverter implements Converter {
 			writer.writeStartElement("currencyPair");
 			Iterator<Cell> cellIterator = row.cellIterator();
 			String sym = cellIterator.next().toString();
-			String[] symbol =( sym.split(" ")[0]).split("/");
-		
-			
+			String[] symbol = (sym.split(" ")[0]).split("/");
+
 			writer.writeStartElement("symbol");
 			writer.writeCharacters(symbol[0] + symbol[1]);
 			writer.writeEndElement();
@@ -54,7 +57,6 @@ public class CurrencyPairsConverter implements Converter {
 			writer.writeCharacters(symbol[1]);
 			writer.writeEndElement();
 
-
 			writer.writeEndElement();
 
 		}
@@ -62,7 +64,8 @@ public class CurrencyPairsConverter implements Converter {
 		writer.writeEndElement();
 		writer.writeEndElement();
 		writer.writeEndDocument();
-		return os.toByteArray();
+		message.getBody().setContent(os.toByteArray());
 
 	}
+
 }

@@ -1,6 +1,7 @@
 package receiver;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+
+import msg.Message;
 
 import org.apache.log4j.Logger;
 
@@ -17,7 +20,7 @@ import domain.StockQuote;
 
 public class StockQuoteReceiver implements Receiver{
 	static Logger logger = Logger.getLogger(StockQuoteReceiver.class);
-	public static final String ROUTING_KEY = "stocksQuotes";
+	public static final String BINDING_KEY = "stocksQuotes";
 	private StockQuoteDao stockQuoteDao;
 
 	public StockQuoteReceiver(StockQuoteDao stockQuoteDao) {
@@ -32,12 +35,11 @@ public class StockQuoteReceiver implements Receiver{
 	public void setStockSummaryDao(StockQuoteDao stockQuoteDao) {
 		this.stockQuoteDao = stockQuoteDao;
 	}
-
-	public boolean receive(byte[] msg) {
-		logger.info("msg received: " + new String(msg));
+	
+	public boolean receive(Message msg) {
 		try {
-			InputStream is = new ByteArrayInputStream(msg);
-
+			InputStream is = new ByteArrayInputStream(msg.getBody().getContent());
+			
 			JAXBContext context = JAXBContext.newInstance(StocksQuotes.class);
 			Unmarshaller um = context.createUnmarshaller();
 
@@ -49,15 +51,16 @@ public class StockQuoteReceiver implements Receiver{
 
 			StocksQuotes stocksQuotes = (StocksQuotes) um.unmarshal(is);
 			List<StockQuote> list = stocksQuotes.getQuotesList();
+			boolean resp = true;
 			if (list != null) {
 				logger.info("stocks quotes size " + list.size());
 				for (StockQuote stockQuote : list) {
-					stockQuoteDao.add(stockQuote);
+					resp = resp && stockQuoteDao.add(stockQuote);
 				}
 			} else
 				logger.info("null stocks quotes");
 
-			return true;
+			return resp;
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();

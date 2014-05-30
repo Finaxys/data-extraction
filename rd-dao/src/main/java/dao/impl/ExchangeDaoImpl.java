@@ -68,11 +68,11 @@ public class ExchangeDaoImpl implements ExchangeDao {
 
 	private byte[] mkRowKey(Integer provider, String suffix, String mic) {
 		byte[] suffixHash = Md5Utils.md5sum(suffix);
-		byte[] provHash = Md5Utils.md5sum(provider + suffixHash.toString());
+		byte[] provBytes = Bytes.toBytes(provider);
 		byte[] micb = Bytes.toBytes(mic);
 		byte[] rowkey = new byte[Md5Utils.MD5_LENGTH + micb.length]; // mic code length = 4
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, provBytes, 0, Md5Utils.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, micb, 0, micb.length);
 
 		return rowkey;
@@ -99,8 +99,11 @@ public class ExchangeDaoImpl implements ExchangeDao {
 						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((String) value));
 					if (field.getType().equals(Boolean.class))
 						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Boolean) value));
-					if (field.getType().equals(long.class))
+					if (field.getType().equals(Long.class))
 						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Long) value));
+					if (field.getType().equals(Integer.class))
+						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Integer) value));
+			
 				}
 				i++;
 

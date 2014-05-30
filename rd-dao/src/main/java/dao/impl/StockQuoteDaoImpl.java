@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import msg.Document.DataType;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HConnection;
@@ -43,11 +45,13 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 	public static final byte[] NAME_COL = Bytes.toBytes("name");
 	public static final byte[] VOLUME_COL = Bytes.toBytes("volume");
 	public static final byte[] TS_COL = Bytes.toBytes("ts");
+	public static final byte[] TYPE_COL = Bytes.toBytes("t");
 
 	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_quote");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
 
 	private static final int longLength = 8;
+	private static final int intLength =4;
 	
 	private HConnection connection;
 
@@ -65,26 +69,29 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 	}
 
 	private byte[] mkRowKey(StockQuote stockQuote) {
-		return mkRowKey(stockQuote.getProvider(), stockQuote.getExchSymb(), stockQuote.getSymbol(), stockQuote.getTs());
+		return mkRowKey(stockQuote.getProvider(), stockQuote.getExchSymb(), stockQuote.getSymbol(), stockQuote.getTs(), stockQuote.getType());
 	}
 
-	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol, Long ts) {
+	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) {
 		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
-		byte[] provHash = Md5Utils.md5sum(provider + exchSymbHash.toString());
+		byte[] provBytes = Bytes.toBytes(provider);
+		byte[] typeBytes = dataType.getName().getBytes();
 		byte[] symbHash = Md5Utils.md5sum(symbol);
 		byte[] timestamp = Bytes.toBytes(ts);
-		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH + longLength]; 
+		byte[] rowkey = new byte[2 * intLength + 2 * Md5Utils.MD5_LENGTH + longLength]; 
 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, provBytes, 0, intLength);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, typeBytes, 0, intLength);
 		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, timestamp, 0, timestamp.length);
 
 		return rowkey;
 	}
 
-	private Get mkGet(Integer provider, String exchSymb, String symbol, Long ts) {
-		Get g = new Get(mkRowKey(provider, exchSymb, symbol, ts));
+	private Get mkGet(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) {
+		Get g = new Get(mkRowKey(provider, exchSymb, symbol, ts, dataType));
 		return g;
 	}
 
@@ -153,9 +160,9 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 
 	}
 
-	public StockQuote get(Integer provider, String exchSymb, String symbol, Long ts) throws IOException {
+	public StockQuote get(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
-		Get g = mkGet(provider, exchSymb, symbol, ts);
+		Get g = mkGet(provider, exchSymb, symbol, ts, dataType);
 		Result result = table.get(g);
 		if (result.isEmpty())
 			return null;

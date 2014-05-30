@@ -6,13 +6,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
@@ -28,7 +26,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import converter.Converter;
 
-public class FXRatesConverter implements Converter {
+public class IndexQuotesConverter implements Converter {
 
 	public void convert(Message message) throws Exception {
 		XMLEventFactory eventFactory = XMLEventFactory.newInstance();
@@ -54,27 +52,22 @@ public class FXRatesConverter implements Converter {
 
 				writer.add(eventFactory.createStartDocument());
 
-				writer.add(eventFactory.createStartElement("", "", "rates"));
-				writer.add(eventFactory.createStartElement("", "", "ratesList"));
+				writer.add(eventFactory.createStartElement("", "", "quotes"));
+				writer.add(eventFactory.createStartElement("", "", "quotesList"));
 				while (reader.hasNext()) {
 					XMLEvent e = reader.nextEvent();
-					if (e.isStartElement() && ((StartElement) e).getName().getLocalPart().equals("rate")) {
+					if (e.isStartElement() && ((StartElement) e).getName().getLocalPart().equals("quote")) {
 
-						writer.add(eventFactory.createStartElement("", "", "rate"));
-						Attribute a = ((StartElement) e).getAttributeByName(new QName("id"));
-						writer.add(eventFactory.createStartElement("", "", "Symbol"));
-						writer.add(eventFactory.createCharacters(a.getValue()));
-						writer.add(eventFactory.createEndElement("", "", "Symbol"));
+						writer.add(eventFactory.createStartElement("", "", "quote"));
 						writer.add(eventFactory.createStartElement("", "", "Provider"));
 						writer.add(eventFactory.createCharacters(message.getBody().getProvider() + ""));
 						writer.add(eventFactory.createEndElement("", "", "Provider"));
 
-					} else if ((e.isStartElement() && (((StartElement) e).getName().getLocalPart().equals("Date")
-							|| ((StartElement) e).getName().getLocalPart().equals("Time") || ((StartElement) e)
-							.getName().getLocalPart().equals("Name")))
-							|| (e.isEndElement() && (((EndElement) e).getName().getLocalPart().equals("Date")
-									|| ((EndElement) e).getName().getLocalPart().equals("Time") || ((EndElement) e)
-									.getName().getLocalPart().equals("Name"))))
+					} else if ((e.isStartElement() && (((StartElement) e).getName().getLocalPart()
+							.equals("LastTradeDate") || ((StartElement) e).getName().getLocalPart()
+							.equals("LastTradeTime")))
+							|| (e.isEndElement() && (((EndElement) e).getName().getLocalPart().equals("LastTradeDate") || ((EndElement) e)
+									.getName().getLocalPart().equals("LastTradeTime"))))
 						continue;
 					else if (e.isCharacters()) {
 
@@ -98,8 +91,8 @@ public class FXRatesConverter implements Converter {
 						writer.add(e);
 					} else if (e.isEndElement() && e.asEndElement().getName().getLocalPart().equals("results")) {
 
-						writer.add(eventFactory.createEndElement("", "", "ratesList"));
-						writer.add(eventFactory.createEndElement("", "", "rates"));
+						writer.add(eventFactory.createEndElement("", "", "quotesList"));
+						writer.add(eventFactory.createEndElement("", "", "quotes"));
 						end = true;
 						break;
 					} else

@@ -10,4 +10,5 @@ public interface IndexInfoDao {
 	public IndexInfo get(Integer provider, String exchSymb, String symbol) throws IOException;
 	public List<IndexInfo> list(String prefix) throws IOException;
 	public List<IndexInfo> listAll() throws IOException;
+	public List<String> listAllSymbols() throws IOException ;
 }

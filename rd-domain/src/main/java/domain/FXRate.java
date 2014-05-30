@@ -5,6 +5,11 @@ import java.math.BigDecimal;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import msg.Document.DataType;
+
+import org.apache.hadoop.hbase.util.Bytes;
+
+
 @XmlRootElement(name = "rate")
 public class FXRate {
 	private String symbol;
@@ -13,12 +18,15 @@ public class FXRate {
 	private BigDecimal bid;
 	private String provider;
 	private Long ts;
+	private DataType dataType;
+
+	
 
 	public FXRate() {
 		super();
 	}
 
-	public FXRate(String symbol, BigDecimal rate, BigDecimal ask, BigDecimal bid, String provider, Long ts) {
+	public FXRate(String symbol, BigDecimal rate, BigDecimal ask, BigDecimal bid, String provider, Long ts, DataType dataType) {
 		super();
 		this.symbol = symbol;
 		this.rate = rate;
@@ -26,6 +34,7 @@ public class FXRate {
 		this.bid = bid;
 		this.provider = provider;
 		this.ts = ts;
+		this.dataType = dataType;
 	}
 
 	@XmlElement(name = "Symbol")
@@ -80,6 +89,15 @@ public class FXRate {
 
 	public void setTs(Long ts) {
 		this.ts = ts;
+	}
+
+	@XmlElement(name = "Type")
+	public DataType getType() {
+		return dataType;
+	}
+
+	public void setType(DataType dataType) {
+		this.dataType = dataType;
 	}
 
 }

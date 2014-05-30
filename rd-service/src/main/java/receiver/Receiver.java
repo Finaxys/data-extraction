@@ -1,5 +1,7 @@
 package receiver;
 
+import msg.Message;
+
 public interface Receiver {
-public boolean receive(byte[] msg);
+	public boolean receive(Message message);
 }

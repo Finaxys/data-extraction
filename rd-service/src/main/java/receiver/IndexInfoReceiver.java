@@ -1,6 +1,7 @@
 package receiver;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+
+import msg.Message;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +22,7 @@ public class IndexInfoReceiver implements Receiver {
 
 
 		static Logger logger = Logger.getLogger(IndexInfoReceiver.class);
-		public static final String ROUTING_KEY = "indexInfos";
+		public static final String BINDING_KEY = "indexInfos";
 		private IndexInfoDao indexInfoDao;
 
 		public IndexInfoReceiver(IndexInfoDao indexInfoDao) {
@@ -35,11 +38,10 @@ public class IndexInfoReceiver implements Receiver {
 			this.indexInfoDao = indexInfoDao;
 		}
 
-		public boolean receive(byte[] msg) {
-			logger.info("msg received: " + new String(msg));
+		public boolean receive(Message msg) {
 			try {
-				InputStream is = new ByteArrayInputStream(msg);
-
+				InputStream is = new ByteArrayInputStream(msg.getBody().getContent());
+				
 				JAXBContext context = JAXBContext.newInstance(IndexInfos.class);
 				Unmarshaller um = context.createUnmarshaller();
 
@@ -51,15 +53,16 @@ public class IndexInfoReceiver implements Receiver {
 
 				IndexInfos indexInfos = (IndexInfos) um.unmarshal(is);
 				List<IndexInfo> list = indexInfos.getIndexInfosList();
+				boolean resp = true;
 				if (list != null) {
 					logger.info("index infos size " + list.size());
 					for (IndexInfo indexInfo : list) {
-						indexInfoDao.add(indexInfo);
+						resp = resp && indexInfoDao.add(indexInfo);
 					}
 				} else
 					logger.info("null index infos");
 
-				return true;
+				return resp;
 			} catch (Exception e) {
 				logger.error(e);
 				e.printStackTrace();

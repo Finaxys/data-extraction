@@ -3,6 +3,7 @@ package dao.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HConnection;
 import org.apache.hadoop.hbase.client.HTableInterface;
@@ -13,6 +14,7 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+
 import utils.Md5Utils;
 import dao.IndexInfoDao;
 import domain.IndexInfo;
@@ -135,5 +137,28 @@ public class IndexInfoDaoImpl implements IndexInfoDao {
 		}
 		table.close();
 		return ret;
+	}
+	
+	public List<String> listAllSymbols() throws IOException {
+		HTableInterface table = connection.getTable(TABLE_NAME);
+		ResultScanner results = table.getScanner(mkScan());
+		List<String> sp = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (Result r : results) {
+			sb.append("\"" + Bytes.toString(r.getValue(INFO_FAM, SYMBOL_COL)) + "\",");
+			i++;
+
+			// i=1000 => no response
+			if (i == 100) {
+				sp.add(sb.toString().replaceAll(",$", ""));
+				sb.setLength(0);
+				i = 0;
+			}
+
+		}
+		sp.add(sb.toString().replaceAll(",$", ""));
+		table.close();
+		return sp;
 	}
 }

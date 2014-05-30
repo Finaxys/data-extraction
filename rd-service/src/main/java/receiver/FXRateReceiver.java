@@ -1,6 +1,7 @@
 package receiver;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.ValidationEventHandler;
+
+import msg.Message;
 
 import org.apache.log4j.Logger;
 
@@ -17,7 +20,7 @@ import domain.FXRates;
 
 public class FXRateReceiver implements Receiver{
 	static Logger logger = Logger.getLogger(FXRateReceiver.class);
-	public static final String ROUTING_KEY = "fxRates";
+	public static final String BINDING_KEY = "fxRates";
 	private FXRateDao fxRateDao;
 
 	public FXRateReceiver(FXRateDao fxRateDao) {
@@ -33,11 +36,10 @@ public class FXRateReceiver implements Receiver{
 		this.fxRateDao = fxRateDao;
 	}
 
-	public boolean receive(byte[] msg) {
-		logger.info("msg received: " + new String(msg));
+	public boolean receive(Message msg) {
 		try {
-			InputStream is = new ByteArrayInputStream(msg);
-
+			InputStream is = new ByteArrayInputStream(msg.getBody().getContent());
+			
 			JAXBContext context = JAXBContext.newInstance(FXRates.class);
 			Unmarshaller um = context.createUnmarshaller();
 
@@ -49,15 +51,16 @@ public class FXRateReceiver implements Receiver{
 
 			FXRates fxRates = (FXRates) um.unmarshal(is);
 			List<FXRate> list = fxRates.getRatesList();
+			boolean resp = true;
 			if (list != null) {
 				logger.info("fx rates size " + list.size());
 				for (FXRate stockQuote : list) {
-					fxRateDao.add(stockQuote);
+					resp = resp && fxRateDao.add(stockQuote);
 				}
 			} else
 				logger.info("null fx rates");
 
-			return true;
+			return resp;
 		} catch (Exception e) {
 			logger.error(e);
 			e.printStackTrace();
