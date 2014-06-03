@@ -29,6 +29,7 @@ public class IndexQuoteDaoImpl implements IndexQuoteDao {
 
 	public static final byte[] SYMBOL_COL = Bytes.toBytes("s");
 	public static final byte[] PROVIDER_COL = Bytes.toBytes("p");
+	public static final byte[] EXCH_SYMB_COL = Bytes.toBytes("exchSymb");
 	public static final byte[] LTPO_COL = Bytes.toBytes("ltpo");
 	public static final byte[] TS_COL = Bytes.toBytes("ts");
 	public static final byte[] CHANGE_COL = Bytes.toBytes("ch");
@@ -41,7 +42,6 @@ public class IndexQuoteDaoImpl implements IndexQuoteDao {
 	public static final byte[] TABLE_NAME = Bytes.toBytes("index_quote");
 	public static final byte[] VALUE_FAM = Bytes.toBytes("v");
 	
-	private static final int intLength =4;
 
 	private HConnection connection;
 
@@ -57,19 +57,23 @@ public class IndexQuoteDaoImpl implements IndexQuoteDao {
 	}
 
 	private byte[] mkRowKey(IndexQuote index) {
-		return mkRowKey(index.getProvider(), index.getSymbol(), index.getType());
+		return mkRowKey(index.getProvider(), index.getExchSymb(), index.getSymbol(), index.getTs(), index.getDataType());
 	}
 
-	private byte[] mkRowKey(Integer provider, String symbol, DataType dataType) {
-		byte[] provBytes = Bytes.toBytes(provider);
-		byte[] typeBytes = dataType.getName().getBytes();
+	private byte[] mkRowKey(char provider, String exchSymb, String symbol, Long ts, DataType dataType) {
+		byte provByte = (byte)provider;
+		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
+		byte typeByte = dataType.getTByte();
 		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[2 * intLength + Md5Utils.MD5_LENGTH];
+		byte[] timestamp = Bytes.toBytes(ts);
+		byte[] rowkey = new byte[2 + 2 * Md5Utils.MD5_LENGTH];
 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provBytes, 0, intLength);
-		offset = Bytes.putBytes(rowkey, offset, typeBytes, 0, intLength);
-		Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putByte(rowkey, offset, provByte);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putByte(rowkey, offset, typeByte);
+		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		Bytes.putBytes(rowkey, offset, timestamp, 0, timestamp.length);
 
 		return rowkey;
 	}
@@ -94,6 +98,9 @@ public class IndexQuoteDaoImpl implements IndexQuoteDao {
 						p.add(VALUE_FAM, (byte[]) ind_cols[i].get(null), Bytes.toBytes((Long) value));
 					if (field.getType().equals(Integer.class))
 						p.add(VALUE_FAM, (byte[]) ind_cols[i].get(null), Bytes.toBytes((Integer) value));
+					if (field.getType().equals(char.class))
+						p.add(VALUE_FAM, (byte[]) ind_cols[i].get(null), Bytes.toBytes((Character) value));
+						
 				}
 				i++;
 

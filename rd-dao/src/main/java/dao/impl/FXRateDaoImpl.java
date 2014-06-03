@@ -33,7 +33,6 @@ public class FXRateDaoImpl implements FXRateDao{
 	public static final byte[] VALUES_FAM = Bytes.toBytes("v");
 
 	private static final int longLength = 8;
-	private static final int intLength = 4;
 	
 	private HConnection connection;
 
@@ -49,18 +48,18 @@ public class FXRateDaoImpl implements FXRateDao{
 	}
 
 	private byte[] mkRowKey(FXRate fxRate) {
-		return mkRowKey(fxRate.getSymbol(), fxRate.getTs(), fxRate.getType());
+		return mkRowKey(fxRate.getSymbol(), fxRate.getTs(), fxRate.getDataType());
 	}
 
 	private byte[] mkRowKey(String symbol, Long ts, DataType dataType) {
 
+		byte typeByte= dataType.getTByte();
 		byte[] symbBytes = Bytes.toBytes(symbol);
-		byte[] typeBytes = dataType.getName().getBytes();
 		byte[] timestamp = Bytes.toBytes(ts);
-		byte[] rowkey = new byte[symbBytes.length + longLength]; 
+		byte[] rowkey = new byte[1 + symbBytes.length + longLength]; 
 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, typeBytes, 0, intLength);
+		offset = Bytes.putByte(rowkey, offset, typeByte);
 		offset = Bytes.putBytes(rowkey, offset, symbBytes, 0, symbBytes.length);
 		Bytes.putBytes(rowkey, offset, timestamp, 0, longLength);
 		
@@ -77,7 +76,7 @@ public class FXRateDaoImpl implements FXRateDao{
 		p.add(VALUES_FAM, BID_COL, Bytes.toBytes(fxRate.getBid()));
 		p.add(VALUES_FAM, PROVIDER_COL, Bytes.toBytes(fxRate.getProvider()));
 		p.add(VALUES_FAM, TS_COL, Bytes.toBytes(fxRate.getTs()));
-		p.add(VALUES_FAM, TYPE_COL, Bytes.toBytes(fxRate.getType().getName()));
+		p.add(VALUES_FAM, TYPE_COL, Bytes.toBytes(fxRate.getDataType().getName()));
 		return p;
 	}
 

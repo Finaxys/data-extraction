@@ -68,6 +68,9 @@ public class FXRatesConverter implements Converter {
 						writer.add(eventFactory.createStartElement("", "", "Provider"));
 						writer.add(eventFactory.createCharacters(message.getBody().getProvider() + ""));
 						writer.add(eventFactory.createEndElement("", "", "Provider"));
+						writer.add(eventFactory.createStartElement("", "", "DataType"));
+						writer.add(eventFactory.createCharacters(message.getBody().getDataType().getName() + ""));
+						writer.add(eventFactory.createEndElement("", "", "DataType"));
 
 					} else if ((e.isStartElement() && (((StartElement) e).getName().getLocalPart().equals("Date")
 							|| ((StartElement) e).getName().getLocalPart().equals("Time") || ((StartElement) e)
@@ -77,10 +80,9 @@ public class FXRatesConverter implements Converter {
 									.getName().getLocalPart().equals("Name"))))
 						continue;
 					else if (e.isCharacters()) {
-
 						if (e.asCharacters().getData().equals("N/A"))
 							writer.add(eventFactory.createCharacters("0"));
-						else if (e.asCharacters().getData().matches("(\\d{1,2})/(\\d{2})/(\\d{4})"))
+						else if (e.asCharacters().getData().matches("(\\d{1,2})/(\\d{1,2})/(\\d{4})"))
 							date = e.asCharacters().getData();
 						else if (e.asCharacters().getData().matches("(\\d{1,2}):(\\d{2})(am|pm)"))
 							time = e.asCharacters().getData();

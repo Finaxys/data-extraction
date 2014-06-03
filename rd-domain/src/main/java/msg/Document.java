@@ -15,10 +15,10 @@ public class Document implements Serializable {
 	private ContentType contentType;
 	private DataType dataType;
 	private DataClass dataClass;
-	private int provider;
+	private char provider;
 	private byte[] content;
 
-	public Document(ContentType contentType, DataType dataType, DataClass dataClass, int provider, byte[] content) {
+	public Document(ContentType contentType, DataType dataType, DataClass dataClass, char provider, byte[] content) {
 		super();
 		this.contentType = contentType;
 		this.dataType = dataType;
@@ -51,11 +51,11 @@ public class Document implements Serializable {
 		this.dataClass = dataClass;
 	}
 
-	public int getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(int provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 
@@ -68,7 +68,7 @@ public class Document implements Serializable {
 	}
 
 	public enum ContentType {
-		XML("xml"), JSON("xml"), XLS("xls");
+		XML("xml"), JSON("json"), XLS("xls");
 
 		private final String name;
 
@@ -86,22 +86,22 @@ public class Document implements Serializable {
 	}
 
 	public enum DataType {
-		EOD("eod", 0), INTRA("intra", 1), Ref("ref", 2);
+		EOD("EOD", 'e'), INTRA("INTRA", 'i'), Ref("REF", 'r');
 
 		private final String name;
-		private final byte[] bytes;
+		private final byte tByte;
 
-		private DataType(String name, int bytes) {
+		private DataType(String name, char id) {
 			this.name = name;
-			this.bytes = Bytes.toBytes(bytes);
+			this.tByte = (byte)id;
 		}
 
 		public String getName() {
 			return name;
 		}
 
-		public byte[] getBytes() {
-			return bytes;
+		public byte getTByte() {
+			return tByte;
 		}
 	}
 }

@@ -17,6 +17,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 
 import receiver.CurrencyPairReceiver;
+import receiver.ExchangeReceiver;
 import receiver.FXRateReceiver;
 import receiver.IndexInfoReceiver;
 import receiver.IndexQuoteReceiver;
@@ -34,6 +35,7 @@ import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 
 import dao.impl.CurrencyPairDaoImpl;
+import dao.impl.ExchangeDaoImpl;
 import dao.impl.FXRateDaoImpl;
 import dao.impl.IndexInfoDaoImpl;
 import dao.impl.StockDaoImpl;
@@ -105,7 +107,7 @@ public class MomSubscriber implements Subscriber {
 			public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties,
 					byte[] body) throws IOException {
 				Message message = deserializeMessage(body);
-				logger.info("msg received : " + new String(body));
+				logger.info("msg received");
 				receiver.receive(message);
 			}
 		});
@@ -139,66 +141,5 @@ public class MomSubscriber implements Subscriber {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public static void main(String[] args) {
-
-		Thread optThread = new Thread() {
-			public void run() {
-				HConnection hConnection;
-				try {
-					ConnectionFactory factory = new ConnectionFactory();
-					factory.setHost("localhost");
-					Connection connection = factory.newConnection();
-					hConnection = HConnectionManager.createConnection(HBaseConfiguration.create());
-					// Receiver receiver = new ExchangeReceiver(new
-					// ExchangeDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(ExchangeReceiver.BINDING_KEY);
-
-					// Receiver receiver = new StockReceiver(new
-					// StockDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(StockReceiver.BINDING_KEY);
-
-					// Receiver receiver = new StockQuoteReceiver(new
-					// StockQuoteDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(StockQuoteReceiver.BINDING_KEY);
-
-					// Receiver receiver = new FXRateReceiver(new
-					// FXRateDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(FXRateReceiver.BINDING_KEY);
-
-					// Receiver receiver = new CurrencyPairReceiver(new
-					// CurrencyPairDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(CurrencyPairReceiver.BINDING_KEY);
-
-					// Receiver receiver = new IndexInfoReceiver(new
-					// IndexInfoDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(IndexInfoReceiver.BINDING_KEY);
-
-					// Receiver receiver = new IndexQuoteReceiver(new
-					// IndexQuoteDaoImpl(hConnection));
-					// Subscriber subscriber = new Subscriber(connection,
-					// receiver);
-					// subscriber.subscribe(IndexQuoteReceiver.BINDING_KEY);
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		optThread.start();
-
 	}
 }

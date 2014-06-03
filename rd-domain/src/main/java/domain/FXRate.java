@@ -16,7 +16,7 @@ public class FXRate {
 	private BigDecimal rate;
 	private BigDecimal ask;
 	private BigDecimal bid;
-	private String provider;
+	private char provider;
 	private Long ts;
 	private DataType dataType;
 
@@ -26,7 +26,7 @@ public class FXRate {
 		super();
 	}
 
-	public FXRate(String symbol, BigDecimal rate, BigDecimal ask, BigDecimal bid, String provider, Long ts, DataType dataType) {
+	public FXRate(String symbol, BigDecimal rate, BigDecimal ask, BigDecimal bid, char provider, Long ts, DataType dataType) {
 		super();
 		this.symbol = symbol;
 		this.rate = rate;
@@ -74,11 +74,11 @@ public class FXRate {
 	}
 
 	@XmlElement(name = "Provider")
-	public String getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(String provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 
@@ -91,12 +91,12 @@ public class FXRate {
 		this.ts = ts;
 	}
 
-	@XmlElement(name = "Type")
-	public DataType getType() {
+	@XmlElement(name = "DataType")
+	public DataType getDataType() {
 		return dataType;
 	}
 
-	public void setType(DataType dataType) {
+	public void setDataType(DataType dataType) {
 		this.dataType = dataType;
 	}
 

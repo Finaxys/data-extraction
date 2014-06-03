@@ -4,10 +4,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
+import msg.Document;
+import msg.Document.ContentType;
+import msg.Document.DataType;
 import msg.Message;
 
 import org.apache.log4j.Logger;
+
+import provider.IndexQuoteProvider;
+import provider.impl.yahoo.YahooIndexQuoteProvider;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -33,7 +40,7 @@ public class MomPublisher implements Publisher {
 		super();
 	}
 
-	public void publish(Message message, Converter converter) throws Exception {
+	public void publish(Message message) throws Exception {
 
 		// create a connection to rabitmq server
 		logger.info("creating a connection to rabitmq server");
@@ -51,7 +58,6 @@ public class MomPublisher implements Publisher {
 		channel.exchangeDeclare(DIRECT_EXCHANGE_NAME, DIRECT_QUEUE);
 
 		logger.info("publishing the message...");
-		converter.convert(message);
 		channel.basicPublish(DIRECT_EXCHANGE_NAME, message.getRoutingKey(), null, serializeMessage(message));
 
 		logger.info("msg published");
@@ -74,5 +80,20 @@ public class MomPublisher implements Publisher {
 				out.close();
 			bos.close();
 		}
+	}
+
+	public static void main(String[] args) throws Exception {
+		IndexQuoteProvider md = new YahooIndexQuoteProvider();
+		List<Document> l = md.getCurrentIndexQuotes(ContentType.XML, DataType.EOD);
+		Converter converter = new converter.yahoo.IndexQuotesConverter();
+		Publisher p = new MomPublisher();
+		if( l != null && l.size() > 0)
+		for (Document d : l) {
+			Message m = new Message(d, MomPublisher.INDEX_QUOTES_ROUTING_KEY);
+			converter.convert(m);
+			p.publish(m);
+		}
+		
+
 	}
 }

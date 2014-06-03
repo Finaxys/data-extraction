@@ -8,13 +8,13 @@ public class IndexInfo {
 	private String symbol;
 	private String name;
 	private String exchSymb;
-	private Integer provider;
+	private char provider;
 		
 	public IndexInfo() {
 		super();
 	}
 
-	public IndexInfo(String symbol, String name, String exchSymb, Integer provider) {
+	public IndexInfo(String symbol, String name, String exchSymb, char provider) {
 		super();
 		this.symbol = symbol;
 		this.exchSymb = exchSymb;
@@ -41,11 +41,11 @@ public class IndexInfo {
 		this.name = name;
 	}
 
-	public Integer getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Integer provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 	

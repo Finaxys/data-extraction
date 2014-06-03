@@ -11,7 +11,7 @@ public class Stock {
 	
 	private String symbol;
 	private String exchSymb;
-	private Integer provider;
+	private char provider;
 	private String companyName;
 	private Date start;
 	private Date end;
@@ -23,7 +23,7 @@ public class Stock {
 		super();
 	}
 
-	public Stock(String symbol, String exchSymb, Integer provider, String companyName, Date start, Date end, String sector, String industry,
+	public Stock(String symbol, String exchSymb, char provider, String companyName, Date start, Date end, String sector, String industry,
 			Integer fullTimeEmployees) {
 		super();
 		this.exchSymb = exchSymb;
@@ -101,11 +101,11 @@ public class Stock {
 		this.exchSymb = exchSymb;
 	}
 	@XmlElement(name = "Provider")
-	public Integer getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Integer provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 

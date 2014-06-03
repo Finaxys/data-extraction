@@ -43,6 +43,7 @@ public class StockDaoImpl implements StockDao {
 
 	public static final byte[] TABLE_NAME = Bytes.toBytes("stock");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
+	
 
 	private HConnection connection;
 
@@ -63,20 +64,21 @@ public class StockDaoImpl implements StockDao {
 		return mkRowKey(stock.getProvider(), stock.getExchSymb(), stock.getSymbol());
 	}
 
-	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol) {
+	private byte[] mkRowKey(char provider, String exchSymb, String symbol) {
+		byte provByte = (byte)provider;
 		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
-		byte[] provHash = Md5Utils.md5sum(provider + exchSymbHash.toString());
 		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH]; 
+		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH + 1]; 
 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putByte(rowkey, offset, provByte);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
 
 		return rowkey;
 	}
 
-	private Get mkGet(Integer provider, String exchSymb, String symbol) {
+	private Get mkGet(char provider, String exchSymb, String symbol) {
 		Get g = new Get(mkRowKey(provider, exchSymb, symbol));
 		return g;
 	}
@@ -99,6 +101,9 @@ public class StockDaoImpl implements StockDao {
 						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes(((Date) value).getTime()));
 					if (field.getType().equals(Integer.class))
 						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Integer) value));
+					if (field.getType().equals(char.class))
+						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Character) value));
+			
 				}
 				i++;
 
@@ -146,7 +151,7 @@ public class StockDaoImpl implements StockDao {
 
 	}
 
-	public Stock get(Integer provider, String exchSymb, String symbol) throws IOException {
+	public Stock get(char provider, String exchSymb, String symbol) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		Get g = mkGet(provider, exchSymb, symbol);
 		Result result = table.get(g);

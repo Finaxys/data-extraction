@@ -10,7 +10,7 @@ public class Exchange {
 	private String mic;
 	private String symbol;
 	private String suffix;
-	private Integer provider;
+	private char provider;
 	private String name;
 	private String type;
 	private String continent;
@@ -18,19 +18,13 @@ public class Exchange {
 	private String currency;
 	private long openTime;
 	private long closeTime;
-	// private long inputDate;
 	private boolean status;
 
 	public Exchange() {
 		super();
 	}
 
-	// public Exchange(String mic, String name, String type, String continent,
-	// String country,
-	// String currency, long openTime, long closeTime, long inputDate, boolean
-	// status, Map<String,String> dataProviderSymbol) {
-	//
-	public Exchange(String mic, String symbol, String suffix, Integer provider, String name, String type, String continent,
+	public Exchange(String mic, String symbol, String suffix, char provider, String name, String type, String continent,
 			String country, String currency, long openTime, long closeTime, boolean status) {
 		super();
 		this.mic = mic;
@@ -43,13 +37,12 @@ public class Exchange {
 		this.currency = currency;
 		this.openTime = openTime;
 		this.closeTime = closeTime;
-		// this.inputDate = inputDate;
 		this.status = status;
 	}
 
 	public Exchange(byte[] mic, byte[] symbol, byte[] suffix, byte[] provider, byte[] name, byte[] type, byte[] continent,
 			byte[] country, byte[] currency, byte[] openTime, byte[] closeTime, byte[] status) {
-		this(Bytes.toString(mic), Bytes.toString(symbol), Bytes.toString(suffix), Bytes.toInt(provider), Bytes.toString(name), Bytes
+		this(Bytes.toString(mic), Bytes.toString(symbol), Bytes.toString(suffix),(char)(provider[0]), Bytes.toString(name), Bytes
 				.toString(type), Bytes.toString(continent), Bytes.toString(country), Bytes.toString(currency), Bytes
 				.toLong(openTime), Bytes.toLong(closeTime), Bytes.toBoolean(status));
 	}
@@ -148,11 +141,11 @@ public class Exchange {
 		this.symbol = symbol;
 	}
 
-	public Integer getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Integer provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 

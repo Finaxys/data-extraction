@@ -9,11 +9,11 @@ import msg.Document.DataType;
 
 import org.apache.hadoop.hbase.util.Bytes;
 
-
 @XmlRootElement(name = "quote")
 public class IndexQuote {
 	private String symbol;
-	private Integer provider;
+	private char provider;
+	private String exchSymb;
 	private BigDecimal lastTradePriceOnly;
 	private Long ts;
 	private BigDecimal change;
@@ -22,17 +22,19 @@ public class IndexQuote {
 	private BigDecimal daysLow;
 	private Integer volume;
 	private DataType dataType;
-
+	
 
 	public IndexQuote() {
 		super();
 	}
 
-	public IndexQuote(String symbol, Integer provider, BigDecimal lastTradePriceOnly, Long ts, BigDecimal change,
-			BigDecimal open, BigDecimal daysHigh, BigDecimal daysLow, Integer volume, DataType dataType) {
+	public IndexQuote(String symbol, char provider, String exchSymb, BigDecimal lastTradePriceOnly, Long ts,
+			BigDecimal change, BigDecimal open, BigDecimal daysHigh, BigDecimal daysLow, Integer volume,
+			DataType dataType) {
 		super();
 		this.symbol = symbol;
 		this.provider = provider;
+		this.exchSymb = exchSymb;
 		this.lastTradePriceOnly = lastTradePriceOnly;
 		this.ts = ts;
 		this.change = change;
@@ -53,11 +55,11 @@ public class IndexQuote {
 	}
 
 	@XmlElement(name = "Provider")
-	public Integer getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Integer provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 
@@ -70,7 +72,7 @@ public class IndexQuote {
 		this.lastTradePriceOnly = lastTradePriceOnly;
 	}
 
-	@XmlElement(name = "Ts")
+	@XmlElement(name = "ts")
 	public Long getTs() {
 		return ts;
 	}
@@ -124,12 +126,21 @@ public class IndexQuote {
 		this.volume = volume;
 	}
 
-	@XmlElement(name = "Type")
-	public DataType getType() {
+	@XmlElement(name = "ExchSymb")
+	public String getExchSymb() {
+		return exchSymb;
+	}
+
+	public void setExchSymb(String exchSymb) {
+		this.exchSymb = exchSymb;
+	}
+
+	@XmlElement(name = "DataType")
+	public DataType getDataType() {
 		return dataType;
 	}
 
-	public void setType(DataType dataType) {
+	public void setDataType(DataType dataType) {
 		this.dataType = dataType;
 	}
 

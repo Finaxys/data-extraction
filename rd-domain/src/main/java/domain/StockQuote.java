@@ -15,7 +15,7 @@ public class StockQuote {
 
 	private String symbol;
 	private String exchSymb;
-	private Integer provider;
+	private char provider;
 	private Integer averageDailyVolume;
 	private BigDecimal change;
 	private BigDecimal daysLow;
@@ -35,7 +35,7 @@ public class StockQuote {
 		super();
 	}
 
-	public StockQuote(String symbol, String exchSymb, Integer provider, Integer averageDailyVolume, BigDecimal change,
+	public StockQuote(String symbol, String exchSymb, char provider, Integer averageDailyVolume, BigDecimal change,
 			BigDecimal daysLow, BigDecimal daysHigh, BigDecimal yearLow, BigDecimal yearHigh,
 			String marketCapitalization, BigDecimal lastTradePriceOnly, String daysRange, String name, Integer volume,
 			Long ts, DataType dataType) {
@@ -77,11 +77,11 @@ public class StockQuote {
 	}
 
 	@XmlElement(name = "Provider")
-	public Integer getProvider() {
+	public char getProvider() {
 		return provider;
 	}
 
-	public void setProvider(Integer provider) {
+	public void setProvider(char provider) {
 		this.provider = provider;
 	}
 
@@ -192,12 +192,12 @@ public class StockQuote {
 	public void setTs(Long ts) {
 		this.ts = ts;
 	}
-
-	public DataType getType() {
+	@XmlElement(name = "DataType")
+	public DataType getDataType() {
 		return dataType;
 	}
 
-	public void setType(DataType dataType) {
+	public void setDataType(DataType dataType) {
 		this.dataType = dataType;
 	}
 

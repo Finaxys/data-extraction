@@ -33,5 +33,9 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rd-dao"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rd-domain"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rd-service"/>
+	<classpathentry kind="src" path="home_data"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -39,6 +39,7 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 	public static final byte[] DAYS_LOW_COL = Bytes.toBytes("dl");
 	public static final byte[] DAYS_HIGH_COL = Bytes.toBytes("dh");
 	public static final byte[] YEARS_LOW_COL = Bytes.toBytes("yl");
+	public static final byte[] YEARS_HIGH_COL = Bytes.toBytes("yh");
 	public static final byte[] MC_HIGH_COL = Bytes.toBytes("mc");
 	public static final byte[] LTPO_COL = Bytes.toBytes("ltpo");
 	public static final byte[] DAYS_RANG_COL = Bytes.toBytes("dr");
@@ -48,10 +49,9 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 	public static final byte[] TYPE_COL = Bytes.toBytes("t");
 
 	public static final byte[] TABLE_NAME = Bytes.toBytes("stock_quote");
-	public static final byte[] INFO_FAM = Bytes.toBytes("i");
+	public static final byte[] VALUE_FAM = Bytes.toBytes("v");
 
 	private static final int longLength = 8;
-	private static final int intLength =4;
 	
 	private HConnection connection;
 
@@ -69,28 +69,28 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 	}
 
 	private byte[] mkRowKey(StockQuote stockQuote) {
-		return mkRowKey(stockQuote.getProvider(), stockQuote.getExchSymb(), stockQuote.getSymbol(), stockQuote.getTs(), stockQuote.getType());
+		return mkRowKey(stockQuote.getProvider(), stockQuote.getExchSymb(), stockQuote.getSymbol(), stockQuote.getTs(), stockQuote.getDataType());
 	}
 
-	private byte[] mkRowKey(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) {
+	private byte[] mkRowKey(char provider, String exchSymb, String symbol, Long ts, DataType dataType) {
 		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
-		byte[] provBytes = Bytes.toBytes(provider);
-		byte[] typeBytes = dataType.getName().getBytes();
+		byte provByte = (byte)provider;
+		byte typeByte = dataType.getTByte();
 		byte[] symbHash = Md5Utils.md5sum(symbol);
 		byte[] timestamp = Bytes.toBytes(ts);
-		byte[] rowkey = new byte[2 * intLength + 2 * Md5Utils.MD5_LENGTH + longLength]; 
+		byte[] rowkey = new byte[2 + 2 * Md5Utils.MD5_LENGTH + longLength]; 
 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provBytes, 0, intLength);
+		offset = Bytes.putByte(rowkey, offset, provByte);
 		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
-		offset = Bytes.putBytes(rowkey, offset, typeBytes, 0, intLength);
+		offset = Bytes.putByte(rowkey, offset, typeByte);
 		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, timestamp, 0, timestamp.length);
 
 		return rowkey;
 	}
 
-	private Get mkGet(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) {
+	private Get mkGet(char provider, String exchSymb, String symbol, Long ts, DataType dataType) {
 		Get g = new Get(mkRowKey(provider, exchSymb, symbol, ts, dataType));
 		return g;
 	}
@@ -108,13 +108,15 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 			try {
 				if ((value = PropertyUtils.getSimpleProperty(stockQuote, field.getName())) != null) {
 					if (field.getType().equals(String.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((String) value));
+						p.add(VALUE_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((String) value));
 					else if (field.getType().equals(BigDecimal.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((BigDecimal) value));
+						p.add(VALUE_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((BigDecimal) value));
 					else if (field.getType().equals(Integer.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Integer) value));
+						p.add(VALUE_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Integer) value));
 					else if (field.getType().equals(Long.class))
-						p.add(INFO_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Long) value));
+						p.add(VALUE_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Long) value));
+					if (field.getType().equals(char.class))
+						p.add(VALUE_FAM, (byte[]) stockCols[i].get(null), Bytes.toBytes((Character) value));
 				}
 				i++;
 
@@ -160,7 +162,7 @@ public class StockQuoteDaoImpl implements StockQuoteDao {
 
 	}
 
-	public StockQuote get(Integer provider, String exchSymb, String symbol, Long ts, DataType dataType) throws IOException {
+	public StockQuote get(char provider, String exchSymb, String symbol, Long ts, DataType dataType) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		Get g = mkGet(provider, exchSymb, symbol, ts, dataType);
 		Result result = table.get(g);

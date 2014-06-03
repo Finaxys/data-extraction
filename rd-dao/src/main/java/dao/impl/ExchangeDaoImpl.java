@@ -43,6 +43,7 @@ public class ExchangeDaoImpl implements ExchangeDao {
 	public static final byte[] TABLE_NAME = Bytes.toBytes("exchange");
 	public static final byte[] INFO_FAM = Bytes.toBytes("i");
 
+	
 	private HConnection connection;
 
 	// Constructor
@@ -64,19 +65,20 @@ public class ExchangeDaoImpl implements ExchangeDao {
 		return mkRowKey(exchange.getProvider(), exchange.getSuffix(), exchange.getMic());
 	}
 
-	private byte[] mkRowKey(Integer provider, String suffix, String mic) {
+	private byte[] mkRowKey(char provider, String suffix, String mic) {
+		byte provBytes = (byte)provider;
 		byte[] suffixHash = Md5Utils.md5sum(suffix);
-		byte[] provBytes = Bytes.toBytes(provider);
 		byte[] micb = Bytes.toBytes(mic);
-		byte[] rowkey = new byte[Md5Utils.MD5_LENGTH + micb.length]; // mic code length = 4
+		byte[] rowkey = new byte[1 + Md5Utils.MD5_LENGTH + micb.length]; 
 		int offset = 0;
-		offset = Bytes.putBytes(rowkey, offset, provBytes, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putByte(rowkey, offset, provBytes);
+		offset = Bytes.putBytes(rowkey, offset, suffixHash, 0, Md5Utils.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, micb, 0, micb.length);
 
 		return rowkey;
 	}
 
-	private Get mkGet(Integer provider, String suffix, String mic) {
+	private Get mkGet(char provider, String suffix, String mic) {
 		Get g = new Get(mkRowKey(provider, suffix, mic));
 		return g;
 	}
@@ -101,6 +103,8 @@ public class ExchangeDaoImpl implements ExchangeDao {
 						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Long) value));
 					if (field.getType().equals(Integer.class))
 						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Integer) value));
+					if (field.getType().equals(char.class))
+						p.add(INFO_FAM, (byte[]) exch_cols[i].get(null), Bytes.toBytes((Character) value));
 			
 				}
 				i++;
@@ -147,7 +151,7 @@ public class ExchangeDaoImpl implements ExchangeDao {
 		}
 	}
 
-	public Exchange get(Integer provider, String suffix, String mic) throws IOException {
+	public Exchange get(char provider, String suffix, String mic) throws IOException {
 		HTableInterface table = connection.getTable(TABLE_NAME);
 		Get g = mkGet(provider, suffix, mic);
 		Result result = table.get(g);
