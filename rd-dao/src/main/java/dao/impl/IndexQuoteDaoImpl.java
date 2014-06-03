@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.Helper;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -20,7 +22,6 @@ import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import utils.Md5Utils;
 import dao.IndexQuoteDao;
 import domain.Exchange;
 import domain.IndexQuote;
@@ -62,17 +63,17 @@ public class IndexQuoteDaoImpl implements IndexQuoteDao {
 
 	private byte[] mkRowKey(char provider, String exchSymb, String symbol, Long ts, DataType dataType) {
 		byte provByte = (byte)provider;
-		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
+		byte[] exchSymbHash = Helper.md5sum(exchSymb);
 		byte typeByte = dataType.getTByte();
-		byte[] symbHash = Md5Utils.md5sum(symbol);
+		byte[] symbHash = Helper.md5sum(symbol);
 		byte[] timestamp = Bytes.toBytes(ts);
-		byte[] rowkey = new byte[2 + 2 * Md5Utils.MD5_LENGTH];
+		byte[] rowkey = new byte[2 + 2 * Helper.MD5_LENGTH];
 
 		int offset = 0;
 		offset = Bytes.putByte(rowkey, offset, provByte);
-		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Helper.MD5_LENGTH);
 		offset = Bytes.putByte(rowkey, offset, typeByte);
-		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, symbHash, 0, Helper.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, timestamp, 0, timestamp.length);
 
 		return rowkey;

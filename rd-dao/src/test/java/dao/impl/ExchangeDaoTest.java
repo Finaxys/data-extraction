@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-import utils.Md5Utils;
 import dao.impl.ExchangeDaoImpl;
 import domain.Exchange;
 

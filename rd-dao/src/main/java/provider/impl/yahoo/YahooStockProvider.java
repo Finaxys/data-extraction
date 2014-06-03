@@ -1,5 +1,6 @@
 package provider.impl.yahoo;
 
+
 import helper.Helper;
 
 import java.io.File;
@@ -31,11 +32,9 @@ public class YahooStockProvider implements StockProvider {
 			+ "(select industry.id from yahoo.finance.sectors))";
 
 	private CloseableHttpAsyncClient client;
-	private Helper helper;
 
 	public YahooStockProvider() {
 		client = HttpAsyncClients.createDefault();
-		this.helper = new Helper();
 	}
 
 	public CloseableHttpAsyncClient getClient() {
@@ -46,13 +45,6 @@ public class YahooStockProvider implements StockProvider {
 		this.client = client;
 	}
 
-	public Helper getHelper() {
-		return helper;
-	}
-
-	public void setHelper(Helper helper) {
-		this.helper = helper;
-	}
 
 	public List<Document> getStocks(ContentType format) throws Exception {
 		List<Document> list = new ArrayList<Document>();
@@ -70,7 +62,7 @@ public class YahooStockProvider implements StockProvider {
 					.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile), null);
 			File f = future.get();
 			if (f.length() > 0)
-				list.add(new Document(format, DataType.Ref, DataClass.Stocks, Y_PROVIDER_SYMB, helper.toBytes(f)));
+				list.add(new Document(format, DataType.Ref, DataClass.Stocks, Y_PROVIDER_SYMB, Helper.toBytes(f)));
 			return list;
 		} catch (Exception e) {
 			e.printStackTrace();

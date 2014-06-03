@@ -184,18 +184,6 @@ public class MyApp {
 
 		try {
 
-			// Receiver receiver = new CurrencyPairReceiver(new
-			// CurrencyPairDaoImpl(hConnection));
-			// MomSubscriber subscriber = new MomSubscriber(connection,
-			// receiver, CurrencyPairReceiver.BINDING_KEY);
-			// subscriber.subscribe();
-
-			// Receiver receiver = new IndexInfoReceiver(new
-			// IndexInfoDaoImpl(hConnection));
-			// MomSubscriber subscriber = new MomSubscriber(connection,
-			// receiver, IndexInfoReceiver.BINDING_KEY);
-			// subscriber.subscribe();
-
 			Receiver receiver = new IndexQuoteReceiver(new IndexQuoteDaoImpl(hConnection));
 			MomSubscriber subscriber = new MomSubscriber(connection, receiver, IndexQuoteReceiver.BINDING_KEY);
 			subscriber.subscribe();

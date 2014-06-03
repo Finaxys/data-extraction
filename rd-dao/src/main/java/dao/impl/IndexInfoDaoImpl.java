@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.Helper;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,6 @@ import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
-import utils.Md5Utils;
 import dao.IndexInfoDao;
 import domain.IndexInfo;
 
@@ -48,14 +49,14 @@ public class IndexInfoDaoImpl implements IndexInfoDao {
 
 	private byte[] mkRowKey(char provider, String exchSymb, String symbol) {
 		byte provByte = (byte)provider;
-		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
-		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[1 + 2 * Md5Utils.MD5_LENGTH]; 
+		byte[] exchSymbHash = Helper.md5sum(exchSymb);
+		byte[] symbHash = Helper.md5sum(symbol);
+		byte[] rowkey = new byte[1 + 2 * Helper.MD5_LENGTH]; 
 
 		int offset = 0;
 		offset = Bytes.putByte(rowkey, offset, provByte);
-		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
-		Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Helper.MD5_LENGTH);
+		Bytes.putBytes(rowkey, offset, symbHash, 0, Helper.MD5_LENGTH);
 
 		return rowkey;
 	}

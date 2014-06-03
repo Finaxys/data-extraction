@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.Helper;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,13 +21,11 @@ import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import utils.Md5Utils;
 import domain.Exchange;
 import dao.ExchangeDao;
 
 public class ExchangeDaoImpl implements ExchangeDao {
 
-	// static Logger logger = Logger.getLogger(ExchangeDaoImpl.class);
 
 	public static final byte[] MIC_COL = Bytes.toBytes("mic");
 	public static final byte[] SYMBOL_COL = Bytes.toBytes("symbol");
@@ -45,14 +45,22 @@ public class ExchangeDaoImpl implements ExchangeDao {
 
 	
 	private HConnection connection;
-
+    
 	// Constructor
 	public ExchangeDaoImpl(HConnection connection) {
 		this.connection = connection;
 	}
+   
+	public HConnection getConnection() {
+		return connection;
+	}
+
+	public void setConnection(HConnection connection) {
+		this.connection = connection;
+	}
 
 	// Helpers
-
+	
 	private Exchange toExchange(Result r) {
 		return new Exchange(r.getValue(INFO_FAM, MIC_COL), r.getValue(INFO_FAM, SYMBOL_COL), r.getValue(INFO_FAM, SUFFIX_COL), r.getValue(INFO_FAM,
 				PROVIDER_COL), r.getValue(INFO_FAM, NAME_COL), r.getValue(INFO_FAM, TYPE_COL), r.getValue(INFO_FAM,
@@ -67,12 +75,12 @@ public class ExchangeDaoImpl implements ExchangeDao {
 
 	private byte[] mkRowKey(char provider, String suffix, String mic) {
 		byte provBytes = (byte)provider;
-		byte[] suffixHash = Md5Utils.md5sum(suffix);
+		byte[] suffixHash = Helper.md5sum(suffix);
 		byte[] micb = Bytes.toBytes(mic);
-		byte[] rowkey = new byte[1 + Md5Utils.MD5_LENGTH + micb.length]; 
+		byte[] rowkey = new byte[1 + Helper.MD5_LENGTH + micb.length]; 
 		int offset = 0;
 		offset = Bytes.putByte(rowkey, offset, provBytes);
-		offset = Bytes.putBytes(rowkey, offset, suffixHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, suffixHash, 0, Helper.MD5_LENGTH);
 		Bytes.putBytes(rowkey, offset, micb, 0, micb.length);
 
 		return rowkey;

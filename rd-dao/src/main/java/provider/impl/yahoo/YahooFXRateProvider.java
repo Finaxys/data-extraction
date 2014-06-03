@@ -1,5 +1,6 @@
 package provider.impl.yahoo;
 
+
 import helper.Helper;
 
 import java.io.File;
@@ -33,11 +34,9 @@ public class YahooFXRateProvider implements FXRateProvider {
 	private static final String YQL_FXRATE_QUERY = "select * from yahoo.finance.xchange where pair in (?)";
 
 	private CloseableHttpAsyncClient client;
-	private Helper helper;
 
 	public YahooFXRateProvider() {
 		client = HttpAsyncClients.createDefault();
-		this.helper = new Helper();
 	}
 
 	public CloseableHttpAsyncClient getClient() {
@@ -46,14 +45,6 @@ public class YahooFXRateProvider implements FXRateProvider {
 
 	public void setClient(CloseableHttpAsyncClient client) {
 		this.client = client;
-	}
-
-	public Helper getHelper() {
-		return helper;
-	}
-
-	public void setHelper(Helper helper) {
-		this.helper = helper;
 	}
 
 	public List<Document> getCurrentFXRates(ContentType format, DataType type) throws Exception {
@@ -65,14 +56,14 @@ public class YahooFXRateProvider implements FXRateProvider {
 			List<String> symbList = d.listAllSymbols();
 			String query = "";
 			for (String symbs : symbList) {
-				query = helper.constructQuery(YQL_FXRATE_QUERY, symbs);
-				URI uri = helper.contructYqlUri(query, format, YQL_DEFAULT_ENV);
+				query = Helper.constructQuery(YQL_FXRATE_QUERY, symbs);
+				URI uri = Helper.contructYqlUri(query, format, YQL_DEFAULT_ENV);
 				File tfile = File.createTempFile("fxRatesTemp", "." + format);
 				Future<File> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile),
 						null);
 				File f = future.get();
 				if (f.length() > 0)
-					list.add(new Document(format, type, DataClass.FXRates, Y_PROVIDER_SYMB, helper.toBytes(f)));
+					list.add(new Document(format, type, DataClass.FXRates, Y_PROVIDER_SYMB, Helper.toBytes(f)));
 			}
 			return list;
 		} catch (Exception e) {

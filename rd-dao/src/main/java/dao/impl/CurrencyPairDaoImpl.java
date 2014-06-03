@@ -16,10 +16,13 @@ import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import dao.CurrencyPairDao;
 import dao.StockDao;
 import domain.CurrencyPair;
+
 
 public class CurrencyPairDaoImpl implements CurrencyPairDao {
 

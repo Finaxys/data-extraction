@@ -1,5 +1,6 @@
 package provider.impl.yahoo;
 
+
 import helper.Helper;
 
 import java.io.File;
@@ -33,11 +34,9 @@ public class YahooIndexQuoteProvider implements IndexQuoteProvider {
 	private static final String YQL_INDEX_QUOTES_QUERY = "select * from yahoo.finance.quoteslist where symbol in (?)";
 
 	private CloseableHttpAsyncClient client;
-	private Helper helper;
 
 	public YahooIndexQuoteProvider() {
 		client = HttpAsyncClients.createDefault();
-		this.helper = new Helper();
 	}
 
 	public CloseableHttpAsyncClient getClient() {
@@ -46,15 +45,6 @@ public class YahooIndexQuoteProvider implements IndexQuoteProvider {
 
 	public void setClient(CloseableHttpAsyncClient client) {
 		this.client = client;
-	}
-
-
-	public Helper getHelper() {
-		return helper;
-	}
-
-	public void setHelper(Helper helper) {
-		this.helper = helper;
 	}
 
 
@@ -68,14 +58,14 @@ public class YahooIndexQuoteProvider implements IndexQuoteProvider {
 			List<String> symbList = d.listAllSymbols();
 			String query = "";
 			for (String symbs : symbList) {
-				query = helper.constructQuery(YQL_INDEX_QUOTES_QUERY, symbs);
-				URI uri = helper.contructYqlUri(query, format, YQL_DEFAULT_ENV);
+				query = Helper.constructQuery(YQL_INDEX_QUOTES_QUERY, symbs);
+				URI uri = Helper.contructYqlUri(query, format, YQL_DEFAULT_ENV);
 				File tfile = File.createTempFile("indexQuotesTemp", "." + format);
 				Future<File> future = client.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile),
 						null);
 				File f = future.get();
 				if(f.length()>0)
-				list.add(new Document(format, type, DataClass.IndexInfos, Y_PROVIDER_SYMB, helper.toBytes(f)));
+				list.add(new Document(format, type, DataClass.IndexInfos, Y_PROVIDER_SYMB, Helper.toBytes(f)));
 			}
 			return list;
 		} catch (Exception e) {

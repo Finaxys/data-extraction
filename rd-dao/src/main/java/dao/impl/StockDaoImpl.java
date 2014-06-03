@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.Helper;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,7 +25,6 @@ import org.apache.hadoop.hbase.util.Bytes;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import utils.Md5Utils;
 import dao.StockDao;
 import domain.Stock;
 
@@ -66,14 +67,14 @@ public class StockDaoImpl implements StockDao {
 
 	private byte[] mkRowKey(char provider, String exchSymb, String symbol) {
 		byte provByte = (byte)provider;
-		byte[] exchSymbHash = Md5Utils.md5sum(exchSymb);
-		byte[] symbHash = Md5Utils.md5sum(symbol);
-		byte[] rowkey = new byte[2 * Md5Utils.MD5_LENGTH + 1]; 
+		byte[] exchSymbHash = Helper.md5sum(exchSymb);
+		byte[] symbHash = Helper.md5sum(symbol);
+		byte[] rowkey = new byte[2 * Helper.MD5_LENGTH + 1]; 
 
 		int offset = 0;
 		offset = Bytes.putByte(rowkey, offset, provByte);
-		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Md5Utils.MD5_LENGTH);
-		Bytes.putBytes(rowkey, offset, symbHash, 0, Md5Utils.MD5_LENGTH);
+		offset = Bytes.putBytes(rowkey, offset, exchSymbHash, 0, Helper.MD5_LENGTH);
+		Bytes.putBytes(rowkey, offset, symbHash, 0, Helper.MD5_LENGTH);
 
 		return rowkey;
 	}

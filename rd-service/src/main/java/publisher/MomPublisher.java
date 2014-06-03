@@ -82,18 +82,4 @@ public class MomPublisher implements Publisher {
 		}
 	}
 
-	public static void main(String[] args) throws Exception {
-		IndexQuoteProvider md = new YahooIndexQuoteProvider();
-		List<Document> l = md.getCurrentIndexQuotes(ContentType.XML, DataType.EOD);
-		Converter converter = new converter.yahoo.IndexQuotesConverter();
-		Publisher p = new MomPublisher();
-		if( l != null && l.size() > 0)
-		for (Document d : l) {
-			Message m = new Message(d, MomPublisher.INDEX_QUOTES_ROUTING_KEY);
-			converter.convert(m);
-			p.publish(m);
-		}
-		
-
-	}
 }

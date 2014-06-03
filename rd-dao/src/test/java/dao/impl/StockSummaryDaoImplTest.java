@@ -18,7 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-import utils.Md5Utils;
 import junit.framework.TestCase;
 import org.mockito.MockitoAnnotations;
 
