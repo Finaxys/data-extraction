@@ -1,15 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.finaxys.rd</groupId>
+	<groupId>com.finaxys.rd</groupId>
 	<artifactId>data-extraction</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>data-extraction</name>
 	<packaging>pom</packaging>
 	<modules>
-		<module>rd-dao</module>
-		<module>rd-domain</module>
-		<module>rd-service</module>
+		<module>d-dao</module>
+		<module>d-domain</module>
+		<module>d-service</module>
+		<module>d-app</module>
 	</modules>
 
 
@@ -156,10 +157,23 @@
 			<artifactId>quartz-jobs</artifactId>
 			<version>2.2.1</version>
 		</dependency>
+
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>4.0.5.RELEASE</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>4.0.5.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>4.0.5.RELEASE</version>
+		</dependency>
+
 	</dependencies>
 </project>

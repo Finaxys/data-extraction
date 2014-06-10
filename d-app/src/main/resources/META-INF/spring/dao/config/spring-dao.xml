@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="fileCurrencyPairProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.file.FileCurrencyPairProvider" />
+
+	<bean id="fileExchangeProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.file.FileExchangeProvider" />
+
+	<bean id="fileIndexInfoProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.file.FileIndexInfoProvider" />
+
+	<bean id="fileStockProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.file.FileStockProvider" />
+
+	<bean id="currencyPairDao"
+		class="com.finaxys.rd.marketdataprovider.dao.impl.CurrencyPairDaoImpl" />
+
+	<bean id="yahooFXRateProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooFXRateProvider" />
+
+	<bean id="yahooIndexQuoteProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooIndexQuoteProvider" />
+
+	<bean id="yahooStockProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooStockProvider" />
+
+	<bean id="yahooStockQuoteProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooStockQuoteProvider" />
+		
+		<bean id="indexInfoDao"
+		class="com.finaxys.rd.marketdataprovider.dao.impl.IndexInfoDaoImpl" />
+		
+		
+		<bean id="stockDao"
+		class="com.finaxys.rd.marketdataprovider.dao.impl.StockDaoImpl" />
+		
+		
+
+</beans>

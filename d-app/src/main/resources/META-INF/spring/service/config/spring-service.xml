@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<bean id="yahooXmlFXRatesConverter"
+		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlFXRatesConverter" />
+
+	<bean id="yahooXmlIndexQuotesConverter"
+		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlIndexQuotesConverter" />
+
+	<bean id="yahooXmlStockQuotesConverter"
+		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlStockQuotesConverter" />
+
+	<bean id="yahooXmlStocksConverter"
+		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlStocksConverter" />
+
+	<bean id="fileXlsCurrencyPairsConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsCurrencyPairsConverter" />
+
+	<bean id="fileXlsExchangesConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsExchangesConverter" />
+
+	<bean id="fileXlsIndexInfosConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsIndexInfosConverter" />
+
+	<bean id="fileXlsStocksConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsStocksConverter" />
+
+	<bean id="rabbiMqPublisher"
+		class="com.finaxys.rd.dataextraction.publisher.RabbitMqPublisher">
+		<property name="connection" ref="connection" />
+		<property name="queue" value="${publisher.rabbitmq.queue.direct}" />
+		<property name="exchange" value="${publisher.rabbitmq.queue.direct.exchange}" />
+		</bean>
+		
+	
+
+	<bean id="fileXlsCurrencyPairService"
+		class="com.finaxys.rd.dataextraction.service.impl.CurrencyPairServiceImpl">
+		<property name="provider" ref="fileCurrencyPairProvider" />
+		<property name="converter" ref="fileXlsCurrencyPairsConverter" />
+		<property name="publisher" ref="rabbiMqPublisher" />
+		<property name="routingKey"
+			value="${publisher.rabbitmq.routingkey.currency_pairs}" />
+		<property name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+	</bean>
+
+	<bean id="fileXlsExchangeService"
+		class="com.finaxys.rd.dataextraction.service.impl.ExchangeServiceImpl">
+		<property name="provider" ref="fileExchangeProvider" />
+		<property name="converter" ref="fileXlsExchangesConverter" />
+		<property name="publisher" ref="rabbiMqPublisher" />
+		<property name="routingKey" value="${publisher.rabbitmq.routingkey.exchanges}" />
+		<property name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+	</bean>
+
+	<bean id="fileXlsStockService"
+		class="com.finaxys.rd.dataextraction.service.impl.StockServiceImpl">
+		<constructor-arg name="provider" ref="fileStockProvider" />
+		<constructor-arg name="converter" ref="fileXlsStocksConverter" />
+		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.stocks}" />
+		<constructor-arg name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+	</bean>
+
+	<bean id="fileXlsIndexInfoService"
+		class="com.finaxys.rd.dataextraction.service.impl.IndexInfoServiceImpl">
+		<constructor-arg name="provider" ref="fileIndexInfoProvider" />
+		<constructor-arg name="converter" ref="fileXlsIndexInfosConverter" />
+		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.indexes}" />
+		<constructor-arg name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+	</bean>
+
+	<bean id="yahooXmlFXRateService"
+		class="com.finaxys.rd.dataextraction.service.impl.FXRateServiceImpl">
+		<constructor-arg name="provider" ref="yahooFXRateProvider" />
+		<constructor-arg name="converter" ref="yahooXmlFXRatesConverter" />
+		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.fx_rates}" />
+		<constructor-arg name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
+		<constructor-arg name="dataType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+	</bean>
+
+	<bean id="yahooXmlIndexQuoteService"
+		class="com.finaxys.rd.dataextraction.service.impl.IndexQuoteServiceImpl">
+		<constructor-arg name="provider" ref="yahooIndexQuoteProvider" />
+		<constructor-arg name="converter" ref="yahooXmlIndexQuotesConverter" />
+		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.index_quotes}" />
+		<constructor-arg name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
+		<constructor-arg name="dataType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+	</bean>
+
+	<bean id="yahooXmlStockQuoteService"
+		class="com.finaxys.rd.dataextraction.service.impl.StockQuoteServiceImpl">
+		<constructor-arg name="provider" ref="yahooStockQuoteProvider" />
+		<constructor-arg name="converter" ref="yahooXmlStockQuotesConverter" />
+		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.stocks_quotes}" />
+		<constructor-arg name="contentType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
+		<constructor-arg name="dataType"
+			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+	</bean>
+
+</beans>
