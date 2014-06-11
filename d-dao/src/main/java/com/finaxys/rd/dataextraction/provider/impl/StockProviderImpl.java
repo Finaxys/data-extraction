@@ -1,7 +1,7 @@
 /*
  * 
  */
-package com.finaxys.rd.dataextraction.provider.impl.file;
+package com.finaxys.rd.dataextraction.provider.impl;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
+import com.finaxys.rd.dataextraction.gateway.StockGateway;
 import com.finaxys.rd.dataextraction.helper.ProviderHelper;
 import com.finaxys.rd.dataextraction.msg.Document;
 import com.finaxys.rd.dataextraction.msg.Document.ContentType;
@@ -19,41 +20,44 @@ import com.finaxys.rd.dataextraction.msg.Document.DataClass;
 import com.finaxys.rd.dataextraction.msg.Document.DataType;
 import com.finaxys.rd.dataextraction.provider.StockProvider;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class FileStockProvider.
- */
-public class FileStockProvider implements StockProvider {
+public class StockProviderImpl implements StockProvider {
 
 	/** The logger. */
 	static Logger logger = Logger.getLogger(StockProvider.class);
 	
-	/** The file provider symb. */
-	@Value("${provider.file.symbol:0}")
-	public char FILE_PROVIDER_SYMB;
-	
-	/** The data folder. */
-	@Value("${provider.file.dataFolder:home_data}")
-	public String DATA_FOLDER;
-	
-	/** The stocks file. */
-	@Value("${provider.fle.stocksFile:stocks}")
-	public String STOCKS_FILE;
+	private StockGateway gateway;
 
 	/**
 	 * Instantiates a new file stock provider.
 	 */
-	public FileStockProvider() {
+	public StockProviderImpl() {
 		super();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.provider.StockProvider#getStocks(com.finaxys.rd.dataextraction.msg.Document.ContentType)
+	public StockProviderImpl(StockGateway gateway) {
+		super();
+		this.gateway = gateway;
+	}
+
+	public StockGateway getGateway() {
+		return gateway;
+	}
+
+	public void setGateway(StockGateway gateway) {
+		this.gateway = gateway;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.finaxys.rd.dataextraction.provider.StockProvider#getStocks(com.finaxys
+	 * .rd.dataextraction.msg.Document.ContentType)
 	 */
 	public List<Document> getStocks(ContentType format) throws Exception {
 		List<Document> list = new ArrayList<Document>();
-		File f = ProviderHelper.getResourceFile(ProviderHelper.getPath(DATA_FOLDER, STOCKS_FILE, format.getName()));
-		list.add(new Document(format, DataType.Ref, DataClass.Stocks, FILE_PROVIDER_SYMB, ProviderHelper.toBytes(f)));
+		File f = gateway.getStocks(format);
+		list.add(new Document(format, DataType.Ref, DataClass.Stocks, gateway.getProviderSymb(), ProviderHelper.toBytes(f)));
 		return list;
 	}
 

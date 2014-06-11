@@ -1,7 +1,7 @@
 /*
  * 
  */
-package com.finaxys.rd.dataextraction.provider.impl;
+package com.finaxys.rd.dataextraction.gateway.yahoo;
 
 import java.io.File;
 import java.io.FileNotFoundException;

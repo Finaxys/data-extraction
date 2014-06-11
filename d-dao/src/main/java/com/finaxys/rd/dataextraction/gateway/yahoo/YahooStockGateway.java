@@ -1,13 +1,10 @@
-/*
- * 
- */
-package com.finaxys.rd.dataextraction.provider.impl.yahoo;
-
+package com.finaxys.rd.dataextraction.gateway.yahoo;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -16,19 +13,10 @@ import org.apache.http.nio.client.methods.HttpAsyncMethods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.finaxys.rd.dataextraction.helper.ProviderHelper;
-import com.finaxys.rd.dataextraction.msg.Document;
+import com.finaxys.rd.dataextraction.gateway.StockGateway;
 import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.msg.Document.DataClass;
-import com.finaxys.rd.dataextraction.msg.Document.DataType;
-import com.finaxys.rd.dataextraction.provider.StockProvider;
-import com.finaxys.rd.dataextraction.provider.impl.HttpResponseConsumer;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class YahooStockProvider.
- */
-public class YahooStockProvider implements StockProvider {
+public class YahooStockGateway implements StockGateway {
 
 	/** The y provider symb. */
 	@Value("${provider.yahoo.symbol:1}")
@@ -49,7 +37,7 @@ public class YahooStockProvider implements StockProvider {
 	/**
 	 * Instantiates a new yahoo stock provider.
 	 */
-	public YahooStockProvider() {
+	public YahooStockGateway() {
 		super();
 	}
 
@@ -58,7 +46,7 @@ public class YahooStockProvider implements StockProvider {
 	 *
 	 * @param client the client
 	 */
-	public YahooStockProvider(CloseableHttpAsyncClient client) {
+	public YahooStockGateway(CloseableHttpAsyncClient client) {
 		super();
 		this.client = client;
 	}
@@ -81,12 +69,14 @@ public class YahooStockProvider implements StockProvider {
 		this.client = client;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.provider.StockProvider#getStocks(com.finaxys.rd.dataextraction.msg.Document.ContentType)
-	 */
-	public List<Document> getStocks(ContentType format) throws Exception {
-		List<Document> list = new ArrayList<Document>();
+	@Override
+	public char getProviderSymb() {
+		return Y_PROVIDER_SYMB;
+	}
+	
+	@Override
+	public File getStocks(ContentType format) {
+		
 		try {
 			client.start();
 			// URI uri = helper.contructYqlUri(YQL_STOCK_QUERY, format,
@@ -100,14 +90,24 @@ public class YahooStockProvider implements StockProvider {
 			Future<File> future = client
 					.execute(HttpAsyncMethods.createGet(uri), new HttpResponseConsumer(tfile), null);
 			File f = future.get();
-			if (f.length() > 0)
-				list.add(new Document(format, DataType.Ref, DataClass.Stocks, Y_PROVIDER_SYMB, ProviderHelper.toBytes(f)));
-			return list;
-		} catch (Exception e) {
+			return f;
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			return null;
+		}catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ExecutionException e) {
 			e.printStackTrace();
 			return null;
 		} finally {
-//			client.close();
+			// close() method call shutdown() method so we will not be able to
+			// start it again with start() method
+			// apache.googlesource.com/httpasyncclient/+/13388984c55daabdd2c3eb139809eeddc76da783/httpasyncclient/src/main/java/org/apache/http/impl/nio/client/InternalHttpAsyncClient.java
+			// client.close();
 		}
 	}
 

@@ -1,7 +1,7 @@
 /*
  * 
  */
-package com.finaxys.rd.dataextraction.provider.impl.file;
+package com.finaxys.rd.dataextraction.provider.impl;
 
 
 import java.io.File;
@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.finaxys.rd.dataextraction.gateway.ExchangeGateway;
 import com.finaxys.rd.dataextraction.helper.ProviderHelper;
 import com.finaxys.rd.dataextraction.msg.Document;
 import com.finaxys.rd.dataextraction.msg.Document.ContentType;
@@ -19,33 +20,37 @@ import com.finaxys.rd.dataextraction.msg.Document.DataClass;
 import com.finaxys.rd.dataextraction.msg.Document.DataType;
 import com.finaxys.rd.dataextraction.provider.ExchangeProvider;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class FileExchangeProvider.
- */
-public class FileExchangeProvider implements ExchangeProvider {
+public class ExchangeProviderImpl implements ExchangeProvider {
 
 	/** The logger. */
 	static Logger logger = Logger.getLogger(ExchangeProvider.class);
 
-	/** The file provider symb. */
-	@Value("${provider.file.symbol:0}")
-	public char FILE_PROVIDER_SYMB;
-	
-	/** The data folder. */
-	@Value("${provider.file.dataFolder:home_data}")
-	public String DATA_FOLDER;
-	
-	/** The exchanges file. */
-	@Value("${provider.fle.exchangesFile:exchanges}")
-	public String EXCHANGES_FILE;
-	
+	private ExchangeGateway gateway;
 
 	/**
 	 * Instantiates a new file exchange provider.
 	 */
-	public FileExchangeProvider() {
+	public ExchangeProviderImpl() {
 		super();
+	}
+
+
+
+	public ExchangeProviderImpl(ExchangeGateway gateway) {
+		super();
+		this.gateway = gateway;
+	}
+
+
+
+	public ExchangeGateway getGateway() {
+		return gateway;
+	}
+
+
+
+	public void setGateway(ExchangeGateway gateway) {
+		this.gateway = gateway;
 	}
 
 
@@ -55,9 +60,8 @@ public class FileExchangeProvider implements ExchangeProvider {
 	 */
 	public List<Document> getExchanges(ContentType format) throws Exception {
 		List<Document> list = new ArrayList<Document>();
-		String path =ProviderHelper.getPath(DATA_FOLDER, EXCHANGES_FILE, format.getName());
-		File f = ProviderHelper.getResourceFile(path);
-		list.add(new Document(format, DataType.Ref, DataClass.Exchanges, FILE_PROVIDER_SYMB, ProviderHelper.toBytes(f)));
+		File f = gateway.getExchanges(format);
+		list.add(new Document(format, DataType.Ref, DataClass.Exchanges, gateway.getProviderSymb(), ProviderHelper.toBytes(f)));
 		return list;
 
 	}

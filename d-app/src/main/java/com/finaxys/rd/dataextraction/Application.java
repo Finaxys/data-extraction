@@ -4,10 +4,6 @@
 package com.finaxys.rd.dataextraction;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.ZooKeeperConnectionException;
@@ -19,23 +15,13 @@ import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.finaxys.rd.dataextraction.converter.file.xls.FileXlsCurrencyPairsConverter;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.provider.impl.file.FileCurrencyPairProvider;
-import com.finaxys.rd.dataextraction.publisher.RabbitMqPublisher;
-import com.finaxys.rd.dataextraction.service.impl.CurrencyPairServiceImpl;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;

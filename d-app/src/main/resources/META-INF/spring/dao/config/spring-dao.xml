@@ -6,40 +6,76 @@
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+	<bean id="fileCurrencyPairGateway"
+		class="com.finaxys.rd.dataextraction.gateway.file.FileCurrencyPairGateway" />
+
+	<bean id="fileExchangeGateway"
+		class="com.finaxys.rd.dataextraction.gateway.file.FileExchangeGateway" />
+
+	<bean id="fileIndexInfoGateway"
+		class="com.finaxys.rd.dataextraction.gateway.file.FileIndexInfoGateway" />
+
+	<bean id="fileStockGateway"
+		class="com.finaxys.rd.dataextraction.gateway.file.FileStockGateway" />
+
+	<bean id="yahooFXRateGateway"
+		class="com.finaxys.rd.dataextraction.gateway.yahoo.YahooFXRateGateway" />
+
+	<bean id="yahooIndexQuoteGateway"
+		class="com.finaxys.rd.dataextraction.gateway.yahoo.YahooIndexQuoteGateway" />
+
+	<bean id="yahooStockGateway"
+		class="com.finaxys.rd.dataextraction.gateway.yahoo.YahooStockGateway" />
+
+	<bean id="yahooStockQuoteGateway"
+		class="com.finaxys.rd.dataextraction.gateway.yahoo.YahooStockQuoteGateway" />
+
 	<bean id="fileCurrencyPairProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.file.FileCurrencyPairProvider" />
-
+		class="com.finaxys.rd.dataextraction.provider.impl.CurrencyPairProviderImpl">
+		<constructor-arg name="gateway" ref="fileCurrencyPairGateway" />
+	</bean>
 	<bean id="fileExchangeProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.file.FileExchangeProvider" />
-
+		class="com.finaxys.rd.dataextraction.provider.impl.ExchangeProviderImpl">
+		<constructor-arg name="gateway" ref="fileExchangeGateway" />
+	</bean>
 	<bean id="fileIndexInfoProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.file.FileIndexInfoProvider" />
-
+		class="com.finaxys.rd.dataextraction.provider.impl.IndexInfoProviderImpl">
+		<constructor-arg name="gateway" ref="fileIndexInfoGateway" />
+	</bean>
 	<bean id="fileStockProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.file.FileStockProvider" />
+		class="com.finaxys.rd.dataextraction.provider.impl.StockProviderImpl">
+		<constructor-arg name="gateway" ref="fileStockGateway" />
+
+	</bean>
+	<bean id="yahooFXRateProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.FXRateProviderImpl">
+		<constructor-arg name="gateway" ref="yahooFXRateGateway" />
+		<constructor-arg name="currencyPairDao" ref="currencyPairDao" />
+	</bean>
+	<bean id="yahooIndexQuoteProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.IndexQuoteProviderImpl">
+		<constructor-arg name="gateway" ref="yahooIndexQuoteGateway" />
+		<constructor-arg name="indexInfoDao" ref="indexInfoDao" />
+	</bean>
+	<bean id="yahooStockProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.StockProviderImpl">
+		<constructor-arg name="gateway" ref="yahooStockGateway" />
+	</bean>
+	<bean id="yahooStockQuoteProvider"
+		class="com.finaxys.rd.dataextraction.provider.impl.StockQuoteProviderImpl">
+		<constructor-arg name="gateway" ref="yahooStockQuoteGateway" />
+		<constructor-arg name="stockDao" ref="stockDao" />
+	</bean>
 
 	<bean id="currencyPairDao"
 		class="com.finaxys.rd.marketdataprovider.dao.impl.CurrencyPairDaoImpl" />
 
-	<bean id="yahooFXRateProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooFXRateProvider" />
-
-	<bean id="yahooIndexQuoteProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooIndexQuoteProvider" />
-
-	<bean id="yahooStockProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooStockProvider" />
-
-	<bean id="yahooStockQuoteProvider"
-		class="com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooStockQuoteProvider" />
-		
-		<bean id="indexInfoDao"
+	<bean id="indexInfoDao"
 		class="com.finaxys.rd.marketdataprovider.dao.impl.IndexInfoDaoImpl" />
-		
-		
-		<bean id="stockDao"
-		class="com.finaxys.rd.marketdataprovider.dao.impl.StockDaoImpl" />
-		
-		
+
+
+	<bean id="stockDao" class="com.finaxys.rd.marketdataprovider.dao.impl.StockDaoImpl" />
+
+
 
 </beans>

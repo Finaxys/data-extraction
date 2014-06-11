@@ -19,7 +19,7 @@ import com.finaxys.rd.dataextraction.msg.Message;
 import com.finaxys.rd.dataextraction.msg.Document.ContentType;
 import com.finaxys.rd.dataextraction.msg.Document.DataType;
 import com.finaxys.rd.dataextraction.provider.IndexQuoteProvider;
-import com.finaxys.rd.dataextraction.provider.impl.yahoo.YahooIndexQuoteProvider;
+import com.finaxys.rd.dataextraction.provider.impl.IndexQuoteProviderImpl;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
