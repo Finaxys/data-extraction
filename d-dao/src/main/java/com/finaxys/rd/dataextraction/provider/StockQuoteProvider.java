@@ -23,5 +23,5 @@ public interface StockQuoteProvider {
 	 * @return the current stocks quotes
 	 * @throws Exception the exception
 	 */
-	public List<Document> getCurrentStocksQuotes(ContentType format, DataType types) throws Exception;
+	public List<Document> getStocksQuotes(ContentType format, DataType types) throws Exception;
 }

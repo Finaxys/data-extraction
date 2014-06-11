@@ -80,7 +80,7 @@ public class YahooStockQuoteGateway implements StockQuoteGateway {
 	}
 	
 	@Override
-	public File getCurrentStocksQuotes(ContentType format, DataType type, String symbs) {
+	public File getStocksQuotes(ContentType format, String symbs) {
 		try {
 			client.start();
 			String query = ProviderHelper.constructQuery(YQL_QUOTE_QUERY, symbs);

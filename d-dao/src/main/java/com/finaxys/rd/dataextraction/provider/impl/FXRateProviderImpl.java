@@ -80,11 +80,11 @@ public class FXRateProviderImpl implements FXRateProvider {
 	 * (com.finaxys.rd.dataextraction.msg.Document.ContentType,
 	 * com.finaxys.rd.dataextraction.msg.Document.DataType)
 	 */
-	public List<Document> getCurrentFXRates(ContentType format, DataType type) throws Exception {
+	public List<Document> getFXRates(ContentType format, DataType type) throws Exception {
 		List<Document> list = new ArrayList<Document>();
 		List<String> symbList = currencyPairDao.listAllSymbols();
 		for (String symbs : symbList) {
-			File f = gateway.getCurrentFXRates(format, type, symbs);
+			File f = gateway.getFXRates(format, symbs);
 			if (f.length() > 0)
 				list.add(new Document(format, type, DataClass.FXRates, gateway.getProviderSymb(), ProviderHelper
 						.toBytes(f)));

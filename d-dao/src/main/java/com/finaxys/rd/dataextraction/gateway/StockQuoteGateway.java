@@ -7,5 +7,5 @@ import com.finaxys.rd.dataextraction.msg.Document.DataType;
 
 public interface StockQuoteGateway {
 	public char getProviderSymb();
-	public File getCurrentStocksQuotes(ContentType format, DataType type, String symbs);
+	public File getStocksQuotes(ContentType format, String symbs);
 }

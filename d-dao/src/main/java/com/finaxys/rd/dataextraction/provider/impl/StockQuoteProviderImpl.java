@@ -79,13 +79,13 @@ public class StockQuoteProviderImpl implements StockQuoteProvider {
 	 * (com.finaxys.rd.dataextraction.msg.Document.ContentType,
 	 * com.finaxys.rd.dataextraction.msg.Document.DataType)
 	 */
-	public List<Document> getCurrentStocksQuotes(ContentType format, DataType type) throws Exception {
+	public List<Document> getStocksQuotes(ContentType format, DataType type) throws Exception {
 		List<Document> list = new ArrayList<Document>();
 
 		List<String> symbList = stockDao.listAllSymbols();
 
 		for (String symbs : symbList) {
-			File f = gateway.getCurrentStocksQuotes(format, type, symbs);
+			File f = gateway.getStocksQuotes(format, symbs);
 			if (f.length() > 0)
 				list.add(new Document(format, type, DataClass.StockQuotes, gateway.getProviderSymb(), ProviderHelper
 						.toBytes(f)));

@@ -3,9 +3,8 @@ package com.finaxys.rd.dataextraction.gateway;
 import java.io.File;
 
 import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.msg.Document.DataType;
 
-public interface FXRateGateway {
+public interface RateGateway {
 	public char getProviderSymb();
-	public File getFXRates(ContentType format, String symbs);
+	public File getRates(ContentType format);
 }

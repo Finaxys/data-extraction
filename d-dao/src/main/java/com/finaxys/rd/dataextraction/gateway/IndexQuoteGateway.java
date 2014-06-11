@@ -7,5 +7,5 @@ import com.finaxys.rd.dataextraction.msg.Document.DataType;
 
 public interface IndexQuoteGateway {
 	public char getProviderSymb();
-	public File getCurrentIndexQuotes(ContentType format, DataType type, String symbs);
+	public File getIndexQuotes(ContentType format, String symbs);
 }

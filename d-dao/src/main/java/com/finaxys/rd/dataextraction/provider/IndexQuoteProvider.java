@@ -23,5 +23,5 @@ public interface IndexQuoteProvider {
 	 * @return the current index quotes
 	 * @throws Exception the exception
 	 */
-	public List<Document> getCurrentIndexQuotes(ContentType format, DataType type) throws Exception;
+	public List<Document> getIndexQuotes(ContentType format, DataType type) throws Exception;
 }

@@ -79,12 +79,12 @@ public class IndexQuoteProviderImpl implements IndexQuoteProvider {
 	 * (com.finaxys.rd.dataextraction.msg.Document.ContentType,
 	 * com.finaxys.rd.dataextraction.msg.Document.DataType)
 	 */
-	public List<Document> getCurrentIndexQuotes(ContentType format, DataType type) throws Exception {
+	public List<Document> getIndexQuotes(ContentType format, DataType type) throws Exception {
 		List<Document> list = new ArrayList<Document>();
 
 		List<String> symbList = indexInfoDao.listAllSymbols();
 		for (String symbs : symbList) {
-			File f = gateway.getCurrentIndexQuotes(format, type, symbs);
+			File f = gateway.getIndexQuotes(format, symbs);
 			if (f.length() > 0)
 				list.add(new Document(format, type, DataClass.IndexInfos, gateway.getProviderSymb(), ProviderHelper
 						.toBytes(f)));

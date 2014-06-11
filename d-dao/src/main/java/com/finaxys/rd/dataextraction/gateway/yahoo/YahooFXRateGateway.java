@@ -79,7 +79,7 @@ public class YahooFXRateGateway implements FXRateGateway {
 	
 	
 	@Override
-	public File getCurrentFXRates(ContentType format, DataType type, String symbs) {
+	public File getFXRates(ContentType format,  String symbs) {
 		try {
 			client.start();
 			String query = ProviderHelper.constructQuery(YQL_FXRATE_QUERY, symbs);

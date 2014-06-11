@@ -23,5 +23,5 @@ public interface FXRateProvider {
 	 * @return the current fx rates
 	 * @throws Exception the exception
 	 */
-	public List<Document> getCurrentFXRates(ContentType format, DataType type) throws Exception;
+	public List<Document> getFXRates(ContentType format, DataType type) throws Exception;
 }

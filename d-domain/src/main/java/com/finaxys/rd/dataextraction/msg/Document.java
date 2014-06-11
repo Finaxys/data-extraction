@@ -219,6 +219,8 @@ public class Document implements Serializable {
 		EOD("EOD", 'e'),
 		/** The intra. */
 		INTRA("INTRA", 'i'),
+		/** The hist. */
+		HIST("HIST",'h'),
 		/** The Ref. */
 		Ref("REF", 'r');
 

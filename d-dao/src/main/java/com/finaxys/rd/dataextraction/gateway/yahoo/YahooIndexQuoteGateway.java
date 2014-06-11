@@ -81,7 +81,7 @@ public class YahooIndexQuoteGateway implements IndexQuoteGateway {
 	
 	
 	@Override
-	public File getCurrentIndexQuotes(ContentType format, DataType type, String symbs) {
+	public File getIndexQuotes(ContentType format, String symbs) {
 
 		try {
 			client.start();
