@@ -2,11 +2,16 @@
  * 
  */
 package com.finaxys.rd.dataextraction.job;
+
+import java.util.List;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.finaxys.rd.dataextraction.service.ExchangeService;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+import com.finaxys.rd.dataextraction.service.integration.gateway.ExchangeMsgGateway;
+import com.finaxys.rd.dataextraction.service.integration.publisher.Publisher;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -15,34 +20,32 @@ import com.finaxys.rd.dataextraction.service.ExchangeService;
 public class ExchangesJob extends QuartzJobBean {
 
 	/** The exchange service. */
-	private ExchangeService exchangeService;
-	
-	/**
-	 * Gets the exchange service.
-	 *
-	 * @return the exchange service
-	 */
-	public ExchangeService getExchangeService() {
-		return exchangeService;
+	private ExchangeMsgGateway exchangeMsgGateway;
+
+
+	public ExchangeMsgGateway getExchangeMsgGateway() {
+		return exchangeMsgGateway;
 	}
 
-	/**
-	 * Sets the exchange service.
-	 *
-	 * @param exchangeService the new exchange service
-	 */
-	public void setExchangeService(ExchangeService exchangeService) {
-		this.exchangeService = exchangeService;
+	public void setExchangeMsgGateway(ExchangeMsgGateway exchangeMsgGateway) {
+		this.exchangeMsgGateway = exchangeMsgGateway;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org.quartz.JobExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org
+	 * .quartz.JobExecutionContext)
 	 */
 	@Override
 	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
-		try{
-			if(exchangeService!=null)exchangeService.publishExchanges();
+		try {
+			exchangeMsgGateway.publishExchanges();
 		} catch (NullPointerException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

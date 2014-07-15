@@ -3,6 +3,10 @@
  */
 package com.finaxys.rd.dataextraction.service;
 
+import java.util.List;
+
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Interface StockQuoteService.
@@ -10,7 +14,7 @@ package com.finaxys.rd.dataextraction.service;
 public interface StockQuoteService {
 	
 	/**
-	 * Publish stocks quotes.
+	 * Get stocks quotes.
 	 */
-	public void publishStocksQuotes();
+	public List<Message> getCurrentStocksQuotes(String symbols);
 }

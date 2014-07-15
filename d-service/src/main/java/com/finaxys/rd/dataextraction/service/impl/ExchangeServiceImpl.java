@@ -6,33 +6,25 @@ package com.finaxys.rd.dataextraction.service.impl;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.provider.ExchangeProvider;
-import com.finaxys.rd.dataextraction.publisher.Publisher;
+import com.finaxys.rd.dataextraction.dao.integration.ExchangeGateway;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.ExchangeService;
+import com.finaxys.rd.dataextraction.splitter.Splitter;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class ExchangeServiceImpl.
  */
-public class ExchangeServiceImpl implements ExchangeService{
+public class ExchangeServiceImpl implements ExchangeService {
 
-	/** The provider. */
-	private ExchangeProvider provider;
+	/** The gateway. */
+	private ExchangeGateway gateway;
 
 	/** The converter. */
 	private Converter converter;
 
-	/** The publisher. */
-	private Publisher publisher;
-
-	/** The routing key. */
-	private String routingKey;
-
-	/** The content type. */
-	private ContentType contentType;
+	private Splitter splitter;
 
 	/**
 	 * Instantiates a new exchange service impl.
@@ -42,47 +34,46 @@ public class ExchangeServiceImpl implements ExchangeService{
 	}
 
 	
-	/**
-	 * Instantiates a new exchange service impl.
-	 *
-	 * @param provider the provider
-	 * @param converter the converter
-	 * @param publisher the publisher
-	 * @param routingKey the routing key
-	 * @param contentType the content type
-	 */
-	public ExchangeServiceImpl(ExchangeProvider provider, Converter converter, Publisher publisher, String routingKey,
-			ContentType contentType) {
+
+	public ExchangeServiceImpl(ExchangeGateway gateway, Converter converter, Splitter splitter) {
 		super();
-		this.provider = provider;
+		this.gateway = gateway;
 		this.converter = converter;
-		this.publisher = publisher;
-		this.routingKey = routingKey;
-		this.contentType = contentType;
+		this.splitter = splitter;
 	}
 
 
-	/**
-	 * Gets the provider.
-	 *
-	 * @return the provider
-	 */
-	public ExchangeProvider getProvider() {
-		return provider;
+
+	public Splitter getSplitter() {
+		return splitter;
+	}
+
+	public void setSplitter(Splitter splitter) {
+		this.splitter = splitter;
 	}
 
 	/**
-	 * Sets the provider.
-	 *
-	 * @param provider the new provider
+	 * Gets the gateway.
+	 * 
+	 * @return the gateway
 	 */
-	public void setProvider(ExchangeProvider provider) {
-		this.provider = provider;
+	public ExchangeGateway getGateway() {
+		return gateway;
+	}
+
+	/**
+	 * Sets the gateway.
+	 * 
+	 * @param gateway
+	 *            the new gateway
+	 */
+	public void setGateway(ExchangeGateway gateway) {
+		this.gateway = gateway;
 	}
 
 	/**
 	 * Gets the converter.
-	 *
+	 * 
 	 * @return the converter
 	 */
 	public Converter getConverter() {
@@ -91,83 +82,36 @@ public class ExchangeServiceImpl implements ExchangeService{
 
 	/**
 	 * Sets the converter.
-	 *
-	 * @param converter the new converter
+	 * 
+	 * @param converter
+	 *            the new converter
 	 */
 	public void setConverter(Converter converter) {
 		this.converter = converter;
 	}
 
-	/**
-	 * Gets the publisher.
-	 *
-	 * @return the publisher
-	 */
-	public Publisher getPublisher() {
-		return publisher;
-	}
 
-	/**
-	 * Sets the publisher.
-	 *
-	 * @param publisher the new publisher
-	 */
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
 
-	/**
-	 * Gets the routing key.
-	 *
-	 * @return the routing key
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.finaxys.rd.dataextraction.service.ExchangeService#publishExchanges()
 	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
+	public List<Message>  getExchanges() {
 
-	/**
-	 * Sets the routing key.
-	 *
-	 * @param routingKey the new routing key
-	 */
-	public void setRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
-
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the content type
-	 */
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType the new content type
-	 */
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.service.ExchangeService#publishExchanges()
-	 */
-	public void publishExchanges() {
-
-		List<Document> l;
 		try {
-			l = this.provider.getExchanges(this.contentType);
-			if (l != null)
-			for (Document d : l) {
-				Message m = new Message(d, this.routingKey);
-				this.converter.convert(m);
-				this.publisher.publish(m);
+			Document d = this.gateway.getExchanges();
+			if (d != null) {
+				Message message = new Message(d);
+				this.converter.convert(message);
+				List<Message> l = this.splitter.split(message);
+				return l;
 			}
+			return null;
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
 	}
 

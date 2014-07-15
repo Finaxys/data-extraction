@@ -3,6 +3,10 @@
  */
 package com.finaxys.rd.dataextraction.service;
 
+import java.util.List;
+
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Interface IndexQuoteService.
@@ -10,7 +14,7 @@ package com.finaxys.rd.dataextraction.service;
 public interface IndexQuoteService {
 	
 	/**
-	 * Publish index quotes.
+	 * Get index quotes.
 	 */
-	public void publishIndexQuotes();
+	public List<Message> getCurrentIndexQuotes(String symbols);
 }

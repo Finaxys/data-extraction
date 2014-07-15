@@ -6,33 +6,25 @@ package com.finaxys.rd.dataextraction.service.impl;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.provider.StockProvider;
-import com.finaxys.rd.dataextraction.publisher.Publisher;
+import com.finaxys.rd.dataextraction.dao.integration.StockGateway;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.StockService;
+import com.finaxys.rd.dataextraction.splitter.Splitter;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class StockServiceImpl.
  */
-public class StockServiceImpl implements StockService{
-	
-	/** The provider. */
-	private StockProvider provider;
+public class StockServiceImpl implements StockService {
+
+	/** The gateway. */
+	private StockGateway gateway;
 
 	/** The converter. */
 	private Converter converter;
 
-	/** The publisher. */
-	private Publisher publisher;
-
-	/** The routing key. */
-	private String routingKey;
-
-	/** The content type. */
-	private ContentType contentType;
+	private Splitter splitter;
 
 	/**
 	 * Instantiates a new stock service impl.
@@ -41,146 +33,74 @@ public class StockServiceImpl implements StockService{
 		super();
 	}
 
-	
-	/**
-	 * Instantiates a new stock service impl.
-	 *
-	 * @param provider the provider
-	 * @param converter the converter
-	 * @param publisher the publisher
-	 * @param routingKey the routing key
-	 * @param contentType the content type
-	 */
-	public StockServiceImpl(StockProvider provider, Converter converter, Publisher publisher, String routingKey,
-			ContentType contentType) {
+	public StockServiceImpl(StockGateway gateway, Converter converter, Splitter splitter) {
 		super();
-		this.provider = provider;
+		this.gateway = gateway;
 		this.converter = converter;
-		this.publisher = publisher;
-		this.routingKey = routingKey;
-		this.contentType = contentType;
+		this.splitter = splitter;
 	}
 
+	public Splitter getSplitter() {
+		return splitter;
+	}
 
-	
+	public void setSplitter(Splitter splitter) {
+		this.splitter = splitter;
+	}
 
 	/**
-	 * Gets the provider.
-	 *
-	 * @return the provider
+	 * Gets the gateway.
+	 * 
+	 * @return the gateway
 	 */
-	public StockProvider getProvider() {
-		return provider;
+	public StockGateway getGateway() {
+		return gateway;
 	}
-
 
 	/**
-	 * Sets the provider.
-	 *
-	 * @param provider the new provider
+	 * Sets the gateway.
+	 * 
+	 * @param gateway
+	 *            the new gateway
 	 */
-	public void setProvider(StockProvider provider) {
-		this.provider = provider;
+	public void setGateway(StockGateway gateway) {
+		this.gateway = gateway;
 	}
-
 
 	/**
 	 * Gets the converter.
-	 *
+	 * 
 	 * @return the converter
 	 */
 	public Converter getConverter() {
 		return converter;
 	}
 
-
 	/**
 	 * Sets the converter.
-	 *
-	 * @param converter the new converter
+	 * 
+	 * @param converter
+	 *            the new converter
 	 */
 	public void setConverter(Converter converter) {
 		this.converter = converter;
 	}
 
-
-	/**
-	 * Gets the publisher.
-	 *
-	 * @return the publisher
-	 */
-	public Publisher getPublisher() {
-		return publisher;
-	}
-
-
-	/**
-	 * Sets the publisher.
-	 *
-	 * @param publisher the new publisher
-	 */
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
-
-
-	/**
-	 * Gets the routing key.
-	 *
-	 * @return the routing key
-	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
-
-
-	/**
-	 * Sets the routing key.
-	 *
-	 * @param routingKey the new routing key
-	 */
-	public void setRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
-
-
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the content type
-	 */
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType the new content type
-	 */
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.service.StockService#publishStocks()
-	 */
-	public void publishStocks() {
-
-		List<Document> l;
+	@Override
+	public List<Message> getStocks() {
 		try {
-			l = this.provider.getStocks(this.contentType);
-			if (l != null)
-			for (Document d : l) {
-				Message m = new Message(d, this.routingKey);
-				this.converter.convert(m);
-				this.publisher.publish(m);
+			Document d = this.gateway.getStocks();
+			if (d != null) {
+				Message message = new Message(d);
+				this.converter.convert(message);
+				List<Message> l = this.splitter.split(message);
+				return l;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+			return null;
 
+		} catch (Exception e) {
+			return null;
+		}
+
+	}
 }

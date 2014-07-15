@@ -5,113 +5,89 @@ package com.finaxys.rd.dataextraction.converter.file.xls;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
+import com.finaxys.rd.dataextraction.domain.Stock;
+import com.finaxys.rd.dataextraction.domain.Stocks;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+import com.finaxys.rd.dataextraction.domain.msg.Document.ContentType;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class FileXlsStocksConverter.
  */
-public class FileXlsStocksConverter implements Converter{
+public class FileXlsStocksConverter implements Converter {
 
-	/** The stocks el. */
-	@Value("${converter.file.stocks.stocks_el}")
-	public String STOCKS_EL;
-	
-	/** The stocks list el. */
-	@Value("${converter.file.stocks.stocks_list_el}")
-	public String STOCKS_LIST_EL;
-	
-	/** The stock el. */
-	@Value("${converter.file.stocks.stock_el}")
-	public String STOCK_EL;
-	
-	/** The symbol el. */
-	@Value("${converter.file.stocks.symbol_el}")
-	public String SYMBOL_EL;
-	
-	/** The company name el. */
-	@Value("${converter.file.stocks.company_name_el}")
-	public String COMPANY_NAME_EL;
-	
-	/** The provider el. */
-	@Value("${converter.file.stocks.provider_el}")
-	public String PROVIDER_EL;
-	
-	/** The exch symb el. */
-	@Value("${converter.file.stocks.exch_symb_el}")
-	public String EXCH_SYMB_EL;
-	
 	/** The default exchange el. */
 	@Value("${converter.file.stocks.default_exchange_el}")
 	public String DEFAULT_EXCHANGE_EL;
+
 	
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.converter.Converter#convert(com.finaxys.rd.dataextraction.msg.Message)
-	 */
 	public void convert(Message message) throws Exception {
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		XMLStreamWriter writer = factory.createXMLStreamWriter(os);
-		writer.writeStartDocument();
-		writer.writeStartElement(STOCKS_EL);
-		writer.writeStartElement(STOCKS_LIST_EL);
 
 		InputStream is = new ByteArrayInputStream(message.getBody().getContent());
 		HSSFWorkbook workbook = new HSSFWorkbook(is);
 		HSSFSheet sheet = workbook.getSheetAt(0);
 		Iterator<Row> rowIterator = sheet.iterator();
+		List<Stock> list = new ArrayList<Stock>();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 
 		Row row = rowIterator.next();
+		Stock stock;
 		while (rowIterator.hasNext()) {
 			row = rowIterator.next();
-			writer.writeStartElement(STOCK_EL);
 			Iterator<Cell> cellIterator = row.cellIterator();
-			writer.writeStartElement(SYMBOL_EL);
-			String symbol = cellIterator.next().toString();
-			writer.writeCharacters(symbol);
-			writer.writeEndElement();
 
-			writer.writeStartElement(COMPANY_NAME_EL);
-			writer.writeCharacters(cellIterator.next().toString());
-			writer.writeEndElement();
+			try {
+				stock = new Stock();
 
-			writer.writeStartElement(PROVIDER_EL);
-			writer.writeCharacters(message.getBody().getProvider()+ "");
-			writer.writeEndElement();
+				String symbol = cellIterator.next().toString();
+				stock.setSymbol(symbol);
 
-			writer.writeStartElement(EXCH_SYMB_EL);
-			String exch = DEFAULT_EXCHANGE_EL;
-			if (symbol.indexOf('.') != -1)
-				exch = symbol.substring(symbol.indexOf('.') + 1);
-			writer.writeCharacters(exch);
-			writer.writeEndElement();
+				String exchSymb = DEFAULT_EXCHANGE_EL;
+				if (symbol.indexOf('.') != -1)
+					exchSymb = symbol.substring(symbol.indexOf('.') + 1);
+				stock.setExchSymb(exchSymb);
 
-			writer.writeEndElement();
-
+				stock.setProvider(message.getBody().getProvider());
+				stock.setCompanyName(cellIterator.next().toString());
+				list.add(stock);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
-		writer.writeEndElement();
-		writer.writeEndElement();
-		writer.writeEndDocument();
-		message.getBody().setContent(os.toByteArray());
+		Stocks stocks = new Stocks();
+		stocks.setStocksList(list);
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(Stocks.class);
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			// jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+			// true); Sinon erreur
+			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			jaxbMarshaller.marshal(stocks, os);
+			message.setBody(new Document(message.getBody().getContentType(), message.getBody().getDataType(), message
+					.getBody().getDataClass(), message.getBody().getProvider(), os.toByteArray()));
+			message.getBody().setContentType(ContentType.XML);
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			message.setSend(false);
+		}
 	}
 
 }

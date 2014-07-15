@@ -3,6 +3,10 @@
  */
 package com.finaxys.rd.dataextraction.service;
 
+import java.util.List;
+
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Interface CurrencyPairService.
@@ -10,7 +14,7 @@ package com.finaxys.rd.dataextraction.service;
 public interface CurrencyPairService {
 	
 	/**
-	 * Publish currency pairs.
+	 * Get currency pairs.
 	 */
-	public void publishCurrencyPairs();
+	public List<Message> getCurrencyPairs();
 }

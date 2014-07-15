@@ -3,7 +3,7 @@
  */
 package com.finaxys.rd.dataextraction.converter;
 
-import com.finaxys.rd.dataextraction.msg.Message;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 
 // TODO: Auto-generated Javadoc
 /**

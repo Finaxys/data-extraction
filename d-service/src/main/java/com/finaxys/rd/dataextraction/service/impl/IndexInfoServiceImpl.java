@@ -6,12 +6,11 @@ package com.finaxys.rd.dataextraction.service.impl;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.provider.IndexInfoProvider;
-import com.finaxys.rd.dataextraction.publisher.Publisher;
+import com.finaxys.rd.dataextraction.dao.integration.IndexInfoGateway;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.IndexInfoService;
+import com.finaxys.rd.dataextraction.splitter.Splitter;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -19,20 +18,13 @@ import com.finaxys.rd.dataextraction.service.IndexInfoService;
  */
 public class IndexInfoServiceImpl implements IndexInfoService{
 
-	/** The provider. */
-	private IndexInfoProvider provider;
+	/** The gateway. */
+	private IndexInfoGateway gateway;
 
 	/** The converter. */
 	private Converter converter;
 
-	/** The publisher. */
-	private Publisher publisher;
-
-	/** The routing key. */
-	private String routingKey;
-
-	/** The content type. */
-	private ContentType contentType;
+	private Splitter splitter;
 
 	/**
 	 * Instantiates a new index info service impl.
@@ -41,41 +33,45 @@ public class IndexInfoServiceImpl implements IndexInfoService{
 		super();
 	}
 
-	/**
-	 * Instantiates a new index info service impl.
-	 *
-	 * @param provider the provider
-	 * @param converter the converter
-	 * @param publisher the publisher
-	 * @param routingKey the routing key
-	 * @param contentType the content type
-	 */
-	public IndexInfoServiceImpl(IndexInfoProvider provider, Converter converter, Publisher publisher, String routingKey,
-			ContentType contentType) {
+
+
+	public IndexInfoServiceImpl(IndexInfoGateway gateway, Converter converter, Splitter splitter) {
 		super();
-		this.provider = provider;
+		this.gateway = gateway;
 		this.converter = converter;
-		this.publisher = publisher;
-		this.routingKey = routingKey;
-		this.contentType = contentType;
+		this.splitter = splitter;
+	}
+
+
+
+	public Splitter getSplitter() {
+		return splitter;
+	}
+
+
+
+	public void setSplitter(Splitter splitter) {
+		this.splitter = splitter;
+	}
+
+
+
+	/**
+	 * Gets the gateway.
+	 *
+	 * @return the gateway
+	 */
+	public IndexInfoGateway getGateway() {
+		return gateway;
 	}
 
 	/**
-	 * Gets the provider.
+	 * Sets the gateway.
 	 *
-	 * @return the provider
+	 * @param gateway the new gateway
 	 */
-	public IndexInfoProvider getProvider() {
-		return provider;
-	}
-
-	/**
-	 * Sets the provider.
-	 *
-	 * @param provider the new provider
-	 */
-	public void setProvider(IndexInfoProvider provider) {
-		this.provider = provider;
+	public void setGateway(IndexInfoGateway gateway) {
+		this.gateway = gateway;
 	}
 
 	/**
@@ -96,76 +92,24 @@ public class IndexInfoServiceImpl implements IndexInfoService{
 		this.converter = converter;
 	}
 
-	/**
-	 * Gets the publisher.
-	 *
-	 * @return the publisher
-	 */
-	public Publisher getPublisher() {
-		return publisher;
-	}
-
-	/**
-	 * Sets the publisher.
-	 *
-	 * @param publisher the new publisher
-	 */
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
-
-	/**
-	 * Gets the routing key.
-	 *
-	 * @return the routing key
-	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
-
-	/**
-	 * Sets the routing key.
-	 *
-	 * @param routingKey the new routing key
-	 */
-	public void setRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
-
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the content type
-	 */
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType the new content type
-	 */
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
 
 	/* (non-Javadoc)
 	 * @see com.finaxys.rd.dataextraction.service.IndexInfoService#publishIndexInfos()
 	 */
-	public void publishIndexInfos() {
+	public List<Message>  getIndexInfos() {
 
-		List<Document> l;
 		try {
-			l = this.provider.getIndexInfos(this.contentType);
-			if (l != null)
-			for (Document d : l) {
-				Message m = new Message(d, this.routingKey);
-				this.converter.convert(m);
-				this.publisher.publish(m);
+			Document d = this.gateway.getIndexInfos();
+			if (d != null) {
+				Message message = new Message(d);
+				this.converter.convert(message);
+				List<Message> l = this.splitter.split(message);
+				return l;
 			}
+			return null;
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
 	}
 

@@ -3,11 +3,15 @@
  */
 package com.finaxys.rd.dataextraction.job;
 
+import java.util.List;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
-import com.finaxys.rd.dataextraction.service.StockService;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
+import com.finaxys.rd.dataextraction.service.integration.gateway.StockMsgGateway;
+import com.finaxys.rd.dataextraction.service.integration.publisher.Publisher;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -16,24 +20,24 @@ import com.finaxys.rd.dataextraction.service.StockService;
 public class StocksJob extends QuartzJobBean {
 
 	/** The stock service. */
-	private StockService stockService;
+	private StockMsgGateway stockMsgGateway;
 
 	/**
 	 * Gets the stock service.
 	 *
 	 * @return the stock service
 	 */
-	public StockService getStockService() {
-		return stockService;
+	public StockMsgGateway getStockMsgGateway() {
+		return stockMsgGateway;
 	}
 
 	/**
 	 * Sets the stock service.
 	 *
-	 * @param stockService the new stock service
+	 * @param stockMsgGateway the new stock service
 	 */
-	public void setStockService(StockService stockService) {
-		this.stockService = stockService;
+	public void setStockMsgGateway(StockMsgGateway stockMsgGateway) {
+		this.stockMsgGateway = stockMsgGateway;
 	}
 
 	/* (non-Javadoc)
@@ -42,8 +46,11 @@ public class StocksJob extends QuartzJobBean {
 	@Override
 	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
 		try {
-			stockService.publishStocks();
+			stockMsgGateway.publishStocks();
 		} catch (NullPointerException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

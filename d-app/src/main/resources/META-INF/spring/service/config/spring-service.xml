@@ -6,6 +6,77 @@
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+	<!-- ///// splitters -->
+
+
+
+	<bean id="xmlIndexQuotesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.yahoo.index_quotes.old.quote_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlFXRatesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.yahoo.fx_rates.old.main_rate_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlStockQuotesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.yahoo.stock_quotes.old.quote_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlStocksSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.yahoo.stocks.old.stock_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+		<bean id="xmlOptionChainsSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.yahoo.option_chains.old.main_option_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlCurrencyPairsSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.file.currency_pairs.currency_pair_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlExchangesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.file.exchanges.exchange_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlIndexInfosSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.file.indexes.index_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlInterbankRatesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.file.interbank_rates.rate_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="xmlHistInterbankRatesSplitter" class="com.finaxys.rd.dataextraction.splitter.XmlSplitter">
+		<constructor-arg name="element"
+			value="${converter.file.hist_interbank_rate_data.rate_el}" />
+		<property name="maxSize" value="20000" />
+	</bean>
+
+	<bean id="csvSplitter" class="com.finaxys.rd.dataextraction.splitter.CsvSplitter">
+		<property name="maxSize" value="10000" />
+	</bean>
+
+
+
+	<!-- ///// yahoo xml to xml converters -->
+
 	<bean id="yahooXmlFXRatesConverter"
 		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlFXRatesConverter" />
 
@@ -17,6 +88,11 @@
 
 	<bean id="yahooXmlStocksConverter"
 		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlStocksConverter" />
+
+	<bean id="yahooXmlOptionChainsConverter"
+		class="com.finaxys.rd.dataextraction.converter.yahoo.xml.YahooXmlOptionChainsConverter" />
+
+	<!-- //// file xls to xml converters -->
 
 	<bean id="fileXlsCurrencyPairsConverter"
 		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsCurrencyPairsConverter" />
@@ -30,95 +106,500 @@
 	<bean id="fileXlsStocksConverter"
 		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsStocksConverter" />
 
-	<bean id="rabbiMqPublisher"
-		class="com.finaxys.rd.dataextraction.publisher.RabbitMqPublisher">
-		<property name="connection" ref="connection" />
-		<property name="queue" value="${publisher.rabbitmq.queue.direct}" />
-		<property name="exchange" value="${publisher.rabbitmq.queue.direct.exchange}" />
-		</bean>
-		
-	
+	<bean id="fileXlsInterbankRatesConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsInterbankRatesConverter" />
 
-	<bean id="fileXlsCurrencyPairService"
+	<bean id="fileXlsHistInterbankRateDataConverter"
+		class="com.finaxys.rd.dataextraction.converter.file.xls.FileXlsHistInterbankRateDataConverter" />
+
+	<!-- ///// ebf xls to xml converters -->
+
+	<bean id="ebfXlsHistEuriborConverter"
+		class="com.finaxys.rd.dataextraction.converter.ebf.xls.EbfXlsHistEuriborConverter" />
+
+
+	<!-- /// yahoo xml to csv converters -->
+
+	<bean id="yahooXmlCsvFXRatesConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="yahooXmlFXRatesConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.yahoo.fx_rates.new.rate_el}" />
+	</bean>
+
+	<bean id="yahooXmlCsvIndexQuotesConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="yahooXmlIndexQuotesConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.yahoo.index_quotes.new.quote_el}" />
+	</bean>
+
+	<bean id="yahooXmlCsvStockQuotesConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="yahooXmlStockQuotesConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.yahoo.stock_quotes.new.quote_el}" />
+	</bean>
+
+	<bean id="yahooXmlCsvStocksConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="yahooXmlStocksConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.yahoo.stocks.new.stock_el}" />
+	</bean>
+
+	<bean id="yahooXmlCsvOptionChainsConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="yahooXmlOptionChainsConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.yahoo.options.new.option_chain_el}" />
+	</bean>
+
+	<!-- /// file xls to xml to csv converter -->
+
+	<bean id="fileXmlCsvExchangesConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="fileXlsExchangesConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.file.exchanges.exchange_el}" />
+	</bean>
+
+	<bean id="fileXmlCsvIndexInfosConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="fileXlsIndexInfosConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.file.indexes.index_el}" />
+	</bean>
+
+	<bean id="fileXmlCsvStocksConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="fileXlsStocksConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.file.stocks.stock_el}" />
+	</bean>
+
+	<bean id="fileXmlCsvInterbankRatesConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="fileXlsInterbankRatesConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.file.interbank_rates.rate_el}" />
+	</bean>
+
+	<bean id="fileXmlCsvHistInterbankRateDataConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter"
+			ref="fileXlsHistInterbankRateDataConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.file.hist_interbank_rate_data.rate_el}" />
+	</bean>
+
+	<!-- /// ebf xls to xml to csv converters -->
+	<bean id="ebfXmlCsvHistEuriborConverter"
+		class="com.finaxys.rd.dataextraction.converter.csv.XmlToCsvConverter">
+		<constructor-arg name="xmlConverter" ref="ebfXlsHistEuriborConverter" />
+		<constructor-arg name="seperator"
+			value="${publisher.scaledrisk.csv.seperator}" />
+		<constructor-arg name="splitElement"
+			value="${converter.ebf.hist_interbank_rate_data.rate_el}" />
+	</bean>
+
+
+	<!-- /// file xml services -->
+
+	<bean id="fileXmlCurrencyPairService"
 		class="com.finaxys.rd.dataextraction.service.impl.CurrencyPairServiceImpl">
-		<property name="provider" ref="fileCurrencyPairProvider" />
-		<property name="converter" ref="fileXlsCurrencyPairsConverter" />
-		<property name="publisher" ref="rabbiMqPublisher" />
-		<property name="routingKey"
-			value="${publisher.rabbitmq.routingkey.currency_pairs}" />
-		<property name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+		<constructor-arg name="gateway" ref="fileCurrencyPairGateway" />
+		<constructor-arg name="converter" ref="fileXlsCurrencyPairsConverter" />
+		<constructor-arg name="splitter" ref="xmlCurrencyPairsSplitter" />
 	</bean>
 
-	<bean id="fileXlsExchangeService"
+	<bean id="fileXmlExchangeService"
 		class="com.finaxys.rd.dataextraction.service.impl.ExchangeServiceImpl">
-		<property name="provider" ref="fileExchangeProvider" />
-		<property name="converter" ref="fileXlsExchangesConverter" />
-		<property name="publisher" ref="rabbiMqPublisher" />
-		<property name="routingKey" value="${publisher.rabbitmq.routingkey.exchanges}" />
-		<property name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+		<constructor-arg name="gateway" ref="fileExchangeGateway" />
+		<constructor-arg name="converter" ref="fileXlsExchangesConverter" />
+		<constructor-arg name="splitter" ref="xmlExchangesSplitter" />
 	</bean>
 
-	<bean id="fileXlsStockService"
+	<bean id="fileXmlStockService"
 		class="com.finaxys.rd.dataextraction.service.impl.StockServiceImpl">
-		<constructor-arg name="provider" ref="fileStockProvider" />
+		<constructor-arg name="gateway" ref="fileStockGateway" />
 		<constructor-arg name="converter" ref="fileXlsStocksConverter" />
-		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
-		<constructor-arg name="routingKey"
-			value="${publisher.rabbitmq.routingkey.stocks}" />
-		<constructor-arg name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+		<constructor-arg name="splitter" ref="xmlStocksSplitter" />
 	</bean>
 
-	<bean id="fileXlsIndexInfoService"
+	<bean id="fileXmlIndexInfoService"
 		class="com.finaxys.rd.dataextraction.service.impl.IndexInfoServiceImpl">
-		<constructor-arg name="provider" ref="fileIndexInfoProvider" />
+		<constructor-arg name="gateway" ref="fileIndexInfoGateway" />
 		<constructor-arg name="converter" ref="fileXlsIndexInfosConverter" />
-		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
-		<constructor-arg name="routingKey"
-			value="${publisher.rabbitmq.routingkey.indexes}" />
-		<constructor-arg name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XLS}" />
+		<constructor-arg name="splitter" ref="xmlIndexInfosSplitter" />
 	</bean>
+
+	<bean id="fileXmlInterbankRateService"
+		class="com.finaxys.rd.dataextraction.service.impl.InterbankRateServiceImpl">
+		<constructor-arg name="gateway" ref="fileInterbankRateGateway" />
+		<constructor-arg name="converter" ref="fileXlsInterbankRatesConverter" />
+		<constructor-arg name="splitter" ref="xmlInterbankRatesSplitter" />
+	</bean>
+
+	<bean id="fileXmlHistInterbankRateDataService"
+		class="com.finaxys.rd.dataextraction.service.impl.HistInterbankRateDataServiceImpl">
+		<constructor-arg name="gateway"
+			ref="fileHistInterbankRateDataGateway" />
+		<constructor-arg name="converter"
+			ref="fileXlsHistInterbankRateDataConverter" />
+		<constructor-arg name="splitter" ref="xmlHistInterbankRatesSplitter" />
+	</bean>
+
+	<!-- /// yahoo xml services -->
 
 	<bean id="yahooXmlFXRateService"
 		class="com.finaxys.rd.dataextraction.service.impl.FXRateServiceImpl">
-		<constructor-arg name="provider" ref="yahooFXRateProvider" />
+		<constructor-arg name="gateway" ref="yahooFXRateGateway" />
 		<constructor-arg name="converter" ref="yahooXmlFXRatesConverter" />
-		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
-		<constructor-arg name="routingKey"
-			value="${publisher.rabbitmq.routingkey.fx_rates}" />
-		<constructor-arg name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
-		<constructor-arg name="dataType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+		<constructor-arg name="splitter" ref="xmlFXRatesSplitter" />
 	</bean>
 
 	<bean id="yahooXmlIndexQuoteService"
 		class="com.finaxys.rd.dataextraction.service.impl.IndexQuoteServiceImpl">
-		<constructor-arg name="provider" ref="yahooIndexQuoteProvider" />
+		<constructor-arg name="gateway" ref="yahooIndexQuoteGateway" />
 		<constructor-arg name="converter" ref="yahooXmlIndexQuotesConverter" />
-		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
-		<constructor-arg name="routingKey"
-			value="${publisher.rabbitmq.routingkey.index_quotes}" />
-		<constructor-arg name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
-		<constructor-arg name="dataType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+		<constructor-arg name="splitter" ref="xmlIndexQuotesSplitter" />
 	</bean>
 
 	<bean id="yahooXmlStockQuoteService"
 		class="com.finaxys.rd.dataextraction.service.impl.StockQuoteServiceImpl">
-		<constructor-arg name="provider" ref="yahooStockQuoteProvider" />
+		<constructor-arg name="gateway" ref="yahooStockQuoteGateway" />
 		<constructor-arg name="converter" ref="yahooXmlStockQuotesConverter" />
-		<constructor-arg name="publisher" ref="rabbiMqPublisher" />
-		<constructor-arg name="routingKey"
-			value="${publisher.rabbitmq.routingkey.stocks_quotes}" />
-		<constructor-arg name="contentType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.ContentType).XML}" />
-		<constructor-arg name="dataType"
-			value="#{T(com.finaxys.rd.dataextraction.msg.Document.DataType).EOD}" />
+		<constructor-arg name="splitter" ref="xmlStockQuotesSplitter" />
+	</bean>
+	
+		<bean id="yahooXmlOptionChainService"
+		class="com.finaxys.rd.dataextraction.service.impl.OptionChainServiceImpl">
+		<constructor-arg name="gateway" ref="yahooOptionChainGateway" />
+		<constructor-arg name="converter" ref="yahooXmlOptionChainsConverter" />
+		<constructor-arg name="splitter" ref="xmlOptionChainsSplitter" />
 	</bean>
 
+	<!-- //// ebf xml services -->
+
+
+	<bean id="ebfXmlHistEuriborService"
+		class="com.finaxys.rd.dataextraction.service.impl.HistInterbankRateDataServiceImpl">
+		<constructor-arg name="gateway" ref="ebfEuriborGateway" />
+		<constructor-arg name="converter" ref="ebfXlsHistEuriborConverter" />
+		<constructor-arg name="splitter" ref="xmlHistInterbankRatesSplitter" />
+	</bean>
+
+	<bean id="ebfXmlEuriborService"
+		class="com.finaxys.rd.dataextraction.service.impl.InterbankRateDataServiceImpl">
+		<constructor-arg name="gateway" ref="ebfEuriborGateway" />
+		<constructor-arg name="converter" ref="ebfXlsHistEuriborConverter" />
+		<constructor-arg name="splitter" ref="xmlInterbankRatesSplitter" />
+	</bean>
+
+	<!-- /// file csv services -->
+
+	<bean id="fileCsvExchangeService"
+		class="com.finaxys.rd.dataextraction.service.impl.ExchangeServiceImpl">
+		<constructor-arg name="gateway" ref="fileExchangeGateway" />
+		<constructor-arg name="converter" ref="fileXmlCsvExchangesConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="fileCsvStockService"
+		class="com.finaxys.rd.dataextraction.service.impl.StockServiceImpl">
+		<constructor-arg name="gateway" ref="fileStockGateway" />
+		<constructor-arg name="converter" ref="fileXmlCsvStocksConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="fileCsvIndexInfoService"
+		class="com.finaxys.rd.dataextraction.service.impl.IndexInfoServiceImpl">
+		<constructor-arg name="gateway" ref="fileIndexInfoGateway" />
+		<constructor-arg name="converter" ref="fileXmlCsvIndexInfosConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="fileCsvInterbankRateService"
+		class="com.finaxys.rd.dataextraction.service.impl.InterbankRateServiceImpl">
+		<constructor-arg name="gateway" ref="fileInterbankRateGateway" />
+		<constructor-arg name="converter"
+			ref="fileXmlCsvInterbankRatesConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="fileCsvHistInterbankRateDataService"
+		class="com.finaxys.rd.dataextraction.service.impl.HistInterbankRateDataServiceImpl">
+		<constructor-arg name="gateway"
+			ref="fileHistInterbankRateDataGateway" />
+		<constructor-arg name="converter"
+			ref="fileXmlCsvHistInterbankRateDataConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<!-- /// yahoo csv services -->
+
+	<bean id="yahooCsvFXRateService"
+		class="com.finaxys.rd.dataextraction.service.impl.FXRateServiceImpl">
+		<constructor-arg name="gateway" ref="yahooFXRateGateway" />
+		<constructor-arg name="converter" ref="yahooXmlCsvFXRatesConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<!-- <bean id="yahooCsvIndexQuoteService" -->
+	<!-- class="com.finaxys.rd.dataextraction.service.impl.IndexQuoteServiceImpl"> -->
+	<!-- <constructor-arg name="gateway" ref="yahooIndexQuoteGateway" /> -->
+	<!-- <constructor-arg name="converter" -->
+	<!-- ref="yahooXmlCsvIndexQuotesConverter" /> -->
+	<!-- </bean> -->
+
+	<bean id="yahooCsvIndexQuoteService"
+		class="com.finaxys.rd.dataextraction.service.impl.IndexQuoteServiceImpl">
+		<constructor-arg name="gateway" ref="yahooIndexQuoteGateway" />
+		<constructor-arg name="converter"
+			ref="yahooXmlCsvIndexQuotesConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="yahooCsvStockQuoteService"
+		class="com.finaxys.rd.dataextraction.service.impl.StockQuoteServiceImpl">
+		<constructor-arg name="gateway" ref="yahooStockQuoteGateway" />
+		<constructor-arg name="converter"
+			ref="yahooXmlCsvStockQuotesConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+	
+		<bean id="yahooCsvOptionChainService"
+		class="com.finaxys.rd.dataextraction.service.impl.OptionChainServiceImpl">
+		<constructor-arg name="gateway" ref="yahooOptionChainGateway" />
+		<constructor-arg name="converter"
+			ref="yahooXmlCsvOptionChainsConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<!-- /// ebf csv services -->
+
+	<bean id="ebfCsvHistEuriborService"
+		class="com.finaxys.rd.dataextraction.service.impl.HistInterbankRateDataServiceImpl">
+		<constructor-arg name="gateway" ref="ebfEuriborGateway" />
+		<constructor-arg name="converter" ref="ebfXmlCsvHistEuriborConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+	<bean id="ebfCsvEuriborService"
+		class="com.finaxys.rd.dataextraction.service.impl.InterbankRateDataServiceImpl">
+		<constructor-arg name="gateway" ref="ebfEuriborGateway" />
+		<constructor-arg name="converter" ref="ebfXmlCsvHistEuriborConverter" />
+		<constructor-arg name="splitter" ref="csvSplitter" />
+	</bean>
+
+
+	<!-- /// rmq gateways -->
+
+	<bean id="fileXmlCurrencyPairRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.CurrencyPairMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileXmlCurrencyPairService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.currency_pairs}" />
+	</bean>
+
+	<bean id="fileXmlExchangeRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.ExchangeMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileXmlExchangeService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.exchanges}" />
+	</bean>
+
+	<bean id="fileXmlStockRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.StockMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileXmlStockService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.stocks}" />
+	</bean>
+	<bean id="fileXmlIndexInfoRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.IndexInfoMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileXmlIndexInfoService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.indexes}" />
+	</bean>
+
+	<bean id="fileXmlInterbankRateRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.InterbankRateMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileXmlInterbankRateService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.interbank_rates}" />
+	</bean>
+
+	<bean id="fileXmlHistInterbankRateDataRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.HistInterbankRateDataMsgGatewayImpl">
+		<constructor-arg name="service"
+			ref="fileXmlHistInterbankRateDataService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.hist_interbank_rates}" />
+	</bean>
+
+	<bean id="yahooXmlFXRateRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.FXRateMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooXmlFXRateService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.fx_rates}" />
+	</bean>
+
+	<bean id="yahooXmlIndexQuoteRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.IndexQuoteMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooXmlIndexQuoteService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.index_quotes}" />
+	</bean>
+
+	<bean id="yahooXmlStockQuoteRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.StockQuoteMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooXmlStockQuoteService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.stocks_quotes}" />
+	</bean>
+	
+	<bean id="yahooXmlOptionChainRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.OptionChainMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooXmlOptionChainService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.option_chains}" />
+	</bean>
+
+	<bean id="ebfXmlHistInterbankRateDataRMQGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.HistInterbankRateDataMsgGatewayImpl">
+		<constructor-arg name="service" ref="ebfXmlHistEuriborService" />
+		<constructor-arg name="publisher" ref="rmqPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.rabbitmq.routingkey.hist_interbank_rates}" />
+	</bean>
+
+	<!-- /// scaled risk gateways -->
+
+	<bean id="fileCsvExchangeScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.ExchangeMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileCsvExchangeService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.exchanges}" />
+	</bean>
+
+	<bean id="fileCsvStockScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.StockMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileCsvStockService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.stocks}" />
+	</bean>
+
+	<bean id="fileCsvIndexInfoScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.IndexInfoMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileCsvIndexInfoService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.indexes}" />
+	</bean>
+
+
+	<bean id="fileCsvInterbankRateScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.InterbankRateMsgGatewayImpl">
+		<constructor-arg name="service" ref="fileCsvInterbankRateService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.interbank_rates}" />
+	</bean>
+
+	<bean id="fileCsvHistInterbankRateDataScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.HistInterbankRateDataMsgGatewayImpl">
+		<constructor-arg name="service"
+			ref="fileCsvHistInterbankRateDataService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.hist_interbank_rates}" />
+	</bean>
+
+	<bean id="yahooCsvFXRateScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.FXRateMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooCsvFXRateService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.fx_rates}" />
+	</bean>
+
+	<bean id="yahooCsvIndexQuoteScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.IndexQuoteMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooCsvIndexQuoteService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.index_quotes}" />
+	</bean>
+
+	<bean id="yahooCsvStockQuoteScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.StockQuoteMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooCsvStockQuoteService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.stocks_quotes}" />
+	</bean>
+	
+		<bean id="yahooCsvOptionChainScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.OptionChainMsgGatewayImpl">
+		<constructor-arg name="service" ref="yahooCsvOptionChainService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.option_chains}" />
+	</bean>
+
+	<bean id="ebfCsvHistInterbankRateDataScaledRiskGateway"
+		class="com.finaxys.rd.dataextraction.service.integration.gateway.impl.HistInterbankRateDataMsgGatewayImpl">
+		<constructor-arg name="service" ref="ebfCsvHistEuriborService" />
+		<constructor-arg name="publisher" ref="scaledRiskPublisher" />
+		<constructor-arg name="routingKey"
+			value="${publisher.scaledrisk.routingkey.hist_interbank_rates}" />
+	</bean>
+	<!-- // publishers (proxys) -->
+
+	<bean id="rmqPublisher"
+		class="com.finaxys.rd.dataextraction.service.integration.publisher.RMQPublisher">
+		<property name="connection" ref="connection" />
+		<property name="queue" value="${publisher.rabbitmq.queue.direct}" />
+		<property name="exchange" value="${publisher.rabbitmq.queue.direct.exchange}" />
+	</bean>
+
+	<bean id="scaledRiskPublisher"
+		class="com.finaxys.rd.dataextraction.service.integration.publisher.ScaledRiskPublisher" />
+
+
 </beans>
+
+

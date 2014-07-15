@@ -83,7 +83,7 @@ public class Application {
 	 */
 	@Bean
 	CloseableHttpAsyncClient client() throws IOReactorException  {
-		// return HttpAsyncClients.createDefault();
+//		 return HttpAsyncClients.createDefault();
 		ConnectingIOReactor ioReactor = new DefaultConnectingIOReactor();
         PoolingNHttpClientConnectionManager cm = new PoolingNHttpClientConnectionManager(ioReactor);
         cm.setMaxTotal(100);

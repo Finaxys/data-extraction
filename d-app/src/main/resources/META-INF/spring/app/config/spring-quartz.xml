@@ -7,7 +7,7 @@
 
 
 
-	<bean name="fileXlsCurrencyPairsJobDetail"
+	<bean name="fileXmlCurrencyPairsJobDetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 
 		<property name="jobClass"
@@ -15,13 +15,13 @@
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="currencyPairService" value-ref="fileXlsCurrencyPairService" />
+				<entry key="currencyPairMsgGateway" value-ref="fileXmlCurrencyPairRMQGateway" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="fileXlsExchangesJobDetail"
+	<bean name="fileXmlExchangesJobDetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 
 		<property name="jobClass"
@@ -29,26 +29,26 @@
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="exchangeService" value-ref="fileXlsExchangeService" />
+				<entry key="exchangeMsgGateway" value-ref="fileXmlExchangeRMQGateway" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="fileXlsStocksJobDetail"
+	<bean name="fileXmlStocksJobDetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 
 		<property name="jobClass" value="com.finaxys.rd.dataextraction.job.StocksJob" />
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="stockService" value-ref="fileXlsStockService" />
+				<entry key="stockMsgGateway" value-ref="fileXmlStockRMQGateway" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="fileXlsIndexInfosJobDetail"
+	<bean name="fileXmlIndexInfosJobDetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 
 		<property name="jobClass"
@@ -56,21 +56,53 @@
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="indexInfoService" value-ref="fileXlsIndexInfoService" />
+				<entry key="indexInfoMsgGateway" value-ref="fileXmlIndexInfoRMQGateway" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
 	</bean>
 
-	<bean name="yahooXmlFXRatesJobDetail"
+
+	<bean name="fileXmlInterbankRatesJobDetail"
 		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
 
 		<property name="jobClass"
-			value="com.finaxys.rd.dataextraction.job.FXRatesJob" />
+			value="com.finaxys.rd.dataextraction.job.InterbankRatesJob" />
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="fxRateService" value-ref="yahooXmlFXRateService" />
+				<entry key="interbankRateMsgGateway" value-ref="fileXmlInterbankRateRMQGateway" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+
+	<bean name="fileXmlHistInterbankRateDataJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+
+		<property name="jobClass"
+			value="com.finaxys.rd.dataextraction.job.HistInterbankRateDataJob" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="histInterbankRateDataMsgGateway" value-ref="fileXmlHistInterbankRateDataRMQGateway" />
+				<entry key="year" value="2014" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+
+	<bean name="yahooXmlFXRatesJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+
+		<property name="jobClass" value="com.finaxys.rd.dataextraction.job.FXRatesJob" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="fxRatesMsgGateway" value-ref="yahooXmlFXRateRMQGateway" />
+				<entry key="currencyPairDao" value-ref="currencyPairDao" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -84,7 +116,8 @@
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="indexQuoteService" value-ref="yahooXmlIndexQuoteService" />
+				<entry key="indexQuoteMsgGateway" value-ref="yahooXmlIndexQuoteRMQGateway" />
+				<entry key="indexInfoDao" value-ref="indexInfoDao" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -98,7 +131,38 @@
 
 		<property name="jobDataAsMap">
 			<map>
-				<entry key="stockQuoteService" value-ref="yahooXmlStockQuoteService" />
+				<entry key="stockQuoteMsgGateway" value-ref="yahooXmlStockQuoteRMQGateway" />
+				<entry key="stockDao" value-ref="stockDao" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+	
+		<bean name="yahooXmlOptionChainsJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+
+		<property name="jobClass"
+			value="com.finaxys.rd.dataextraction.job.OptionChainsJob" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="optionChainMsgGateway" value-ref="yahooXmlOptionChainRMQGateway" />
+				<entry key="stockDao" value-ref="stockDao" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<bean name="ebfXmlHistInterbankRateDataJobDetail"
+		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+
+		<property name="jobClass"
+			value="com.finaxys.rd.dataextraction.job.HistInterbankRateDataJob" />
+
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="histInterbankRateDataMsgGateway" value-ref="ebfXmlHistInterbankRateDataRMQGateway" />
+				<entry key="year" value="2014" />
 			</map>
 		</property>
 		<property name="durability" value="true" />
@@ -108,54 +172,104 @@
 
 
 
-	<bean id="fileXlsCurrencyPairsTrigger"
+	<bean id="fileXmlCurrencyPairsTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="fileXlsCurrencyPairsJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.file_xls_currency_pairs.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.file_xls_currency_pairs.start_delay}" />
+		<property name="jobDetail" ref="fileXmlCurrencyPairsJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_currency_pairs.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_currency_pairs.start_delay}" />
 	</bean>
 
-	<bean id="fileXlsExchangesTrigger"
+	<bean id="fileXmlExchangesTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="fileXlsExchangesJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.file_xls_exchanges.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.file_xls_exchanges.start_delay}" />
+		<property name="jobDetail" ref="fileXmlExchangesJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_exchanges.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_exchanges.start_delay}" />
 
 	</bean>
 
-	<bean id="fileXlsStocksTrigger"
+	<bean id="fileXmlStocksTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="fileXlsStocksJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.file_xls_stocks.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.file_xls_stocks.start_delay}" />
+		<property name="jobDetail" ref="fileXmlStocksJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_stocks.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_stocks.start_delay}" />
 	</bean>
 
-	<bean id="fileXlsIndexInfosTrigger"
+	<bean id="fileXmlIndexInfosTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
-		<property name="jobDetail" ref="fileXlsIndexInfosJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.file_xls_index_infos.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.file_xls_index_infos.start_delay}" />
+		<property name="jobDetail" ref="fileXmlIndexInfosJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_index_infos.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_index_infos.start_delay}" />
+	</bean>
+
+	<bean id="fileXmlInterbankRatesTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="fileXmlInterbankRatesJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_interbank_rates.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_interbank_rates.start_delay}" />
+	</bean>
+
+	<bean id="fileXmlHistInterbankRateDataTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="fileXmlHistInterbankRateDataJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.file_xml_hist_interbank_rate_data.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.file_xml_hist_interbank_rate_data.start_delay}" />
 	</bean>
 
 	<bean id="yahooXmlFXRatesTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="yahooXmlFXRatesJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.yahoo_xml_fx_rates.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.yahoo_xml_fx_rates.start_delay}" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.yahoo_xml_fx_rates.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.yahoo_xml_fx_rates.start_delay}" />
 	</bean>
 
 	<bean id="yahooXmlIndexQuotesTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="yahooXmlIndexQuotesJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.yahoo_xml_index_quotes.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.yahoo_xml_index_quotes.start_delay}" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.yahoo_xml_index_quotes.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.yahoo_xml_index_quotes.start_delay}" />
 	</bean>
 
 	<bean id="yahooXmlStockQuotesTrigger"
 		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
 		<property name="jobDetail" ref="yahooXmlStockQuotesJobDetail" />
-		<property name="repeatInterval" value="${app.quartz.trigger.yahoo_xml_stock_quotes.repeat_interval}" />
-		<property name="startDelay" value="${app.quartz.trigger.yahoo_xml_stock_quotes.start_delay}" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.yahoo_xml_stock_quotes.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.yahoo_xml_stock_quotes.start_delay}" />
+	</bean>
+	
+	<bean id="yahooXmlOptionChainsTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="yahooXmlOptionChainsJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.yahoo_xml_stock_quotes.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.yahoo_xml_stock_quotes.start_delay}" />
+	</bean>
+
+	<bean id="ebfXmlHistInterbankRateDataTrigger"
+		class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="ebfXmlHistInterbankRateDataJobDetail" />
+		<property name="repeatInterval"
+			value="${app.quartz.trigger.ebf_xml_hist_interbank_rate_data.repeat_interval}" />
+		<property name="startDelay"
+			value="${app.quartz.trigger.ebf_xml_hist_interbank_rate_data.start_delay}" />
 	</bean>
 
 
@@ -163,24 +277,32 @@
 		<property name="configLocation" value="classpath:quartz.properties" />
 		<property name="jobDetails">
 			<list>
-				<ref bean="fileXlsCurrencyPairsJobDetail" />
-				<ref bean="fileXlsExchangesJobDetail" />
-				<ref bean="fileXlsStocksJobDetail" />
-				<ref bean="fileXlsIndexInfosJobDetail" />
+<!-- 				<ref bean="fileXmlCurrencyPairsJobDetail" /> -->
+<!-- 				<ref bean="fileXmlExchangesJobDetail" /> -->
+				<ref bean="fileXmlStocksJobDetail" />
+<!-- 				<ref bean="fileXmlIndexInfosJobDetail" /> -->
+<!-- 				<ref bean="fileXmlInterbankRatesJobDetail" /> -->
+<!-- 				<ref bean="fileXmlHistInterbankRateDataJobDetail" /> -->
 <!-- 				<ref bean="yahooXmlFXRatesJobDetail" /> -->
+<!-- 				<ref bean="yahooXmlOptionChainsJobDetail" /> -->
 <!-- 				<ref bean="yahooXmlIndexQuotesJobDetail" /> -->
 <!-- 				<ref bean="yahooXmlStockQuotesJobDetail" /> -->
+<!-- 				<ref bean="ebfXmlHistInterbankRateDataJobDetail" /> -->
 			</list>
 		</property>
 		<property name="triggers">
 			<list>
-				<ref bean="fileXlsCurrencyPairsTrigger" />
-				<ref bean="fileXlsExchangesTrigger" />
-				<ref bean="fileXlsStocksTrigger" />
-				<ref bean="fileXlsIndexInfosTrigger" />
+<!-- 				<ref bean="fileXmlCurrencyPairsTrigger" /> -->
+<!-- 				<ref bean="fileXmlExchangesTrigger" /> -->
+				<ref bean="fileXmlStocksTrigger" />
+<!-- 				<ref bean="fileXmlIndexInfosTrigger" /> -->
+<!-- 				<ref bean="fileXmlInterbankRatesTrigger" /> -->
+<!-- 				<ref bean="fileXmlHistInterbankRateDataTrigger" /> -->
 <!-- 				<ref bean="yahooXmlFXRatesTrigger" /> -->
+<!-- 				<ref bean="yahooXmlOptionChainsTrigger" /> -->
 <!-- 				<ref bean="yahooXmlIndexQuotesTrigger" /> -->
 <!-- 				<ref bean="yahooXmlStockQuotesTrigger" /> -->
+<!-- 				<ref bean="ebfXmlHistInterbankRateDataTrigger" /> -->
 			</list>
 		</property>
 	</bean>

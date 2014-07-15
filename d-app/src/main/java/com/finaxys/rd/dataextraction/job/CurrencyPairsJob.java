@@ -3,11 +3,16 @@
  */
 package com.finaxys.rd.dataextraction.job;
 
+import java.util.List;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.CurrencyPairService;
+import com.finaxys.rd.dataextraction.service.integration.gateway.CurrencyPairMsgGateway;
+import com.finaxys.rd.dataextraction.service.integration.publisher.Publisher;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -16,34 +21,31 @@ import com.finaxys.rd.dataextraction.service.CurrencyPairService;
 public class CurrencyPairsJob extends QuartzJobBean {
 
 	/** The currency pair service. */
-	private CurrencyPairService currencyPairService;
+	private CurrencyPairMsgGateway currencyPairMsgGateway;
 
-	/**
-	 * Gets the currency pair service.
-	 *
-	 * @return the currency pair service
-	 */
-	public CurrencyPairService getCurrencyPairService() {
-		return currencyPairService;
+	public CurrencyPairMsgGateway getCurrencyPairMsgGateway() {
+		return currencyPairMsgGateway;
 	}
 
-	/**
-	 * Sets the currency pair service.
-	 *
-	 * @param currencyPairService the new currency pair service
-	 */
-	public void setCurrencyPairService(CurrencyPairService currencyPairService) {
-		this.currencyPairService = currencyPairService;
+	public void setCurrencyPairMsgGateway(CurrencyPairMsgGateway currencyPairMsgGateway) {
+		this.currencyPairMsgGateway = currencyPairMsgGateway;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org.quartz.JobExecutionContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.scheduling.quartz.QuartzJobBean#executeInternal(org
+	 * .quartz.JobExecutionContext)
 	 */
 	@Override
 	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
 		try {
-			currencyPairService.publishCurrencyPairs();
+			currencyPairMsgGateway.publishCurrencyPairs();
 		} catch (NullPointerException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

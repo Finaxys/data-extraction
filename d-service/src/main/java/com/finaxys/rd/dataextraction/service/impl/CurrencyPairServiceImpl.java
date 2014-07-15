@@ -6,81 +6,71 @@ package com.finaxys.rd.dataextraction.service.impl;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.provider.CurrencyPairProvider;
-import com.finaxys.rd.dataextraction.publisher.Publisher;
+import com.finaxys.rd.dataextraction.dao.integration.CurrencyPairGateway;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.CurrencyPairService;
+import com.finaxys.rd.dataextraction.splitter.Splitter;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class CurrencyPairServiceImpl.
  */
-public class CurrencyPairServiceImpl implements CurrencyPairService{
+public class CurrencyPairServiceImpl implements CurrencyPairService {
 
-	/** The provider. */
-	private CurrencyPairProvider provider;
+	/** The gateway. */
+	private CurrencyPairGateway gateway;
 
 	/** The converter. */
 	private Converter converter;
 
-	/** The publisher. */
-	private Publisher publisher;
 
-	/** The routing key. */
-	private String routingKey;
-
-	/** The content type. */
-	private  ContentType contentType;
-	
+	private Splitter splitter;
 	/**
 	 * Instantiates a new currency pair service impl.
 	 */
 	public CurrencyPairServiceImpl() {
 		super();
 	}
-	
-	/**
-	 * Instantiates a new currency pair service impl.
-	 *
-	 * @param provider the provider
-	 * @param converter the converter
-	 * @param publisher the publisher
-	 * @param routingKey the routing key
-	 * @param contentType the content type
-	 */
-	public CurrencyPairServiceImpl(CurrencyPairProvider provider, Converter converter, Publisher publisher,
-			String routingKey, ContentType contentType) {
+
+
+	public CurrencyPairServiceImpl(CurrencyPairGateway gateway, Converter converter, Splitter splitter) {
 		super();
-		this.provider = provider;
+		this.gateway = gateway;
 		this.converter = converter;
-		this.publisher = publisher;
-		this.routingKey = routingKey;
-		this.contentType = contentType;
+		this.splitter = splitter;
+	}
+
+	public Splitter getSplitter() {
+		return splitter;
+	}
+
+	public void setSplitter(Splitter splitter) {
+		this.splitter = splitter;
 	}
 
 	/**
-	 * Gets the provider.
-	 *
-	 * @return the provider
+	 * Gets the gateway.
+	 * 
+	 * @return the gateway
 	 */
-	public CurrencyPairProvider getProvider() {
-		return provider;
+	public CurrencyPairGateway getGateway() {
+		return gateway;
 	}
 
 	/**
-	 * Sets the provider.
-	 *
-	 * @param provider the new provider
+	 * Sets the gateway.
+	 * 
+	 * @param gateway
+	 *            the new gateway
 	 */
-	public void setProvider(CurrencyPairProvider provider) {
-		this.provider = provider;
+	public void setGateway(CurrencyPairGateway gateway) {
+		this.gateway = gateway;
 	}
 
 	/**
 	 * Gets the converter.
-	 *
+	 * 
 	 * @return the converter
 	 */
 	public Converter getConverter() {
@@ -89,101 +79,33 @@ public class CurrencyPairServiceImpl implements CurrencyPairService{
 
 	/**
 	 * Sets the converter.
-	 *
-	 * @param converter the new converter
+	 * 
+	 * @param converter
+	 *            the new converter
 	 */
 	public void setConverter(Converter converter) {
 		this.converter = converter;
 	}
 
-	/**
-	 * Gets the publisher.
-	 *
-	 * @return the publisher
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.finaxys.rd.dataextraction.service.CurrencyPairService#
+	 * publishCurrencyPairs()
 	 */
-	public Publisher getPublisher() {
-		return publisher;
-	}
+	public List<Message> getCurrencyPairs() {
 
-	/**
-	 * Sets the publisher.
-	 *
-	 * @param publisher the new publisher
-	 */
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
-
-	/**
-	 * Gets the currency pairs routing key.
-	 *
-	 * @return the currency pairs routing key
-	 */
-	public String getCurrencyPairsRoutingKey() {
-		return routingKey;
-	}
-
-	/**
-	 * Sets the currency pairs routing key.
-	 *
-	 * @param routingKey the new currency pairs routing key
-	 */
-	public void setCurrencyPairsRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
-
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the content type
-	 */
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType the new content type
-	 */
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-	/**
-	 * Gets the routing key.
-	 *
-	 * @return the routing key
-	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
-
-	/**
-	 * Sets the routing key.
-	 *
-	 * @param routingKey the new routing key
-	 */
-	public void setRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.service.CurrencyPairService#publishCurrencyPairs()
-	 */
-	public void publishCurrencyPairs() {
-
-		List<Document> l;
 		try {
-			l = this.provider.getCurrencyPairs(this.contentType);
-			if (l != null)
-			for (Document d : l) {
-				Message m = new Message(d, this.routingKey);
-				this.converter.convert(m);
-				this.publisher.publish(m);
+			Document d = this.gateway.getCurrencyPairs();
+			if (d != null) {
+				Message message = new Message(d);
+				this.converter.convert(message);
+				List<Message> l = this.splitter.split(message);
+				return l;
 			}
+			return null;
 		} catch (Exception e) {
-			e.printStackTrace();
+			return null;
 		}
 	}
 

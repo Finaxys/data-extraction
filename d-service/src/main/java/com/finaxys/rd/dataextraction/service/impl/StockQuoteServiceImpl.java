@@ -6,37 +6,27 @@ package com.finaxys.rd.dataextraction.service.impl;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.converter.Converter;
-import com.finaxys.rd.dataextraction.msg.Document;
-import com.finaxys.rd.dataextraction.msg.Message;
-import com.finaxys.rd.dataextraction.msg.Document.ContentType;
-import com.finaxys.rd.dataextraction.msg.Document.DataType;
-import com.finaxys.rd.dataextraction.provider.StockQuoteProvider;
-import com.finaxys.rd.dataextraction.publisher.Publisher;
+import com.finaxys.rd.dataextraction.dao.integration.StockQuoteGateway;
+import com.finaxys.rd.dataextraction.domain.msg.Document;
+import com.finaxys.rd.dataextraction.domain.msg.Message;
 import com.finaxys.rd.dataextraction.service.StockQuoteService;
+import com.finaxys.rd.dataextraction.splitter.Splitter;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class StockQuoteServiceImpl.
  */
 public class StockQuoteServiceImpl implements StockQuoteService {
-	
-	/** The provider. */
-	private StockQuoteProvider provider;
+
+	/** The gateway. */
+	private StockQuoteGateway gateway;
 
 	/** The converter. */
 	private Converter converter;
 
-	/** The publisher. */
-	private Publisher publisher;
+	private Splitter splitter;
+	
 
-	/** The routing key. */
-	private String routingKey;
-
-	/** The content type. */
-	private ContentType contentType;
-
-	/** The data type. */
-	private DataType dataType;
 
 	/**
 	 * Instantiates a new stock quote service impl.
@@ -47,48 +37,52 @@ public class StockQuoteServiceImpl implements StockQuoteService {
 
 	/**
 	 * Instantiates a new stock quote service impl.
-	 *
-	 * @param provider the provider
-	 * @param converter the converter
-	 * @param publisher the publisher
-	 * @param routingKey the routing key
-	 * @param contentType the content type
-	 * @param dataType the data type
+	 * 
+	 * @param gateway
+	 *            the gateway
+	 * @param converter
+	 *            the converter
+	 * @param publisher
+	 *            the publisher
+	 * @param contentType
+	 *            the content type
 	 */
-	public StockQuoteServiceImpl(StockQuoteProvider provider, Converter converter, Publisher publisher, String routingKey,
-			ContentType contentType, DataType dataType) {
+	public StockQuoteServiceImpl(StockQuoteGateway gateway, Converter converter ) {
 		super();
-		this.provider = provider;
+		this.gateway = gateway;
 		this.converter = converter;
-		this.publisher = publisher;
-		this.routingKey = routingKey;
-		this.contentType = contentType;
-		this.dataType = dataType;
 	}
 
 	
-
-	/**
-	 * Gets the provider.
-	 *
-	 * @return the provider
-	 */
-	public StockQuoteProvider getProvider() {
-		return provider;
+	public StockQuoteServiceImpl(StockQuoteGateway gateway, Converter converter, Splitter splitter ) {
+		super();
+		this.gateway = gateway;
+		this.converter = converter;
+		this.splitter = splitter;
 	}
 
 	/**
-	 * Sets the provider.
-	 *
-	 * @param provider the new provider
+	 * Gets the gateway.
+	 * 
+	 * @return the gateway
 	 */
-	public void setProvider(StockQuoteProvider provider) {
-		this.provider = provider;
+	public StockQuoteGateway getGateway() {
+		return gateway;
+	}
+
+	/**
+	 * Sets the gateway.
+	 * 
+	 * @param gateway
+	 *            the new gateway
+	 */
+	public void setGateway(StockQuoteGateway gateway) {
+		this.gateway = gateway;
 	}
 
 	/**
 	 * Gets the converter.
-	 *
+	 * 
 	 * @return the converter
 	 */
 	public Converter getConverter() {
@@ -97,102 +91,41 @@ public class StockQuoteServiceImpl implements StockQuoteService {
 
 	/**
 	 * Sets the converter.
-	 *
-	 * @param converter the new converter
+	 * 
+	 * @param converter
+	 *            the new converter
 	 */
 	public void setConverter(Converter converter) {
 		this.converter = converter;
 	}
 
-	/**
-	 * Gets the publisher.
-	 *
-	 * @return the publisher
-	 */
-	public Publisher getPublisher() {
-		return publisher;
+
+	
+	
+	public Splitter getSplitter() {
+		return splitter;
 	}
 
-	/**
-	 * Sets the publisher.
-	 *
-	 * @param publisher the new publisher
-	 */
-	public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
+	public void setSplitter(Splitter splitter) {
+		this.splitter = splitter;
 	}
 
-	/**
-	 * Gets the routing key.
-	 *
-	 * @return the routing key
-	 */
-	public String getRoutingKey() {
-		return routingKey;
-	}
 
-	/**
-	 * Sets the routing key.
-	 *
-	 * @param routingKey the new routing key
-	 */
-	public void setRoutingKey(String routingKey) {
-		this.routingKey = routingKey;
-	}
 
-	/**
-	 * Gets the content type.
-	 *
-	 * @return the content type
-	 */
-	public ContentType getContentType() {
-		return contentType;
-	}
-
-	/**
-	 * Sets the content type.
-	 *
-	 * @param contentType the new content type
-	 */
-	public void setContentType(ContentType contentType) {
-		this.contentType = contentType;
-	}
-
-	/**
-	 * Gets the data type.
-	 *
-	 * @return the data type
-	 */
-	public DataType getDataType() {
-		return dataType;
-	}
-
-	/**
-	 * Sets the data type.
-	 *
-	 * @param dataType the new data type
-	 */
-	public void setDataType(DataType dataType) {
-		this.dataType = dataType;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.finaxys.rd.dataextraction.service.StockQuoteService#publishStocksQuotes()
-	 */
-	public void publishStocksQuotes() {
-
-		List<Document> l;
+	@Override
+	public List<Message> getCurrentStocksQuotes(String symbols) {
 		try {
-			l = this.provider.getCurrentStocksQuotes(this.contentType, this.dataType);
-			if (l != null)
-			for (Document d : l) {
-				Message m = new Message(d, this.routingKey);
-				this.converter.convert(m);
-				this.publisher.publish(m);
+			Document d = this.gateway.getCurrentStocksQuotes(symbols);
+			if (d != null) {
+				Message message = new Message(d);
+				this.converter.convert(message);
+				List<Message> l = splitter.split(message);
+				return l;
 			}
+			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
 		}
 	}
-
 }
