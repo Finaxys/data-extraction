@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<query xmlns:yahoo="http://www.yahooapis.com/v1/base.rng"
-	yahoo:count="4" yahoo:created="2014-06-13T01:42:59Z" yahoo:lang="en-US">
-<results>
-<quote symbol ='4'></quote>
-</results>
