@@ -1,0 +1,111 @@
+package com.finaxys.rd.dataextraction.dao.integration.ebf;
+
+import java.net.URI;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.protocol.HttpContext;
+import org.joda.time.LocalDate;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.finaxys.rd.dataextraction.dao.helper.EBFGatewayHelper;
+import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
+import com.finaxys.rd.dataextraction.dao.integration.HistDataGateway;
+import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
+import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
+import com.finaxys.rd.dataextraction.domain.Enum.DataClass;
+import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.Document;
+import com.finaxys.rd.dataextraction.domain.InterbankRate;
+import com.finaxys.rd.dataextraction.domain.InterbankRateData;
+
+public class EBFInterbankRateDataGateway implements HistDataGateway<InterbankRateData, InterbankRate> {
+
+	@Autowired
+	private CloseableHttpClient httpClient;
+
+	private final HttpContext context;
+
+	/** The content type. */
+	private ContentType contentType;
+
+	private Parser<InterbankRateData> histDataParser;
+	
+	
+	public EBFInterbankRateDataGateway(ContentType contentType,
+			Parser<InterbankRateData> histDataParser) {
+		super();
+		this.contentType = contentType;
+		this.histDataParser = histDataParser;
+		this.context = HttpClientContext.create();
+	}
+
+
+	public EBFInterbankRateDataGateway(CloseableHttpClient httpClient,
+			ContentType contentType, Parser<InterbankRateData> histDataParser) {
+		super();
+		this.httpClient = httpClient;
+		this.contentType = contentType;
+		this.histDataParser = histDataParser;
+		this.context = HttpClientContext.create();
+	}
+
+
+	public CloseableHttpClient getHttpClient() {
+		return httpClient;
+	}
+
+
+	public void setHttpClient(CloseableHttpClient httpClient) {
+		this.httpClient = httpClient;
+	}
+
+
+	public ContentType getContentType() {
+		return contentType;
+	}
+
+
+	public void setContentType(ContentType contentType) {
+		this.contentType = contentType;
+	}
+
+
+	public Parser<InterbankRateData> getHistDataParser() {
+		return histDataParser;
+	}
+
+
+	public void setHistDataParser(Parser<InterbankRateData> histDataParser) {
+		this.histDataParser = histDataParser;
+	}
+
+
+
+
+	@Override
+	public List<InterbankRateData> getHistData(List<InterbankRate> products,
+			LocalDate startDate, LocalDate endDate) throws Exception {
+		try {
+
+			URI uri = EBFGatewayHelper.contructEBFHistEuriborUri(startDate.getYear(), contentType);
+			HttpGet request = new HttpGet(uri);
+			YahooGatewayHelper.signOAuthYQLRequest(request);
+			CloseableHttpResponse response = httpClient.execute(request, context);
+			byte[] data = IOUtils.toByteArray(response.getEntity().getContent());
+
+			if (data.length > 0)
+				return histDataParser.parse(new Document(contentType, DataType.HIST, DataClass.InterbankRatesData, EBFGatewayHelper.EBF_PROVIDER_SYMB, data));
+			else
+				return null;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+}
