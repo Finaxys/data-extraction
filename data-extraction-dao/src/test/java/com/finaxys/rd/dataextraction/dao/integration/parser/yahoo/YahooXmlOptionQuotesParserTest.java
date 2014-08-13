@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
 import com.finaxys.rd.dataextraction.domain.DataWrapper;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
@@ -60,7 +61,7 @@ public class YahooXmlOptionQuotesParserTest {
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(
 				expirationDateFormat).withLocale(Locale.US);
-		OptionQuote optionQuote = new OptionQuote( '0', new DateTime() ,  "GOOG140920C00265000",
+		OptionQuote optionQuote = new OptionQuote( '1', new DateTime() ,  "GOOG140920C00265000",
 				DataType.INTRA ,  new DateTime("2014-07-27T17:17:37Z"),  "GOOG",
 				"C", new BigDecimal("309.50"), new BigDecimal("0"),
 				new BigDecimal("309.50"), new BigDecimal("309.50"),
@@ -97,7 +98,8 @@ public class YahooXmlOptionQuotesParserTest {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_without_optionschain_element.xml");
 	}
 
-	@Test
+
+	@Test(expected = DataReadingParserException.class)  
 	public void test_convert_fields_not_wellformedxml() throws Exception {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_not_wellformedxml.xml");
 	}
@@ -114,7 +116,7 @@ public class YahooXmlOptionQuotesParserTest {
 
 		byte[] inData = TestHelper.getResourceAsBytes(testFile);
 		Document inMessageFixture = new Document(inData);
-		inMessageFixture.setSource('0');
+		inMessageFixture.setSource('1');
 		inMessageFixture.setDataType(DataType.INTRA);
 
 		// Execution

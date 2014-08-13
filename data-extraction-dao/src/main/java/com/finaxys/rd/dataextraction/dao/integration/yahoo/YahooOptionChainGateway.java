@@ -1,8 +1,14 @@
 package com.finaxys.rd.dataextraction.dao.integration.yahoo;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -10,14 +16,18 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayCommunicationException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewaySecurityException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.RefOptionChainGateway;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
-import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
-import com.finaxys.rd.dataextraction.domain.Enum.DataClass;
-import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 import com.finaxys.rd.dataextraction.domain.Document;
+import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
+import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 import com.finaxys.rd.dataextraction.domain.OptionChain;
 import com.finaxys.rd.dataextraction.domain.Stock;
 
@@ -40,17 +50,14 @@ public class YahooOptionChainGateway implements RefOptionChainGateway {
 
 	private Parser<OptionChain> parser;
 
-	
-	public YahooOptionChainGateway(ContentType contentType,
-			Parser<OptionChain> parser) {
+	public YahooOptionChainGateway(ContentType contentType, Parser<OptionChain> parser) {
 		super();
 		this.contentType = contentType;
 		this.parser = parser;
 		this.context = HttpClientContext.create();
 	}
 
-	public YahooOptionChainGateway(CloseableHttpClient httpClient,
-			ContentType contentType, Parser<OptionChain> parser) {
+	public YahooOptionChainGateway(CloseableHttpClient httpClient, ContentType contentType, Parser<OptionChain> parser) {
 		super();
 		this.httpClient = httpClient;
 		this.contentType = contentType;
@@ -82,36 +89,25 @@ public class YahooOptionChainGateway implements RefOptionChainGateway {
 		this.parser = parser;
 	}
 
-	private String getSymbols(List<Stock> stocks) {
-		StringBuilder sb = new StringBuilder();
-		for (Stock stock : stocks) {
-			if (stock.getExchSymb().equals("US"))
-				sb.append("\"" + stock.getSymbol() + "\",");
-			else
-				sb.append("\"" + stock.getSymbol() + "." + stock.getExchSymb()
-						+ "\",");
-		}
 
-		return sb.toString().replaceAll(",$", "");
-	}
 
 	@Override
-	public List<OptionChain> getRefData(List<Stock> stocks) throws Exception {
+	public List<OptionChain> getRefData(List<Stock> products) throws GatewayException {
 		try {
-			List<String> params = new ArrayList<String>(
-					Arrays.asList(getSymbols(stocks)));
-			byte[] data = YahooGatewayHelper.executeYQLQuery(
-					OPTION_CHAIN_QUERY, params, contentType, httpClient,
-					context);
+			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
+			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
+			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getStocksSymbols(products)));
+			byte[] data = YahooGatewayHelper.executeYQLQuery(OPTION_CHAIN_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
-				return parser.parse(new Document(contentType, DataType.INTRA,
-						DataClass.OptionChain,
-						YahooGatewayHelper.Y_PROVIDER_SYMB, data));
+				return parser.parse(new Document(data, DataType.INTRA));
 			else
 				return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
+			throw new GatewaySecurityException(e);
+		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
+			throw new GatewayCommunicationException(e);
+		} catch (NullPointerException | ParserException e) {
+			throw new GatewayException(e);
 		}
 	}
 

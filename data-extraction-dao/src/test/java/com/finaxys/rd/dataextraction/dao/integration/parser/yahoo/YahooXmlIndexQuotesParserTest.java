@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
 import com.finaxys.rd.dataextraction.domain.DataWrapper;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
@@ -50,7 +51,7 @@ public class YahooXmlIndexQuotesParserTest {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-		IndexQuote indexQuote = new IndexQuote('0', new DateTime(), "^GSPC",
+		IndexQuote indexQuote = new IndexQuote('1', new DateTime(), "^GSPC",
 				DataType.INTRA, formatter.parseDateTime("7/22/2014 4:30pm"),
 				"US", new BigDecimal("1983.53"), new BigDecimal("+9.90"),
 				new BigDecimal("1975.65"), new BigDecimal("1986.24"),
@@ -74,19 +75,16 @@ public class YahooXmlIndexQuotesParserTest {
 	}
 
 
-	@Test
+	@Test(expected = DataReadingParserException.class)  
 	public void test_convert_without_quote_element() throws Exception {
 
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_not_wellformedxml.xml");
 	}
 
-	@Test
-	public void test_convert_no_datatype() throws Exception {
 
-		commonTest("/YahooXmlIndexQuotesParser/test_convert_no_datatype.xml");
-	}
 
-	@Test
+
+	@Test(expected = DataReadingParserException.class)  
 	public void test_convert_not_wellformedxml() throws Exception {
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_not_wellformedxml.xml");
 		

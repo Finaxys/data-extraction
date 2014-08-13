@@ -12,6 +12,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 
 @XmlRootElement(name = "oquote")
@@ -25,6 +26,7 @@ public class OptionQuote extends QuoteData implements Serializable{
 
 
 
+    @HBaseRowKeyField(className = "OptionQuote", order = 2)
 	private String optionChain;
 	
 	private String optionType;
@@ -43,6 +45,7 @@ public class OptionQuote extends QuoteData implements Serializable{
 
 	private BigDecimal strike;
 
+	@HBaseRowKeyField(className = "OptionQuote", order = 3)
 	private LocalDate expiration;
 
 	private BigInteger volume;

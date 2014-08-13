@@ -49,8 +49,8 @@ public class Enum {
 		Exchange,
 		/** The FX rate. */
 		FXRate,
-		/** The Index info. */
-		IndexInfo,
+		/** The Index. */
+		Index,
 		/** The Index quote. */
 		IndexQuote,
 		/** The Stock quote. */

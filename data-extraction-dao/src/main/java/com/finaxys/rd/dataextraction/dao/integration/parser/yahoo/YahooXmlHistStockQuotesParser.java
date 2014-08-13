@@ -9,8 +9,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -20,9 +22,14 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
+import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.StockQuote;
@@ -32,6 +39,9 @@ import com.finaxys.rd.dataextraction.domain.StockQuote;
  * The Class YahooXmlIndexQuotesConverter.
  */
 public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
+
+	static Logger logger = Logger.getLogger(YahooXmlHistStockQuotesParser.class);
+
 	@Value("${parser.yahoo.hist_stock_quotes.date_format}")
 	private String DATE_FORMAT;
 
@@ -56,114 +66,109 @@ public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 	@Value("${parser.yahoo.hist_stock_quotes.old.low_el}")
 	private String LOW_EL;
 
-
 	@Value("${parser.yahoo.hist_stock_quotes.old.close_el}")
 	private String CLOSE_EL;
 
-
 	@Value("${parser.yahoo.hist_stock_quotes.old.volume_el}")
 	private String VOLUME_EL;
-	
 
 	@Value("${parser.yahoo.hist_stock_quotes.old.adj_close_el}")
 	private String ADJ_CLOSE_EL;
 
-	public List<StockQuote> parse(Document document) throws Exception {
-		XMLInputFactory ifactory = XMLInputFactory.newInstance();
-		InputStream is = new ByteArrayInputStream(document.getContent());
-		StreamSource source = new StreamSource(is);
-		XMLEventReader reader = ifactory.createXMLEventReader(source);
-		
-		List<StockQuote> list = new ArrayList<StockQuote>();
-		StockQuote stockQuote = null;
-		boolean isValid = true;
-		while (reader.hasNext()) {
-			try {
-				XMLEvent ev = reader.nextEvent();
+	public List<StockQuote> parse(Document document) throws ParserException {
+		XMLEventReader reader;
+		try {
+			Assert.notNull(document, "Cannot parse Null document");
+			XMLInputFactory ifactory = XMLInputFactory.newInstance();
 
+			InputStream is = new ByteArrayInputStream(document.getContent());
+			StreamSource source = new StreamSource(is);
 
+			reader = ifactory.createXMLEventReader(source);
 
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
-					stockQuote = new StockQuote();
+			List<StockQuote> list = new ArrayList<StockQuote>();
+			StockQuote stockQuote = null;
+			boolean isValid = true;
+			while (reader.hasNext()) {
+				try {
+					XMLEvent ev = reader.nextEvent();
 
+					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+						stockQuote = new StockQuote();
 
-					Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
-					if (a != null && !a.getValue().equals("")) {
-						String[] sp = a.getValue().split("\\.");
-						stockQuote.setSymbol(sp[0]);
-						if (sp.length == 2)
-							stockQuote.setExchSymb(sp[1]);
-						else
-							stockQuote.setExchSymb("US");
-					} else
-						isValid = false;
-				}
-				if (stockQuote != null && isValid) {
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DATE_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setQuoteDateTime(new DateTime(evt.asCharacters().getData()));
-
+						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
+						if (a != null && !a.getValue().equals("")) {
+							String[] sp = a.getValue().split("\\.");
+							stockQuote.setSymbol(sp[0]);
+							if (sp.length == 2)
+								stockQuote.setExchSymb(sp[1]);
+							else
+								stockQuote.setExchSymb("US");
+						} else
+							isValid = false;
 					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
-					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(HIGH_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setDaysHigh(new BigDecimal(evt.asCharacters().getData()));
-					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LOW_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setDaysLow(new BigDecimal(evt.asCharacters().getData()));
-					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CLOSE_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setClose(new BigDecimal(evt.asCharacters().getData()));
-					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setVolume(new BigInteger(evt.asCharacters().getData()));
-					}
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ADJ_CLOSE_EL)) {
-						XMLEvent evt = reader.nextEvent();
-						if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-							stockQuote.setAdjClose(new BigDecimal(evt.asCharacters().getData()));
-					}
-
-					if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
-
-						if ( document.getSource() != Character.UNASSIGNED && document.getDataType() != null) {
-							stockQuote.setSource(document.getSource());
-							stockQuote.setDataType(document.getDataType());				
-							list.add(stockQuote);
-							stockQuote = null;
+					if (stockQuote != null && isValid) {
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DATE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setQuoteDateTime(new DateTime(evt.asCharacters().getData()));
 
 						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(HIGH_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setDaysHigh(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LOW_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setDaysLow(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CLOSE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setClose(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setVolume(new BigInteger(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ADJ_CLOSE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								stockQuote.setAdjClose(new BigDecimal(evt.asCharacters().getData()));
+						}
+
+						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+
+							if ( document.getDataType() != null) {
+								stockQuote.setSource(YahooGatewayHelper.Y_PROVIDER_SYMB);
+								stockQuote.setDataType(document.getDataType());
+								list.add(stockQuote);
+								stockQuote = null;
+
+							}
+						}
+
 					}
-
+				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+					logger.error("Exception when creating a new object by the parser: " + e);
+					isValid = false;
+					break;
+				} catch (XMLStreamException | NoSuchElementException e) {
+					throw new DataReadingParserException(e);
 				}
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-				isValid = false;
-				break;
-			} catch (XMLStreamException e) {
-				e.printStackTrace();
-				isValid = false;
-				break;
-
-			} catch (Exception e) {
-				e.printStackTrace();
-				isValid = false;
 			}
+			return list;
+		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+			throw new DataReadingParserException(e);
 		}
-		
-		return list;
 
 	}
 }

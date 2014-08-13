@@ -8,11 +8,14 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -22,11 +25,16 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
+import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.OptionQuote;
@@ -36,6 +44,9 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
  * The Class YahooXmlIndexQuotesConverter.
  */
 public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
+
+	static Logger logger = Logger.getLogger(YahooXmlOQuotesParser.class);
+
 	/** The date format. */
 	@Value("${parser.yahoo.oquotes.date_format}")
 	private String DATE_FORMAT;
@@ -95,135 +106,135 @@ public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
 	@Value("${parser.yahoo.oquotes.old.openinterest_el}")
 	private String OPENINTEREST_EL;
 
-	public List<OptionQuote> parse(Document document) throws Exception {
+	public List<OptionQuote> parse(Document document) throws ParserException {
+		XMLEventReader reader;
+		try {
+			Assert.notNull(document, "Cannot parse Null document");
+			XMLInputFactory ifactory = XMLInputFactory.newInstance();
+			InputStream is = new ByteArrayInputStream(document.getContent());
+			StreamSource source = new StreamSource(is);
 
-		XMLInputFactory ifactory = XMLInputFactory.newInstance();
-		InputStream is = new ByteArrayInputStream(document.getContent());
-		StreamSource source = new StreamSource(is);
-		XMLEventReader reader = ifactory.createXMLEventReader(source);
-		
-		List<OptionQuote> list = new ArrayList<OptionQuote>();
-		DateTimeFormatter expirationFormatter = DateTimeFormat.forPattern(EXPIRATION_DATE_FORMAT).withLocale(Locale.ENGLISH);
-		String ts = "";
-		OptionQuote optionQuote = null;
-		boolean isValid = true;
-		while (reader.hasNext()) {
-			try {
-				XMLEvent ev = reader.nextEvent();
+			reader = ifactory.createXMLEventReader(source);
 
+			List<OptionQuote> list = new ArrayList<OptionQuote>();
+			DateTimeFormatter expirationFormatter = DateTimeFormat.forPattern(EXPIRATION_DATE_FORMAT).withLocale(Locale.ENGLISH);
+			String ts = "";
+			OptionQuote optionQuote = null;
+			boolean isValid = true;
+			while (reader.hasNext()) {
+				try {
+					XMLEvent ev = reader.nextEvent();
 
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equalsIgnoreCase(HEADER_EL)) {
-					Attribute a = ((StartElement) ev).getAttributeByName(new QName(((StartElement) ev).getNamespaceURI(HEADER_NS), HEADER_CREATED));
-					if (a != null && !a.getValue().isEmpty())
-						ts = a.getValue();
-				}
-
-
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
-					optionQuote = new OptionQuote();
-					if (ts == null || ts.isEmpty())
-						isValid = false;
-					else isValid = true;
-					
-					Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
-					if (a != null && !a.getValue().equals(""))
-						optionQuote.setSymbol(a.getValue());
-					else
-						isValid = false;
-				}
-				if (optionQuote != null && isValid) {
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setChange(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PRICE_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setPrice(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PREVCLOSE_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setPrevClose(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setBid(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setAsk(new BigDecimal(evt.asCharacters().getData()));
-				}
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setStrike(new BigDecimal(evt.asCharacters().getData()));
-				}
-
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(EXPIRATION_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-						optionQuote.setExpiration(expirationFormatter.parseDateTime(evt.asCharacters().getData()).toLocalDate());
-				}
-
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
-					{	
-						NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
-						
-						optionQuote.setVolume(new BigInteger(nf_us.parse(evt.asCharacters().getData()).toString()));
-					
+					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equalsIgnoreCase(HEADER_EL)) {
+						Attribute a = ((StartElement) ev).getAttributeByName(new QName(((StartElement) ev).getNamespaceURI(HEADER_NS), HEADER_CREATED));
+						if (a != null && !a.getValue().isEmpty())
+							ts = a.getValue();
 					}
-				}
-				
-				if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPENINTEREST_EL)) {
-					XMLEvent evt = reader.nextEvent();
-					if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
-						NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
-						
-						optionQuote.setOpenInterest(nf_us.parse(evt.asCharacters().getData()).intValue());
+
+					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
+						optionQuote = new OptionQuote();
+						if (ts == null || ts.isEmpty())
+							isValid = false;
+						else
+							isValid = true;
+
+						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
+						if (a != null && !a.getValue().equals(""))
+							optionQuote.setSymbol(a.getValue());
+						else
+							isValid = false;
+					}
+					if (optionQuote != null && isValid) {
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setChange(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PRICE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setPrice(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PREVCLOSE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setPrevClose(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setBid(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setAsk(new BigDecimal(evt.asCharacters().getData()));
+						}
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setStrike(new BigDecimal(evt.asCharacters().getData()));
+						}
+
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(EXPIRATION_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+								optionQuote.setExpiration(expirationFormatter.parseDateTime(evt.asCharacters().getData()).toLocalDate());
+						}
+
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
+								NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
+
+								optionQuote.setVolume(new BigInteger(nf_us.parse(evt.asCharacters().getData()).toString()));
+
+							}
+						}
+
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPENINTEREST_EL)) {
+							XMLEvent evt = reader.nextEvent();
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
+								NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
+
+								optionQuote.setOpenInterest(nf_us.parse(evt.asCharacters().getData()).intValue());
+
+							}
+						}
+
+						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
+
+							if (ts != null && !ts.isEmpty() && document.getDataType() != null) {
+								optionQuote.setQuoteDateTime(new DateTime(ts));
+								optionQuote.setSource(YahooGatewayHelper.Y_PROVIDER_SYMB);
+								optionQuote.setDataType(document.getDataType());
+								optionQuote.setInputDate(new DateTime());
+								list.add(optionQuote);
+								optionQuote = null;
+
+							} else
+								isValid = false;
+						}
 
 					}
+				} catch (NullPointerException | ParseException | UnsupportedOperationException | IllegalArgumentException e) {
+					logger.error("Exception when creating a new object by the parser: " + e);
+
+					break;
+				} catch (XMLStreamException | NoSuchElementException e) {
+					throw new DataReadingParserException(e);
 				}
-
-				if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
-					
-						if (ts != null && !ts.isEmpty() && document.getSource() != Character.UNASSIGNED && document.getDataType() != null) {
-							optionQuote.setQuoteDateTime(new DateTime(ts));
-							optionQuote.setSource(document.getSource());
-							optionQuote.setDataType(document.getDataType());
-							optionQuote.setInputDate(new DateTime());
-                            list.add(optionQuote);
-							optionQuote = null;
-
-						}else isValid = false;
-					}
-				
-				}	
-			}catch(NullPointerException e){
-				e.printStackTrace();
-				isValid = false;
-				break;
-			} catch (XMLStreamException e) {
-				e.printStackTrace();
-				isValid = false;
-			break;
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				isValid = false;
 			}
+			return list;
+		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+			throw new DataReadingParserException(e);
 		}
-		return list;
+
 	}
 
 }

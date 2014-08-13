@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 @XmlRootElement(name = "rate")
 @XmlType(propOrder = {"symbol", "currency", "provider", "source", "inputDate", "dataType"})
@@ -20,6 +21,7 @@ public class InterbankRate  extends ProductData  implements Serializable {
 	private static final long serialVersionUID = -5710626964653341196L;
 
 	/** Currency name */
+    @HBaseRowKeyField(className = "InterbankRate", order = 3)
 	private String currency;
 
 	/**

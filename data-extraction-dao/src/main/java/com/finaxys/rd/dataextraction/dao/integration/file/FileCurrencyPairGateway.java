@@ -1,11 +1,21 @@
 package com.finaxys.rd.dataextraction.dao.integration.file;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
+
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayCommunicationException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewaySecurityException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.helper.FileGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.RefDataGateway;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
@@ -52,7 +62,8 @@ public class FileCurrencyPairGateway implements RefDataGateway<CurrencyPair> {
 	}
 
 	@Override
-	public List<CurrencyPair> getRefData() throws Exception {
+	public List<CurrencyPair> getRefData() throws GatewayException {
+		try{
 		File file = FileGatewayHelper.getResourceFile(FileGatewayHelper
 				.getPath(FileGatewayHelper.DATA_FOLDER, CURRENCY_PAIRS_FILE,
 						contentType.getName()));
@@ -63,6 +74,9 @@ public class FileCurrencyPairGateway implements RefDataGateway<CurrencyPair> {
 					FileGatewayHelper.toBytes(file)));
 		else
 			return null;
+		} catch (NullPointerException  | IOException | ParserException e) {
+			throw new GatewayException(e);
+		}
 	}
 
 }

@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 
 // TODO: Auto-generated Javadoc
@@ -32,7 +33,8 @@ public class IndexQuote  extends QuoteData  implements Serializable{
 	private static final long serialVersionUID = -6697935490907016258L;
 
 
-	
+
+    @HBaseRowKeyField(className = "Index", order = 3)
 	private String exchSymb;
 	
 	/** The last trade price only. */

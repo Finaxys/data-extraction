@@ -5,16 +5,17 @@ package com.finaxys.rd.dataextraction.service.impl;
 
 import java.util.List;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
 import com.finaxys.rd.dataextraction.dao.integration.IntradayDataGateway;
 import com.finaxys.rd.dataextraction.domain.MarketData;
 import com.finaxys.rd.dataextraction.service.IntradayDataService;
+import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class MarketDataServiceImpl.
  */
-public class IntradayDataServiceImpl<T extends MarketData, K extends MarketData>  implements
-		IntradayDataService<T, K> {
+public class IntradayDataServiceImpl<T extends MarketData, K extends MarketData> implements IntradayDataService<T, K> {
 
 	/** The gateway. */
 	private IntradayDataGateway<T, K> gateway;
@@ -25,13 +26,11 @@ public class IntradayDataServiceImpl<T extends MarketData, K extends MarketData>
 	}
 
 	@Override
-	public List<T> getCurrentData(List<K> products)
-			throws Exception {
+	public List<T> getCurrentData(List<K> products) throws ServiceException {
 		try {
 			return this.gateway.getCurrentData(products);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (GatewayException e) {
+			throw new ServiceException(e);
 		}
 	}
 }

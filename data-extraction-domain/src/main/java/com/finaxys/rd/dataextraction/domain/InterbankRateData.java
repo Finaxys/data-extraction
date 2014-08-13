@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 
 @XmlRootElement(name = "interbankRateData")
@@ -24,9 +25,11 @@ public class InterbankRateData  extends RateData  implements Serializable {
 	private static final long serialVersionUID = 8587455397446182450L;
 
 	/** Currency name */
+    @HBaseRowKeyField(className = "InterbankRateData", order = 3)
 	private String currency;
 	
 	/** Bucket name */
+    @HBaseRowKeyField(className = "InterbankRateData", order = 4)
 	private String bucket;
 	
 	private BigDecimal value = new BigDecimal(0);

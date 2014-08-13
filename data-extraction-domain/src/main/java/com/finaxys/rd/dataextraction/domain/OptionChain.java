@@ -10,6 +10,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 
 @XmlRootElement(name = "optionChain")
@@ -22,6 +23,7 @@ public class OptionChain  extends ProductData implements Serializable{
 	private static final long serialVersionUID = -8241203495855981504L;
 
 
+    @HBaseRowKeyField(className = "OptionChain", order = 3)
 	private LocalDate expiration;
 	
 

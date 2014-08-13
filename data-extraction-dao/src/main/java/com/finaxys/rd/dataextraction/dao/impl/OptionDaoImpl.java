@@ -172,8 +172,7 @@ public class OptionDaoImpl implements OptionDao {
 
 			int offset = 0;
 			offset = Bytes.putByte(prefix, offset, provByte);
-			Bytes.putBytes(prefix, offset, exchSymbHash, 0,
-					DaoHelper.MD5_LENGTH);
+			Bytes.putBytes(prefix, offset, exchSymbHash, 0, DaoHelper.MD5_LENGTH);
 
 			return list(prefix);
 		} catch (Exception e) {

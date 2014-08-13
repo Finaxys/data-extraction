@@ -4,17 +4,23 @@
 package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.joda.time.DateTime;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Stock;
@@ -25,41 +31,47 @@ import com.finaxys.rd.dataextraction.domain.Stock;
  */
 public class FileXlsStocksParser implements Parser<Stock> {
 
+	static Logger logger = Logger.getLogger(FileXlsStocksParser.class);
 
-	
-	public List<Stock> parse(Document document) throws Exception {
+	public List<Stock> parse(Document document) throws ParserException {
+		HSSFWorkbook workbook;
+		try {
+			Assert.notNull(document, "Cannot parse Null document");
+			InputStream is = new ByteArrayInputStream(document.getContent());
 
-		InputStream is = new ByteArrayInputStream(document.getContent());
-		HSSFWorkbook workbook = new HSSFWorkbook(is);
-		HSSFSheet sheet = workbook.getSheetAt(0);
-		Iterator<Row> rowIterator = sheet.iterator();
-		List<Stock> list = new ArrayList<Stock>();
-		
+			workbook = new HSSFWorkbook(is);
 
-		Row row = rowIterator.next();
-		Stock stock;
-		while (rowIterator.hasNext()) {
-			row = rowIterator.next();
-			Iterator<Cell> cellIterator = row.cellIterator();
+			HSSFSheet sheet = workbook.getSheetAt(0);
+			Iterator<Row> rowIterator = sheet.iterator();
+			List<Stock> list = new ArrayList<Stock>();
 
-			try {
-				stock = new Stock();
+			Row row = rowIterator.next();
+			Stock stock;
+			while (rowIterator.hasNext()) {
+				row = rowIterator.next();
+				Iterator<Cell> cellIterator = row.cellIterator();
 
-				String symbol = cellIterator.next().toString();
-				stock.setSymbol(symbol);
-				stock.setCompanyName(cellIterator.next().toString());
-				stock.setExchSymb(cellIterator.next().toString());
-				stock.setProvider(cellIterator.next().toString().charAt(0));
-				stock.setSource(document.getSource());
-				stock.setInputDate(new DateTime());
-				stock.setDataType(document.getDataType());
-				list.add(stock);
-			} catch (Exception e) {
-				e.printStackTrace();
+				try {
+					stock = new Stock();
+
+					String symbol = cellIterator.next().toString();
+					stock.setSymbol(symbol);
+					stock.setCompanyName(cellIterator.next().toString());
+					stock.setExchSymb(cellIterator.next().toString());
+					stock.setProvider(cellIterator.next().toString().charAt(0));
+					stock.setSource(document.getSource());
+					stock.setInputDate(new DateTime());
+					stock.setDataType(document.getDataType());
+					list.add(stock);
+				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+					logger.error("Exception when creating a new object by the parser: " + e);
+				}
 			}
-		}
 
-		return list;
+			return list;
+		} catch (NullPointerException | IOException e) {
+			throw new DataReadingParserException(e);
+		}
 	}
 
 }

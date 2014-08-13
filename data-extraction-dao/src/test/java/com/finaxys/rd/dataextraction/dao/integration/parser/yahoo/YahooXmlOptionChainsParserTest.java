@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
 import com.finaxys.rd.dataextraction.domain.DataWrapper;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
@@ -38,8 +39,8 @@ public class YahooXmlOptionChainsParserTest {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-		OptionChain optionChain = new OptionChain('0', new DateTime(), "YHOO",
-				DataType.REF, '0', formatter.parseDateTime("2014-07")
+		OptionChain optionChain = new OptionChain('1', new DateTime(), "YHOO",
+				DataType.REF, '1', formatter.parseDateTime("2014-07")
 						.toLocalDate());
 
 		List<OptionChain> outList = new ArrayList<OptionChain>();
@@ -52,14 +53,14 @@ public class YahooXmlOptionChainsParserTest {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-		OptionChain optionChain1 = new OptionChain('0', new DateTime(), "YHOO",
-				DataType.REF, '0', formatter.parseDateTime("2014-07")
+		OptionChain optionChain1 = new OptionChain('1', new DateTime(), "YHOO",
+				DataType.REF, '1', formatter.parseDateTime("2014-07")
 						.toLocalDate());
-		OptionChain optionChain2 = new OptionChain('0', new DateTime(), "AAPL",
-				DataType.REF, '0', formatter.parseDateTime("2014-07")
+		OptionChain optionChain2 = new OptionChain('1', new DateTime(), "AAPL",
+				DataType.REF, '1', formatter.parseDateTime("2014-07")
 						.toLocalDate());
-		OptionChain optionChain3 = new OptionChain('0', new DateTime(), "AAPL",
-				DataType.REF, '0', formatter.parseDateTime("2014-08")
+		OptionChain optionChain3 = new OptionChain('1', new DateTime(), "AAPL",
+				DataType.REF, '1', formatter.parseDateTime("2014-08")
 						.toLocalDate());
 
 		List<OptionChain> outList = new ArrayList<OptionChain>();
@@ -85,7 +86,8 @@ public class YahooXmlOptionChainsParserTest {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_without_option_element.xml");
 	}
 
-	@Test
+
+	@Test(expected = DataReadingParserException.class)  
 	public void test_convert_fields_not_wellformedxml() throws Exception {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_not_wellformedxml.xml");
 	}
@@ -102,7 +104,7 @@ public class YahooXmlOptionChainsParserTest {
 
 		byte[] inData = TestHelper.getResourceAsBytes(testFile);
 		Document inMessageFixture = new Document(inData);
-		inMessageFixture.setSource('0');
+		inMessageFixture.setSource('1');
 		inMessageFixture.setDataType(DataType.REF);
 
 		// Execution

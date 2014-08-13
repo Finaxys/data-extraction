@@ -1,8 +1,14 @@
 package com.finaxys.rd.dataextraction.dao.integration.yahoo;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -12,22 +18,24 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayCommunicationException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewaySecurityException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.EODDataGateway;
 import com.finaxys.rd.dataextraction.dao.integration.HistDataGateway;
 import com.finaxys.rd.dataextraction.dao.integration.IntradayDataGateway;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
-import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
-import com.finaxys.rd.dataextraction.domain.Enum.DataClass;
-import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 import com.finaxys.rd.dataextraction.domain.Document;
+import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
+import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 import com.finaxys.rd.dataextraction.domain.Index;
 import com.finaxys.rd.dataextraction.domain.IndexQuote;
 
-public class YahooIndexQuoteGateway implements
-		IntradayDataGateway<IndexQuote, Index>,
-		EODDataGateway<IndexQuote, Index>, HistDataGateway<IndexQuote, Index> {
+public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, Index>, EODDataGateway<IndexQuote, Index>, HistDataGateway<IndexQuote, Index> {
 
 	@Value("${gateway.yahoo.yqlIndexQuotesQuery}")
 	private String CURRENT_INDEX_QUOTES_QUERY;
@@ -48,14 +56,10 @@ public class YahooIndexQuoteGateway implements
 	private Parser<IndexQuote> intradayDataParser;
 
 	private Parser<IndexQuote> eodDataParser;
-	
 
 	private Parser<IndexQuote> histDataParser;
 
-	public YahooIndexQuoteGateway(ContentType contentType,
-			Parser<IndexQuote> intradayDataParser,
-			Parser<IndexQuote> eodDataParser,
-			Parser<IndexQuote> histDataParser) {
+	public YahooIndexQuoteGateway(ContentType contentType, Parser<IndexQuote> intradayDataParser, Parser<IndexQuote> eodDataParser, Parser<IndexQuote> histDataParser) {
 		super();
 		this.contentType = contentType;
 		this.intradayDataParser = intradayDataParser;
@@ -64,9 +68,7 @@ public class YahooIndexQuoteGateway implements
 		this.context = HttpClientContext.create();
 	}
 
-	public YahooIndexQuoteGateway(CloseableHttpClient httpClient,
-			ContentType contentType, Parser<IndexQuote> intradayDataParser,
-			Parser<IndexQuote> eodDataParser,
+	public YahooIndexQuoteGateway(CloseableHttpClient httpClient, ContentType contentType, Parser<IndexQuote> intradayDataParser, Parser<IndexQuote> eodDataParser,
 			Parser<IndexQuote> histDataParser) {
 		super();
 		this.httpClient = httpClient;
@@ -119,79 +121,79 @@ public class YahooIndexQuoteGateway implements
 
 	private String getSymbols(List<Index> indexes) {
 		StringBuilder sb = new StringBuilder();
-		for (Index index : indexes) {
-			if (index.getExchSymb().equals("US"))
-				sb.append("\"" + index.getSymbol() + "\",");
-			else
-				sb.append("\"" + index.getSymbol() + "." + index.getExchSymb()
-						+ "\",");
-		}
+		if (indexes != null && indexes.size() > 0)
+			for (Index index : indexes) {
+				if (index.getExchSymb().equals("US"))
+					sb.append("\"" + index.getSymbol() + "\",");
+				else
+					sb.append("\"" + index.getSymbol() + "." + index.getExchSymb() + "\",");
+			}
 
 		return sb.toString().replaceAll(",$", "");
 	}
 
 	@Override
-	public List<IndexQuote> getEODData(List<Index> products) throws Exception {
+	public List<IndexQuote> getEODData(List<Index> products) throws GatewayException {
 		try {
-			List<String> params = new ArrayList<String>(
-					Arrays.asList(getSymbols(products)));
-			byte[] data = YahooGatewayHelper.executeYQLQuery(
-					EOD_INDEX_QUOTES_QUERY, params, contentType, httpClient,
-					context);
+			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
+			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
+			List<String> params = new ArrayList<String>(Arrays.asList(getSymbols(products)));
+			byte[] data = YahooGatewayHelper.executeYQLQuery(EOD_INDEX_QUOTES_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
-				return eodDataParser.parse(new Document(contentType,
-						DataType.EOD, DataClass.IndexQuote,
-						YahooGatewayHelper.Y_PROVIDER_SYMB, data));
+				return eodDataParser.parse(new Document(data, DataType.EOD));
 			else
 				return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
+			throw new GatewaySecurityException(e);
+		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
+			throw new GatewayCommunicationException(e);
+		} catch (NullPointerException | ParserException e) {
+			throw new GatewayException(e);
 		}
 	}
 
 	@Override
-	public List<IndexQuote> getCurrentData(List<Index> products) {
+	public List<IndexQuote> getCurrentData(List<Index> products) throws GatewayException {
 		try {
-			List<String> params = new ArrayList<String>(
-					Arrays.asList(getSymbols(products)));
-			byte[] data = YahooGatewayHelper.executeYQLQuery(
-					CURRENT_INDEX_QUOTES_QUERY, params, contentType,
-					httpClient, context);
+			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
+			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
+			List<String> params = new ArrayList<String>(Arrays.asList(getSymbols(products)));
+			byte[] data = YahooGatewayHelper.executeYQLQuery(CURRENT_INDEX_QUOTES_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
-				return intradayDataParser.parse(new Document(contentType,
-						DataType.INTRA, DataClass.IndexQuote,
-						YahooGatewayHelper.Y_PROVIDER_SYMB, data));
+				return intradayDataParser.parse(new Document(data, DataType.INTRA));
 			else
 				return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
+			throw new GatewaySecurityException(e);
+		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
+			throw new GatewayCommunicationException(e);
+		} catch (NullPointerException | ParserException e) {
+			throw new GatewayException(e);
 		}
 	}
 
 	@Override
-	public List<IndexQuote> getHistData(List<Index> products,
-			LocalDate startDate, LocalDate endDate) throws Exception {
+	public List<IndexQuote> getHistData(List<Index> products, LocalDate startDate, LocalDate endDate) throws GatewayException {
 		try {
-			DateTimeFormatter dformatter = DateTimeFormat
-					.forPattern("yyyy-MM-dd");
-			List<String> params = new ArrayList<String>(Arrays.asList(
-					getSymbols(products), dformatter.print(startDate),
-					dformatter.print(endDate)));
+			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
+			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
+			Assert.notNull(startDate, "Cannot execute data extraction. Start date is null.");
+			Assert.notNull(endDate, "Cannot execute data extraction. End date is null.");
+			
+			DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+			List<String> params = new ArrayList<String>(Arrays.asList(getSymbols(products), dformatter.print(startDate), dformatter.print(endDate)));
 
-			byte[] data = YahooGatewayHelper.executeYQLQuery(
-					HIST_INDEX_QUOTES_QUERY, params, contentType, httpClient,
-					context);
+			byte[] data = YahooGatewayHelper.executeYQLQuery(HIST_INDEX_QUOTES_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
-				return intradayDataParser.parse(new Document(contentType,
-						DataType.HIST, DataClass.IndexQuote,
-						YahooGatewayHelper.Y_PROVIDER_SYMB, data));
+				return intradayDataParser.parse(new Document(data, DataType.HIST));
 			else
 				return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
+			throw new GatewaySecurityException(e);
+		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
+			throw new GatewayCommunicationException(e);
+		} catch (NullPointerException | ParserException e) {
+			throw new GatewayException(e);
 		}
 	}
 

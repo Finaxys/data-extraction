@@ -13,6 +13,8 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeysFields;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -29,9 +31,12 @@ public class Exchange extends MarketData implements Serializable{
 
 
 	/** The symbol. */
+    @HBaseRowKeyField(className = "Exchange", order = 2)
 	private String sourceSymbol;
 	
 	/** The provider. */
+
+    @HBaseRowKeyField(className = "Exchange", order = 1)
 	private char provider;
 	
 	/** The name. */

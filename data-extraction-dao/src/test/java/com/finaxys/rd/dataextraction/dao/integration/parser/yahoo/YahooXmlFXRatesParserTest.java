@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
 import com.finaxys.rd.dataextraction.domain.DataWrapper;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
@@ -43,7 +44,7 @@ public class YahooXmlFXRatesParserTest {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-		FXRate fxRate = new FXRate('0', new DateTime(), "EURUSD",
+		FXRate fxRate = new FXRate('1', new DateTime(), "EURUSD",
 				DataType.INTRA, formatter.parseDateTime("7/23/2014 10:35pm"),
 				new BigDecimal("1.3463"), new BigDecimal("1.3463"),
 				new BigDecimal("1.3462"));
@@ -105,43 +106,8 @@ public class YahooXmlFXRatesParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	@Test
-	public void test_convert_no_provider() throws Exception {
+	
 
-		// Setup
-		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
-
-		byte[] inData = TestHelper
-				.getResourceAsBytes("/YahooXmlFXRatesParser/test_convert_no_provider.xml");
-		Document inMessageFixture = new Document(inData);
-		inMessageFixture.setDataType(DataType.INTRA);
-
-		// Execution
-		List<FXRate> inList = target.parse(inMessageFixture);
-		DataWrapper<FXRate> in = new DataWrapper<FXRate>(inList);
-
-		// Verification
-		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
-	}
-
-	@Test
-	public void test_convert_no_datatype() throws Exception {
-
-		// Setup
-		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
-
-		byte[] inData = TestHelper
-				.getResourceAsBytes("/YahooXmlFXRatesParser/test_convert_no_datatype.xml");
-		Document inMessageFixture = new Document(inData);
-		inMessageFixture.setSource('1');
-
-		// Execution
-		List<FXRate> inList = target.parse(inMessageFixture);
-		DataWrapper<FXRate> in = new DataWrapper<FXRate>(inList);
-
-		// Verification
-		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
-	}
 
 	@Test
 	public void test_convert_without_rate_element() throws Exception {
@@ -163,7 +129,8 @@ public class YahooXmlFXRatesParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	@Test
+
+	@Test(expected = DataReadingParserException.class)  
 	public void test_convert_fields_not_wellformedxml() throws Exception {
 
 		// Setup

@@ -12,6 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -27,6 +28,7 @@ public class Stock extends ProductData implements Serializable{
 	private static final long serialVersionUID = -3735824421169372229L;
 
 	/** The exch symb. */
+	 @HBaseRowKeyField(className = "Stock", order = 2)
 	private String exchSymb;
 
 	/** The company name. */

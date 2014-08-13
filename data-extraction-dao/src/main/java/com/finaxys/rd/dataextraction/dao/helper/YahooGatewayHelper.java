@@ -28,6 +28,8 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.log4j.Logger;
 
 import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
+import com.finaxys.rd.dataextraction.domain.MarketData;
+import com.finaxys.rd.dataextraction.domain.Stock;
 
 public class YahooGatewayHelper {
 
@@ -119,7 +121,29 @@ public class YahooGatewayHelper {
 	public static void signOAuthYQLRequest(Object request) throws OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 		signOAuthRequest(request, YQL_CONSUMERKEY, YQL_CONSUMERSECRET);
 	}
+	
+	
+	public static String getSymbols(List<? extends MarketData> products) {
+		StringBuilder sb = new StringBuilder();
+		if (products != null && products.size() > 0)
+			for (MarketData product : products)
+				sb.append("\"" + product.getSymbol() + "\",");
 
+		return sb.toString().replaceAll(",$", "");
+	}
+
+	public static  String getStocksSymbols(List<Stock> stocks) {
+		StringBuilder sb = new StringBuilder();
+		for (Stock stock : stocks) {
+			if (stock.getExchSymb().equals("US"))
+				sb.append("\"" + stock.getSymbol() + "\",");
+			else
+				sb.append("\"" + stock.getSymbol() + "." + stock.getExchSymb() + "\",");
+		}
+
+		return sb.toString().replaceAll(",$", "");
+	}
+	
 	/**
 	 * The Enum Configuration.
 	 */

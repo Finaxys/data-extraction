@@ -5,8 +5,11 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Stock;
@@ -15,13 +18,18 @@ import com.finaxys.rd.dataextraction.domain.Stock;
 /**
  * The Class YahooXmlStocksConverter.
  */
-public class YahooXmlStocksParser implements Parser {
+public class YahooXmlStocksParser implements Parser<Stock> {
+
+	static Logger logger = Logger
+			.getLogger(YahooXmlStocksParser.class);
+	
 	@Value("${parser.yahoo.stocks.new.stock_el}")
 	private String ITEM_EL;
 	/* (non-Javadoc)
 	 * @see com.finaxys.rd.dataextraction.parser.Parser#parse(com.finaxys.rd.dataextraction.msg.Message)
 	 */
-	public List<Stock> parse(Document document) throws Exception {
+	public List<Stock> parse(Document document) throws ParserException {
+//		Assert.notNull(document, "Cannot parse Null document");
 //		XMLEventFactory eventFactory = XMLEventFactory.newInstance();
 //		XMLInputFactory ifactory = XMLInputFactory.newInstance();
 //		XMLOutputFactory ofactory = XMLOutputFactory.newInstance();

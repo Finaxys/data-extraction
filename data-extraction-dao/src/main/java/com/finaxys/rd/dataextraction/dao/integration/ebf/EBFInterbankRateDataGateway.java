@@ -1,7 +1,13 @@
 package com.finaxys.rd.dataextraction.dao.integration.ebf;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +17,12 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayCommunicationException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
+import com.finaxys.rd.dataextraction.dao.exception.GatewaySecurityException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.helper.EBFGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.helper.YahooGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.HistDataGateway;
@@ -34,64 +45,54 @@ public class EBFInterbankRateDataGateway implements HistDataGateway<InterbankRat
 	private ContentType contentType;
 
 	private Parser<InterbankRateData> histDataParser;
-	
-	
-	public EBFInterbankRateDataGateway(ContentType contentType,
-			Parser<InterbankRateData> histDataParser) {
+
+	public EBFInterbankRateDataGateway(ContentType contentType, Parser<InterbankRateData> histDataParser) {
 		super();
 		this.contentType = contentType;
 		this.histDataParser = histDataParser;
 		this.context = HttpClientContext.create();
 	}
 
-
-	public EBFInterbankRateDataGateway(CloseableHttpClient httpClient,
-			ContentType contentType, Parser<InterbankRateData> histDataParser) {
+	public EBFInterbankRateDataGateway(CloseableHttpClient httpClient, ContentType contentType, Parser<InterbankRateData> histDataParser) {
 		super();
 		this.httpClient = httpClient;
 		this.contentType = contentType;
 		this.histDataParser = histDataParser;
 		this.context = HttpClientContext.create();
 	}
-
 
 	public CloseableHttpClient getHttpClient() {
 		return httpClient;
 	}
 
-
 	public void setHttpClient(CloseableHttpClient httpClient) {
 		this.httpClient = httpClient;
 	}
-
 
 	public ContentType getContentType() {
 		return contentType;
 	}
 
-
 	public void setContentType(ContentType contentType) {
 		this.contentType = contentType;
 	}
-
 
 	public Parser<InterbankRateData> getHistDataParser() {
 		return histDataParser;
 	}
 
-
 	public void setHistDataParser(Parser<InterbankRateData> histDataParser) {
 		this.histDataParser = histDataParser;
 	}
 
-
-
-
 	@Override
-	public List<InterbankRateData> getHistData(List<InterbankRate> products,
-			LocalDate startDate, LocalDate endDate) throws Exception {
+	public List<InterbankRateData> getHistData(List<InterbankRate> products, LocalDate startDate, LocalDate endDate) throws GatewayException {
 		try {
-
+			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
+			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
+			Assert.notNull(startDate, "Cannot execute data extraction. Start date is null.");
+			Assert.notNull(endDate, "Cannot execute data extraction. End date is null.");
+			
 			URI uri = EBFGatewayHelper.contructEBFHistEuriborUri(startDate.getYear(), contentType);
 			HttpGet request = new HttpGet(uri);
 			YahooGatewayHelper.signOAuthYQLRequest(request);
@@ -102,9 +103,12 @@ public class EBFInterbankRateDataGateway implements HistDataGateway<InterbankRat
 				return histDataParser.parse(new Document(contentType, DataType.HIST, DataClass.InterbankRatesData, EBFGatewayHelper.EBF_PROVIDER_SYMB, data));
 			else
 				return null;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
+			throw new GatewaySecurityException(e);
+		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
+			throw new GatewayCommunicationException(e);
+		} catch (NullPointerException | ParserException e) {
+			throw new GatewayException(e);
 		}
 	}
 

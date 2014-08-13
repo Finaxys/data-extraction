@@ -1,11 +1,14 @@
 package com.finaxys.rd.dataextraction.dao.integration.file;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 
+import com.finaxys.rd.dataextraction.dao.exception.GatewayException;
+import com.finaxys.rd.dataextraction.dao.exception.ParserException;
 import com.finaxys.rd.dataextraction.dao.helper.FileGatewayHelper;
 import com.finaxys.rd.dataextraction.dao.integration.RefDataGateway;
 import com.finaxys.rd.dataextraction.dao.integration.parser.Parser;
@@ -52,16 +55,16 @@ public class FileIndexGateway implements RefDataGateway<Index> {
 	}
 
 	@Override
-	public List<Index> getRefData() throws Exception {
-		File file = FileGatewayHelper.getResourceFile(FileGatewayHelper
-				.getPath(FileGatewayHelper.DATA_FOLDER, INDEXES_FILE,
-						contentType.getName()));
-		if (file != null && file.length() > 0)
-			return parser.parse(new Document(contentType, DataType.REF,
-					DataClass.IndexInfo, FileGatewayHelper.FILE_PROVIDER_SYMB,
-					FileGatewayHelper.toBytes(file)));
-		else
-			return null;
+	public List<Index> getRefData() throws GatewayException {
+		try {
+			File file = FileGatewayHelper.getResourceFile(FileGatewayHelper.getPath(FileGatewayHelper.DATA_FOLDER, INDEXES_FILE, contentType.getName()));
+			if (file != null && file.length() > 0)
+				return parser.parse(new Document(contentType, DataType.REF, DataClass.Index, FileGatewayHelper.FILE_PROVIDER_SYMB, FileGatewayHelper.toBytes(file)));
+			else
+				return null;
+		} catch (NullPointerException | IOException | ParserException e) {
+			throw new GatewayException(e);
+		}
 	}
 
 }

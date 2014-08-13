@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.finaxys.rd.dataextraction.dao.exception.DataReadingParserException;
 import com.finaxys.rd.dataextraction.domain.DataWrapper;
 import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
@@ -48,53 +49,45 @@ public class YahooXmlStockQuotesParserTest {
 		ReflectionTestUtils.setField(target, "VOLUME_EL", "Volume");
 	}
 
-
 	@Test
 	public void test_convert() throws Exception {
 
-		commonTest("/YahooXmlOptionQuotesParser/test_convert_not_wellformedxml.xml");
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
-		StockQuote stockQuote = new StockQuote( '0', new DateTime() ,  "YHOO",
-				DataType.INTRA ,  new DateTime("2014-07-23T13:56:28Z"),  "US",
-				new BigInteger("19698700"), new BigDecimal("+0.14"),
-				new BigDecimal("33.71"),new BigDecimal("33.80"),new BigDecimal("26.75"),new BigDecimal("41.72"),
-				"34.236B", new BigDecimal("33.74"), "33.71 - 33.80", "Yahoo! Inc.",
-				new BigInteger("743201"),  new BigDecimal("0.0"),new BigDecimal("0.0"),new BigDecimal("0.0"));
+		StockQuote stockQuote = new StockQuote('1', new DateTime(), "YHOO", DataType.INTRA, new DateTime("2014-07-23T13:56:28Z"), "US", new BigInteger("19698700"), new BigDecimal(
+				"+0.14"), new BigDecimal("33.71"), new BigDecimal("33.80"), new BigDecimal("26.75"), new BigDecimal("41.72"), "34.236B", new BigDecimal("33.74"), "33.71 - 33.80",
+				"Yahoo! Inc.", new BigInteger("743201"), new BigDecimal("0.0"), new BigDecimal("0.0"), new BigDecimal("0.0"));
 
 		List<StockQuote> outList = new ArrayList<StockQuote>();
 		outList.add(stockQuote);
 		commonTest(outList, "/YahooXmlStockQuotesParser/test_convert.xml");
-			}
-	
-	
+	}
+
 	@Test
 	public void test_convert_no_symbol() throws Exception {
 
-		commonTest("/YahooXmlStockQuotesParser/test_convert_no_symbol.xml");}
+		commonTest("/YahooXmlStockQuotesParser/test_convert_no_symbol.xml");
+	}
 
 	@Test
 	public void test_convert_no_ts() throws Exception {
 
-		commonTest("/YahooXmlStockQuotesParser/test_convert_no_ts.xml");	}
-
+		commonTest("/YahooXmlStockQuotesParser/test_convert_no_ts.xml");
+	}
 
 	@Test
 	public void test_convert_without_quote_element() throws Exception {
 
-		commonTest("/YahooXmlStockQuotesParser/test_convert_without_quote_element.xml");}
+		commonTest("/YahooXmlStockQuotesParser/test_convert_without_quote_element.xml");
+	}
 
-	@Test
-	public void test_convert_fields_not_wellformedxml() throws Exception {
+	@Test(expected = DataReadingParserException.class)  
+	public void test_convert_fields_not_wellformedxml_throws_DataReadingParserException() throws Exception {
 
-		commonTest("/YahooXmlStockQuotesParser/test_convert_not_wellformedxml.xml");}
-	
-	
+		commonTest("/YahooXmlStockQuotesParser/test_convert_not_wellformedxml.xml");
+		
+	}
 
-	
-
-
-	private void commonTest(List<StockQuote> list, String testFile)
-			throws Exception {
+	private void commonTest(List<StockQuote> list, String testFile) throws Exception {
 		DataWrapper<StockQuote> out = null;
 		if (list != null) {
 			out = new DataWrapper<StockQuote>(list);
@@ -104,7 +97,7 @@ public class YahooXmlStockQuotesParserTest {
 
 		byte[] inData = TestHelper.getResourceAsBytes(testFile);
 		Document inMessageFixture = new Document(inData);
-		inMessageFixture.setSource('0');
+		inMessageFixture.setSource('1');
 		inMessageFixture.setDataType(DataType.INTRA);
 
 		// Execution

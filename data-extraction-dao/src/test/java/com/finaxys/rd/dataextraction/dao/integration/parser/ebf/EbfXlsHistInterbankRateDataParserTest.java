@@ -49,7 +49,6 @@ public class EbfXlsHistInterbankRateDataParserTest {
 		outInterbankRateDatasList.add(interbankRateData);
 		DataWrapper<InterbankRateData> outInterbankRateDatas = new DataWrapper<InterbankRateData>(outInterbankRateDatasList);
 		
-//		Message outMessageFixture = marshall(interbankRateDatas);
 
 		
 		byte[] inData = TestHelper.getResourceAsBytes("/EbfXlsHistEuriborParser/test_convert.xls");

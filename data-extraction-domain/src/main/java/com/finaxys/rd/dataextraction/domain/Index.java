@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyField;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -30,6 +31,7 @@ public class Index  extends ProductData  implements Serializable{
 	private String name;
 	
 	/** The exch symb. */
+    @HBaseRowKeyField(className = "Index", order = 2)
 	private String exchSymb;
 	
 
