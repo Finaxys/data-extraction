@@ -4,6 +4,7 @@
 package com.finaxys.rd.dataextraction;
 
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -23,13 +24,14 @@ import org.apache.http.impl.nio.conn.PoolingNHttpClientConnectionManager;
 import org.apache.http.impl.nio.reactor.DefaultConnectingIOReactor;
 import org.apache.http.nio.reactor.ConnectingIOReactor;
 import org.apache.http.nio.reactor.IOReactorException;
+import org.apache.log4j.Logger;
 import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.finaxys.rd.dataextraction.jobmanager.EODJobManager;
@@ -47,7 +49,28 @@ import com.rabbitmq.client.ConnectionFactory;
 @Import(ServicesConfig.class)
 public class Application {
 
-	
+	private static Logger logger = Logger.getLogger(Application.class);
+
+	public static final String usage = "Choose an action (set the number) \n"
+			+ "1: initAllJobs \n"
+			+ "2: getFileXlsCurrencyPair \n"
+			+ "3: getFileXlsExchange \n"
+			+ "4: getFileXlsInterbankRate \n"
+			+ "5: getFileXlslIndex \n"
+			+ "6: getFileXlsOption \n"
+			+ "7: getFileXlsStock \n"
+			+ "8: scheduleFXRatesJobs \n"
+			+ "9: scheduleIndexQuotesJobs \n"
+			+ "10: scheduleOptionQuotesJobs \n"
+			+ "11: scheduleOQuotesJobs \n"
+			+ "12: scheduleStockQuotesJobs \n"
+			+ "13: startOptionChainsJob \n"
+			+ "14: scheduleEODFXRatesJobs \n"
+			+ "15: scheduleEODIndexQuotesJobs \n"
+			+ "16: scheduleEODOptionQuotesJobs \n"
+			+ "17: scheduleEODOQuotesJobs \n"
+			+ "18: scheduleEODStockQuotesJobs \n"
+	        + "19: exit \n";
 	
 
 	/** The rabbit host. */
@@ -135,8 +158,6 @@ public class Application {
 
 	}
 
-
-	
 	/**
 	 * The main method.
 	 * 
@@ -144,15 +165,46 @@ public class Application {
 	 *            the arguments
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
-	 * @throws SchedulerException 
+	 * @throws SchedulerException
 	 */
 	public static void main(String[] args) throws IOException, SchedulerException {
 
-		ApplicationContext context = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/spring-config.xml");
-//
-		JobsInitialiser jobsInitialiser =(JobsInitialiser) context.getBean("jobsInitialiser", new OneTimeJobManager(context), new IntradayJobManager(context), new EODJobManager(context));
-		jobsInitialiser.init();
+		final AbstractApplicationContext context = new ClassPathXmlApplicationContext("classpath:/META-INF/spring/spring-config.xml");
+		context.registerShutdownHook();
+
+		JobsInitialiser jobsInitialiser = (JobsInitialiser) context.getBean("jobsInitialiser", new OneTimeJobManager(context), new IntradayJobManager(context), new EODJobManager(
+				context));
+		logger.info(usage);
+
+		while(true){
+			Scanner sc = new Scanner(System.in);
+			int str = sc.nextInt();
+
+			switch(str){
+			case 1:	jobsInitialiser.initAll();	break;
+			case 2:	jobsInitialiser.getFileXlsCurrencyPair();	break;
+			case 3:	jobsInitialiser.getFileXlsExchange();	break;
+			case 4:	jobsInitialiser.getFileXlsInterbankRate();	break;
+			case 5:	jobsInitialiser.getFileXlslIndex();	break;
+			case 6:	jobsInitialiser.getFileXlsOption();	break;
+			case 7:	jobsInitialiser.getFileXlsStock();	break;
+			case 8:	jobsInitialiser.scheduleFXRatesJobs();	break;
+			case 9:	jobsInitialiser.scheduleIndexQuotesJobs();	break;
+			case 10:	jobsInitialiser.scheduleOptionQuotesJobs();	break;
+			case 11:	jobsInitialiser.scheduleOQuotesJobs();;	break;
+			case 12:	jobsInitialiser.scheduleStockQuotesJobs();;	break;
+			case 13:	jobsInitialiser.startOptionChainsJob();	break;
+			case 14:	jobsInitialiser.scheduleEODFXRatesJobs();	break;
+			case 15:	jobsInitialiser.scheduleEODIndexQuotesJobs();	break;
+			case 16:	jobsInitialiser.scheduleEODOptionQuotesJobs();	break;
+			case 17:	jobsInitialiser.scheduleEODOQuotesJobs();	break;
+			case 18:	jobsInitialiser.scheduleEODStockQuotesJobs();	break;
+			case 19:	System.exit(0);
+			}	
+		}
 		
+		
+
 	}
 
 	public static class IdleConnectionMonitorThread implements Runnable {

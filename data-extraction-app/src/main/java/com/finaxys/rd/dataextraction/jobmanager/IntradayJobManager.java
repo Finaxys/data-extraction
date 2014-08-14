@@ -175,10 +175,13 @@ public class IntradayJobManager {
 		scheduler.addJob(jobDetail, true);
 
 		List<CronTrigger> triggers = createTriggers("trigger-" + jobClass.getSimpleName() + "-" + jobData.hashCode(), jobDetail, openTime, closeTime, delay);
-
 		for (CronTrigger trigger : triggers)
-			scheduler.scheduleJob(trigger);
+			try {
 
+				scheduler.scheduleJob(trigger);
+			} catch (Exception e) {
+
+			}
 		if (!scheduler.isStarted())
 			scheduler.start();
 

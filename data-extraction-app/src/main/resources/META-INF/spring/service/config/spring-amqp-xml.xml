@@ -75,8 +75,8 @@
 	</int:header-enricher>
 	
 	
-	<int-stream:stdout-channel-adapter
-		id="stdOut" channel="publish-subscribe-channel" append-newline="true" />
+<!-- 	<int-stream:stdout-channel-adapter -->
+<!-- 		id="stdOut" channel="publish-subscribe-channel" append-newline="true" /> -->
 
 	<!-- To send AMQP Messages to an Exchange, configure an outbound-channel-adapter. -->
 	<int-amqp:outbound-channel-adapter
