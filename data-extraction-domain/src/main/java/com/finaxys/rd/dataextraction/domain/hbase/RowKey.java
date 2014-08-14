@@ -60,7 +60,12 @@ public class RowKey {
 	}
 
 	public void createRowKey() {
-		this.key = strategy.createRowKey(rowKeyFields);
+		byte[] createdKey = strategy.createRowKey(rowKeyFields);
+		if (createdKey == null) {
+			this.key = new byte[0];
+		} else {
+			this.key = Arrays.copyOf(createdKey, createdKey.length);
+		}
 	}
 
 }

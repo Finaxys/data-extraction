@@ -55,12 +55,12 @@ public class Document implements Serializable {
 		this.dataType = dataType;
 		this.dataClass = dataClass;
 		this.source = source;
-		this.content = content;
+		setContent(content);
 	}
 
 	public Document(byte[] content) {
 		super();
-		this.content = content;
+		setContent(content);
 	}
 
 	public Document(byte[] content, DataType dataType) {
