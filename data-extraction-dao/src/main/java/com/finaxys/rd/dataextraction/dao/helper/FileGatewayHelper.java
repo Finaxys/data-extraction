@@ -19,20 +19,19 @@ import org.apache.log4j.Logger;
  */
 public class FileGatewayHelper {
 
-
-
 	public static final char FILE_PROVIDER_SYMB = Configuration.FILE_PROVIDER_SYMB.get().charAt(0);
 
-	public static final  String DATA_FOLDER = Configuration.DATA_FOLDER.get();
+	public static final String DATA_FOLDER = Configuration.DATA_FOLDER.get();
 
-	
-	
 	/**
 	 * Gets the path.
 	 *
-	 * @param folder the folder
-	 * @param file the file
-	 * @param ext the ext
+	 * @param folder
+	 *            the folder
+	 * @param file
+	 *            the file
+	 * @param ext
+	 *            the ext
 	 * @return the path
 	 */
 	public static String getPath(String folder, String file, String ext) {
@@ -42,10 +41,11 @@ public class FileGatewayHelper {
 	/**
 	 * Gets the resource file.
 	 *
-	 * @param path the path
+	 * @param path
+	 *            the path
 	 * @return the resource file
 	 */
-	public static File getResourceFile(String path){
+	public static File getResourceFile(String path) {
 		File f = new File(FileGatewayHelper.class.getResource(path).getPath());
 		return f;
 
@@ -54,25 +54,24 @@ public class FileGatewayHelper {
 	/**
 	 * To bytes.
 	 *
-	 * @param file the file
+	 * @param file
+	 *            the file
 	 * @return the byte[]
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static byte[] toBytes(File file) throws IOException {
 		return FileUtils.readFileToByteArray(file);
 	}
-	
-	
+
 	/**
 	 * The Enum Configuration.
 	 */
 	public enum Configuration {
 
-
 		FILE_PROVIDER_SYMB("gateway.file.symbol"),
 
 		DATA_FOLDER("gateway.file.dataFolder");
-
 
 		/** The key. */
 		private final String key;
@@ -118,7 +117,7 @@ public class FileGatewayHelper {
 						configuration.put(c, properties.getProperty(key));
 				}
 			} catch (IllegalArgumentException | IOException | NullPointerException e) {
-				e.printStackTrace();
+				logger.error("Exception when reading configuration file " + fileName + ": " + e);
 			}
 		}
 

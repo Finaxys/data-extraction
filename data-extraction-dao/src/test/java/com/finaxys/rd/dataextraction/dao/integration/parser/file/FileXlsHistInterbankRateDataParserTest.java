@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class FileXlsHistInterbankRateDataParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 
 		InterbankRateData interbankRateData = new InterbankRateData('0',
 				new DateTime(), "LIBOR", DataType.HIST, new DateTime(
@@ -58,7 +59,7 @@ public class FileXlsHistInterbankRateDataParserTest {
 	}
 
 	@Test
-	public void test_convert_bad_dates() throws Exception {
+	public void test_convert_bad_dates() throws IOException, JAXBException   {
 
 		DataWrapper<InterbankRateData> out = new DataWrapper<InterbankRateData>();
 
@@ -78,7 +79,7 @@ public class FileXlsHistInterbankRateDataParserTest {
 	}
 
 	@Test
-	public void test_convert_bad_rate_value() throws Exception {
+	public void test_convert_bad_rate_value() throws IOException, JAXBException   {
 
 		DataWrapper<InterbankRateData> out = new DataWrapper<InterbankRateData>();
 

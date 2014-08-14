@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.ebf;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class EbfXlsHistInterbankRateDataParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException {
 		DateTimeFormatter formatter = DateTimeFormat.forPattern("dd/MM/yyyy");
 		
 		InterbankRateData interbankRateData = new InterbankRateData('0', new DateTime(), "EURIBOR",

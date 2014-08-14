@@ -2,8 +2,11 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -24,7 +27,7 @@ public class YahooXmlOptionChainsParserTest {
 	String dateFormat;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()   {
 		target = new YahooXmlOptionChainsParser();
 		dateFormat = "yyyy-MM";
 		ReflectionTestUtils.setField(target, "DATE_FORMAT", dateFormat);
@@ -35,7 +38,7 @@ public class YahooXmlOptionChainsParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws JAXBException, IOException  {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
@@ -49,7 +52,7 @@ public class YahooXmlOptionChainsParserTest {
 	}
 
 	@Test
-	public void test_convert_many_contracts() throws Exception {
+	public void test_convert_many_contracts() throws JAXBException, IOException  {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
@@ -72,28 +75,28 @@ public class YahooXmlOptionChainsParserTest {
 	}
 
 	@Test
-	public void test_convert_no_symbol() throws Exception {
+	public void test_convert_no_symbol() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_no_symbol.xml");
 	}
 
 	@Test
-	public void test_convert_no_contract() throws Exception {
+	public void test_convert_no_contract() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_no_contract.xml");
 	}
 
 	@Test
-	public void test_convert_without_option_element() throws Exception {
+	public void test_convert_without_option_element() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_without_option_element.xml");
 	}
 
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_fields_not_wellformedxml() throws Exception {
+	public void test_convert_fields_not_wellformedxml() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionChainsParser/test_convert_not_wellformedxml.xml");
 	}
 
-	private void commonTest(List<OptionChain> list, String testFile)
-			throws Exception {
+	private void commonTest(List<OptionChain> list, String testFile) throws JAXBException, IOException
+			 {
 		// Setup
 		DataWrapper<OptionChain> out = null;
 		if (list != null) {
@@ -115,7 +118,7 @@ public class YahooXmlOptionChainsParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	private void commonTest(String testFile) throws Exception {
+	private void commonTest(String testFile) throws JAXBException, IOException  {
 		commonTest(null, testFile);
 	}
 }

@@ -19,8 +19,7 @@ import com.finaxys.rd.dataextraction.service.integration.gateway.MarketDataPubli
 /**
  * The Class FXRatesJob.
  */
-public class IntradayDataJob<T extends MarketData, K extends MarketData>
-		extends QuartzJobBean {
+public class IntradayDataJob<T extends MarketData, K extends MarketData> extends QuartzJobBean {
 
 	private List<K> products;
 
@@ -52,8 +51,7 @@ public class IntradayDataJob<T extends MarketData, K extends MarketData>
 		return publishingGateway;
 	}
 
-	public void setPublishingGateway(
-			MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
+	public void setPublishingGateway(MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
 		this.publishingGateway = publishingGateway;
 	}
 
@@ -74,62 +72,40 @@ public class IntradayDataJob<T extends MarketData, K extends MarketData>
 	}
 
 	@Override
-	protected void executeInternal(JobExecutionContext arg0)
-			throws JobExecutionException {
+	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
 
-		try {
-			int x = products.size() / bucketSize;
-			int y = products.size() % bucketSize;
+		int x = products.size() / bucketSize;
+		int y = products.size() % bucketSize;
 
-			for (int i = 0; i < x; i++) {
-				Task<T, K> task = new Task<T, K>(products.subList(
-						(i * bucketSize), ((i + 1) * bucketSize)), service,
-						publishingGateway);
-				executorService.execute(task);
-			}
-
-			Task<T, K> task = new Task<T, K>(products.subList((x * bucketSize),
-					(x * bucketSize) + y), service, publishingGateway);
+		for (int i = 0; i < x; i++) {
+			Task<T, K> task = new Task<T, K>(products.subList((i * bucketSize), ((i + 1) * bucketSize)), service, publishingGateway);
 			executorService.execute(task);
-
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
+		Task<T, K> task = new Task<T, K>(products.subList((x * bucketSize), (x * bucketSize) + y), service, publishingGateway);
+		executorService.execute(task);
 
 	}
 
-	private static class Task<T extends MarketData, K extends MarketData>
-			implements Runnable {
+	private static class Task<T extends MarketData, K extends MarketData> implements Runnable {
 		private List<K> products;
 
 		private IntradayDataService<T, K> service;
 
 		private MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway;
 
-		public Task(
-				List<K> products,
-				IntradayDataService<T, K> service,
-				MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
+		public Task(List<K> products, IntradayDataService<T, K> service, MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
 			super();
 			this.products = products;
 			this.service = service;
 			this.publishingGateway = publishingGateway;
 		}
 
-
 		public void run() {
-			List<T> data;
-			try {
-				data = service.getCurrentData(products);
-				if (data != null && data.size() > 0)
-					publishingGateway.publishMarketData(new MarketDataWrapper<T>(data));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			List<T> data = service.getCurrentData(products);
+			if (data != null && data.size() > 0)
+				publishingGateway.publishMarketData(new MarketDataWrapper<T>(data));
+
 		}
 	}
 }

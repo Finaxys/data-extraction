@@ -2,10 +2,13 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -26,7 +29,7 @@ public class YahooXmlStockQuotesParserTest {
 	String dateFormat;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()  {
 		target = new YahooXmlStockQuotesParser();
 		dateFormat = "MM/dd/yyyy h:mmaa";
 		ReflectionTestUtils.setField(target, "DATE_FORMAT", dateFormat);
@@ -50,7 +53,7 @@ public class YahooXmlStockQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws JAXBException, IOException  {
 
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
 		StockQuote stockQuote = new StockQuote('1', new DateTime(), "YHOO", DataType.INTRA, new DateTime("2014-07-23T13:56:28Z"), "US", new BigInteger("19698700"), new BigDecimal(
@@ -63,31 +66,31 @@ public class YahooXmlStockQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert_no_symbol() throws Exception {
+	public void test_convert_no_symbol() throws JAXBException, IOException  {
 
 		commonTest("/YahooXmlStockQuotesParser/test_convert_no_symbol.xml");
 	}
 
 	@Test
-	public void test_convert_no_ts() throws Exception {
+	public void test_convert_no_ts() throws JAXBException, IOException  {
 
 		commonTest("/YahooXmlStockQuotesParser/test_convert_no_ts.xml");
 	}
 
 	@Test
-	public void test_convert_without_quote_element() throws Exception {
+	public void test_convert_without_quote_element() throws JAXBException, IOException  {
 
 		commonTest("/YahooXmlStockQuotesParser/test_convert_without_quote_element.xml");
 	}
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_fields_not_wellformedxml_throws_DataReadingParserException() throws Exception {
+	public void test_convert_fields_not_wellformedxml_throws_DataReadingParserException() throws JAXBException, IOException  {
 
 		commonTest("/YahooXmlStockQuotesParser/test_convert_not_wellformedxml.xml");
 		
 	}
 
-	private void commonTest(List<StockQuote> list, String testFile) throws Exception {
+	private void commonTest(List<StockQuote> list, String testFile) throws JAXBException, IOException  {
 		DataWrapper<StockQuote> out = null;
 		if (list != null) {
 			out = new DataWrapper<StockQuote>(list);
@@ -108,7 +111,7 @@ public class YahooXmlStockQuotesParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	private void commonTest(String testFile) throws Exception {
+	private void commonTest(String testFile) throws JAXBException, IOException  {
 		commonTest(null, testFile);
 	}
 }

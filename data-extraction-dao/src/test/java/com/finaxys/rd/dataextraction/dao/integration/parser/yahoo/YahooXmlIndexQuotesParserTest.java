@@ -2,10 +2,13 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -26,7 +29,7 @@ public class YahooXmlIndexQuotesParserTest {
 	String dateFormat;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()   {
 		target = new YahooXmlIndexQuotesParser();
 		dateFormat = "MM/dd/yyyy h:mmaa";
 		ReflectionTestUtils.setField(target, "DATE_FORMAT", dateFormat);
@@ -47,7 +50,7 @@ public class YahooXmlIndexQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException     {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
@@ -63,20 +66,20 @@ public class YahooXmlIndexQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert_no_id() throws Exception {
+	public void test_convert_no_id() throws IOException, JAXBException   {
 
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_no_id.xml");
 	}
 
 	@Test
-	public void test_convert_no_ts() throws Exception {
+	public void test_convert_no_ts() throws IOException, JAXBException   {
 
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_no_ts.xml");
 	}
 
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_without_quote_element() throws Exception {
+	public void test_convert_without_quote_element() throws IOException, JAXBException   {
 
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_not_wellformedxml.xml");
 	}
@@ -85,13 +88,13 @@ public class YahooXmlIndexQuotesParserTest {
 
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_not_wellformedxml() throws Exception {
+	public void test_convert_not_wellformedxml() throws IOException, JAXBException   {
 		commonTest("/YahooXmlIndexQuotesParser/test_convert_not_wellformedxml.xml");
 		
 	}
 
-	private void commonTest(List<IndexQuote> list, String testFile)
-			throws Exception {
+	private void commonTest(List<IndexQuote> list, String testFile) throws IOException, JAXBException
+			  {
 		// Setup
 		DataWrapper<IndexQuote> out = null;
 		if (list != null) {
@@ -113,7 +116,7 @@ public class YahooXmlIndexQuotesParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	private void commonTest(String testFile) throws Exception {
+	private void commonTest(String testFile) throws IOException, JAXBException   {
 		commonTest(null, testFile);
 	}
 

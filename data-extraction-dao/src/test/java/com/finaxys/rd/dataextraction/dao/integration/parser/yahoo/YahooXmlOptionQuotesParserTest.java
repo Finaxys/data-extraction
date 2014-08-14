@@ -2,11 +2,14 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -28,7 +31,7 @@ public class YahooXmlOptionQuotesParserTest {
 	String expirationDateFormat;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()   {
 		target = new YahooXmlOptionQuotesParser();
 		dateFormat = "MM/dd/yyyy h:mmaa";
 		expirationDateFormat = "yyyy-MM-dd";
@@ -56,7 +59,7 @@ public class YahooXmlOptionQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws JAXBException, IOException  {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(
@@ -75,12 +78,12 @@ public class YahooXmlOptionQuotesParserTest {
 	}
 
 	@Test
-	public void test_convert_no_symbol() throws Exception {
+	public void test_convert_no_symbol() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_no_symbol.xml");
 	}
 
 	@Test
-	public void test_convert_no_ts() throws Exception {
+	public void test_convert_no_ts() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_no_ts.xml");
 	}
 
@@ -89,23 +92,23 @@ public class YahooXmlOptionQuotesParserTest {
 	
 
 	@Test
-	public void test_convert_without_option_element() throws Exception {
+	public void test_convert_without_option_element() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_without_option_element.xml");
 	}
 
 	@Test
-	public void test_convert_without_optionschain_element() throws Exception {
+	public void test_convert_without_optionschain_element() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_without_optionschain_element.xml");
 	}
 
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_fields_not_wellformedxml() throws Exception {
+	public void test_convert_fields_not_wellformedxml() throws JAXBException, IOException  {
 		commonTest("/YahooXmlOptionQuotesParser/test_convert_not_wellformedxml.xml");
 	}
 
-	private void commonTest(List<OptionQuote> list, String testFile)
-			throws Exception {
+	private void commonTest(List<OptionQuote> list, String testFile) throws JAXBException, IOException
+			 {
 		// Setup
 		DataWrapper<OptionQuote> out = null;
 		if (list != null) {
@@ -127,7 +130,7 @@ public class YahooXmlOptionQuotesParserTest {
 		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
-	private void commonTest(String testFile) throws Exception {
+	private void commonTest(String testFile) throws JAXBException, IOException  {
 		commonTest(null, testFile);
 	}
 }

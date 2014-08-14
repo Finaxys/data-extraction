@@ -2,8 +2,11 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -25,7 +28,7 @@ public class FileXlsCurrencyPairsConverterTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException  {
 
 		CurrencyPair currencyPair = new 
 		CurrencyPair('0', new DateTime(), "EURUSD",
@@ -53,7 +56,7 @@ public class FileXlsCurrencyPairsConverterTest {
 	}
 	
 	@Test
-	public void test_convert_bad_symbol() throws Exception {
+	public void test_convert_bad_symbol() throws IOException, JAXBException   {
 
 		
 		DataWrapper<CurrencyPair> out = new DataWrapper<CurrencyPair>(

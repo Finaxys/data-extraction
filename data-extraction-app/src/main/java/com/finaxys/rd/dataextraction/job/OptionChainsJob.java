@@ -40,8 +40,7 @@ public class OptionChainsJob extends QuartzJobBean {
 		return publishingGateway;
 	}
 
-	public void setPublishingGateway(
-			MarketDataPublishingGateway<MarketDataWrapper<OptionChain>> publishingGateway) {
+	public void setPublishingGateway(MarketDataPublishingGateway<MarketDataWrapper<OptionChain>> publishingGateway) {
 		this.publishingGateway = publishingGateway;
 	}
 
@@ -85,31 +84,22 @@ public class OptionChainsJob extends QuartzJobBean {
 	 * .quartz.JobExecutionContext)
 	 */
 	@Override
-	protected void executeInternal(JobExecutionContext arg0)
-			throws JobExecutionException {
-		try {
-			List<Stock> stocks = stockDao.list(provider);
+	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
 
-			int x = stocks.size() / bucketSize;
-			int y = stocks.size() % bucketSize;
+		List<Stock> stocks = stockDao.list(provider);
 
-			for (int i = 0; i < x; i++) {
+		int x = stocks.size() / bucketSize;
+		int y = stocks.size() % bucketSize;
 
-				Task task = new Task(stocks.subList((i * bucketSize),
-						((i + 1) * bucketSize)), service, publishingGateway);
-				executorService.execute(task);
-			}
+		for (int i = 0; i < x; i++) {
 
-			Task task = new Task(stocks.subList((x * bucketSize),
-					(x * bucketSize) + y), service, publishingGateway);
+			Task task = new Task(stocks.subList((i * bucketSize), ((i + 1) * bucketSize)), service, publishingGateway);
 			executorService.execute(task);
-
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
+		Task task = new Task(stocks.subList((x * bucketSize), (x * bucketSize) + y), service, publishingGateway);
+		executorService.execute(task);
+
 	}
 
 	private static class Task implements Runnable {
@@ -118,8 +108,7 @@ public class OptionChainsJob extends QuartzJobBean {
 
 		private MarketDataPublishingGateway<MarketDataWrapper<OptionChain>> publishingGateway;
 
-		public Task(List<Stock> stocks, RefOptionChainService service,
-				MarketDataPublishingGateway<MarketDataWrapper<OptionChain>> publishingGateway) {
+		public Task(List<Stock> stocks, RefOptionChainService service, MarketDataPublishingGateway<MarketDataWrapper<OptionChain>> publishingGateway) {
 			super();
 			this.stocks = stocks;
 			this.service = service;
@@ -127,16 +116,10 @@ public class OptionChainsJob extends QuartzJobBean {
 		}
 
 		public void run() {
-			try {
-				List<OptionChain> data = service.getRefData(stocks);
-				if (data != null && data.size() > 0)
+			List<OptionChain> data = service.getRefData(stocks);
+			if (data != null && data.size() > 0)
 				publishingGateway.publishMarketData(new MarketDataWrapper<OptionChain>(data));
-			} catch (NullPointerException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 		}
 	}
 }

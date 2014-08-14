@@ -2,9 +2,12 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.yahoo;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -25,7 +28,7 @@ public class YahooXmlFXRatesParserTest {
 	String dateFormat;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp()   {
 		target = new YahooXmlFXRatesParser();
 		dateFormat = "MM/dd/yyyy h:mmaa";
 		ReflectionTestUtils.setField(target, "DATE_FORMAT", dateFormat);
@@ -40,7 +43,7 @@ public class YahooXmlFXRatesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 
 		// Setup
 		DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
@@ -67,7 +70,7 @@ public class YahooXmlFXRatesParserTest {
 	}
 
 	@Test
-	public void test_convert_no_id() throws Exception {
+	public void test_convert_no_id() throws JAXBException, IOException   {
 
 		// Setup
 		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
@@ -87,7 +90,7 @@ public class YahooXmlFXRatesParserTest {
 	}
 
 	@Test
-	public void test_convert_no_ts() throws Exception {
+	public void test_convert_no_ts() throws IOException, JAXBException   {
 
 		// Setup
 		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
@@ -110,7 +113,7 @@ public class YahooXmlFXRatesParserTest {
 
 
 	@Test
-	public void test_convert_without_rate_element() throws Exception {
+	public void test_convert_without_rate_element() throws JAXBException, IOException   {
 
 		// Setup
 		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
@@ -131,7 +134,7 @@ public class YahooXmlFXRatesParserTest {
 
 
 	@Test(expected = DataReadingParserException.class)  
-	public void test_convert_fields_not_wellformedxml() throws Exception {
+	public void test_convert_fields_not_wellformedxml() throws IOException   {
 
 		// Setup
 		DataWrapper<FXRate> out = new DataWrapper<FXRate>();
@@ -144,10 +147,7 @@ public class YahooXmlFXRatesParserTest {
 
 		// Execution
 		List<FXRate> inList = target.parse(inMessageFixture);
-		DataWrapper<FXRate> in = new DataWrapper<FXRate>(inList);
 
-		// Verification
-		assertEquals(TestHelper.marshall(out), TestHelper.marshall(in));
 	}
 
 }

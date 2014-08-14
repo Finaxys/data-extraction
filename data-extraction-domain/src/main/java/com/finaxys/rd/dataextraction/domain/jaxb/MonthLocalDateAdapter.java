@@ -10,11 +10,11 @@ public class MonthLocalDateAdapter
     extends XmlAdapter<String, LocalDate>{
 	DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
 	
-    public LocalDate unmarshal(String v) throws Exception {
+    public LocalDate unmarshal(String v)   {
         return dformatter.parseDateTime(v).toLocalDate();
     }
  
-    public String marshal(LocalDate v) throws Exception {
+    public String marshal(LocalDate v)   {
         return dformatter.print(v);
     }
  

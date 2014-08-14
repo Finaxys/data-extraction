@@ -26,7 +26,7 @@ public class OptionQuote extends QuoteData implements Serializable{
 
 
 
-    @HBaseRowKeyField(className = "OptionQuote", order = 2)
+//    @HBaseRowKeyField(className = "OptionQuote", order = 2)
 	private String optionChain;
 	
 	private String optionType;
@@ -45,7 +45,7 @@ public class OptionQuote extends QuoteData implements Serializable{
 
 	private BigDecimal strike;
 
-	@HBaseRowKeyField(className = "OptionQuote", order = 3)
+	@HBaseRowKeyField(className = "OptionQuote", order = 2)
 	private LocalDate expiration;
 
 	private BigInteger volume;

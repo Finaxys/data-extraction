@@ -45,7 +45,7 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 	private ExecutorService executorService;
 
 	DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
-	
+
 	public EODOptionQuoteService getService() {
 		return service;
 	}
@@ -58,8 +58,7 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 		return publishingGateway;
 	}
 
-	public void setPublishingGateway(
-			MarketDataPublishingGateway<MarketDataWrapper<OptionQuote>> publishingGateway) {
+	public void setPublishingGateway(MarketDataPublishingGateway<MarketDataWrapper<OptionQuote>> publishingGateway) {
 		this.publishingGateway = publishingGateway;
 	}
 
@@ -104,38 +103,28 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 	}
 
 	@Override
-	protected void executeInternal(JobExecutionContext arg0)
-			throws JobExecutionException {
-		try {
-			Map<LocalDate, List<OptionChain>> map = new HashMap<LocalDate, List<OptionChain>>();
+	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
+		Map<LocalDate, List<OptionChain>> map = new HashMap<LocalDate, List<OptionChain>>();
 
-			// Get optionChains that input date is this month => we should
-			// refresh the list every month
-			
-			List<OptionChain> optionChains = optionChainDao.list(this.provider
-					+ dformatter.print(new DateTime()));
-			for (OptionChain optionChain : optionChains) {
-				List<OptionChain> list = map.get(optionChain.getExpiration());
-				if (list != null)
-					list.add(optionChain);
-				else {
-					list = new ArrayList<OptionChain>();
-					list.add(optionChain);
-				}
-				map.put(optionChain.getExpiration(), list);
-			}
-			for (LocalDate expiration : map.keySet()) {
-				Task task = new Task(map, expiration, service,
-						publishingGateway);
-				executorService.execute(task);
-			}
+		// Get optionChains that input date is this month => we should
+		// refresh the list every month
 
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		List<OptionChain> optionChains = optionChainDao.list(this.provider);
+		for (OptionChain optionChain : optionChains) {
+			List<OptionChain> list = map.get(optionChain.getExpiration());
+			if (list != null)
+				list.add(optionChain);
+			else {
+				list = new ArrayList<OptionChain>();
+				list.add(optionChain);
+			}
+			map.put(optionChain.getExpiration(), list);
 		}
+		for (LocalDate expiration : map.keySet()) {
+			Task task = new Task(map, expiration, service, publishingGateway);
+			executorService.execute(task);
+		}
+
 	}
 
 	private static class Task implements Runnable {
@@ -145,8 +134,7 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 
 		private MarketDataPublishingGateway<MarketDataWrapper<OptionQuote>> publishingGateway;
 
-		public Task(Map<LocalDate, List<OptionChain>> map,
-				LocalDate expiration, EODOptionQuoteService service,
+		public Task(Map<LocalDate, List<OptionChain>> map, LocalDate expiration, EODOptionQuoteService service,
 				MarketDataPublishingGateway<MarketDataWrapper<OptionQuote>> publishingGateway) {
 			super();
 			this.map = map;
@@ -156,16 +144,10 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 		}
 
 		public void run() {
-			List<OptionQuote> data;
-			try {
-				data = service.getEODData(this.map.get(this.expiration),
-						this.expiration);
-				if (data != null && data.size() > 0)
+			List<OptionQuote> data = service.getEODData(this.map.get(this.expiration), this.expiration);
+			if (data != null && data.size() > 0)
 				publishingGateway.publishMarketData(new MarketDataWrapper<OptionQuote>(data));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 		}
 	}
 }

@@ -21,7 +21,7 @@ public abstract class QuoteData extends MarketData implements Serializable{
 
 
     @HBaseRowKeysFields(rowkeys = {@HBaseRowKeyField(className = "IndexQuote", order = 4),
-	                               @HBaseRowKeyField(className = "OptionQuote", order = 5),
+	                               @HBaseRowKeyField(className = "OptionQuote", order = 4),
 	                          	   @HBaseRowKeyField(className = "StockQuote", order = 4)})
 	private DateTime quoteDateTime;
 

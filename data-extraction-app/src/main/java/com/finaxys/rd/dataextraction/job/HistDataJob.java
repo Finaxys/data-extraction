@@ -17,29 +17,21 @@ import com.finaxys.rd.dataextraction.service.integration.gateway.MarketDataPubli
 
 public class HistDataJob<T extends MarketData, K extends MarketData> extends QuartzJobBean {
 
-	private List<K> products; 
+	private List<K> products;
 
-	private HistDataService<T,K> service;
+	private HistDataService<T, K> service;
 
 	private MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway;
 
-
 	private ExecutorService executorService;
-
-
 
 	private String startDate;
 
 	private String endDate;
-	
+
 	private int bucketSize;
 
-	private DateTimeFormatter dformatter = DateTimeFormat
-			.forPattern("yyyy-MM-dd");
-
-	
-
-
+	private DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 
 	public List<K> getProducts() {
 		return products;
@@ -61,8 +53,7 @@ public class HistDataJob<T extends MarketData, K extends MarketData> extends Qua
 		return publishingGateway;
 	}
 
-	public void setPublishingGateway(
-			MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
+	public void setPublishingGateway(MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
 		this.publishingGateway = publishingGateway;
 	}
 
@@ -99,53 +90,35 @@ public class HistDataJob<T extends MarketData, K extends MarketData> extends Qua
 	}
 
 	@Override
-	protected void executeInternal(JobExecutionContext arg0)
-			throws JobExecutionException {
-		try {
-			LocalDate start = dformatter.parseLocalDate(startDate);
-			LocalDate end = dformatter.parseLocalDate(endDate);
+	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
+		LocalDate start = dformatter.parseLocalDate(startDate);
+		LocalDate end = dformatter.parseLocalDate(endDate);
 
-			int x = products.size() / bucketSize;
-			int y = products.size() % bucketSize;
+		int x = products.size() / bucketSize;
+		int y = products.size() % bucketSize;
 
-			for (int i = 0; i < x; i++) {
+		for (int i = 0; i < x; i++) {
 
-				Task<T,K> task = new Task<T,K> (products.subList((i * bucketSize),
-						((i + 1) * bucketSize)), service, publishingGateway,start, end);
-				executorService.execute(task);
-			}
-
-			Task<T,K>  task = new Task<T,K> (products.subList((x * bucketSize),
-					(x * bucketSize) + y), service, publishingGateway,start, end);
+			Task<T, K> task = new Task<T, K>(products.subList((i * bucketSize), ((i + 1) * bucketSize)), service, publishingGateway, start, end);
 			executorService.execute(task);
-
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+
+		Task<T, K> task = new Task<T, K>(products.subList((x * bucketSize), (x * bucketSize) + y), service, publishingGateway, start, end);
+		executorService.execute(task);
 
 	}
 
 	private static class Task<T extends MarketData, K extends MarketData> implements Runnable {
-		private List<K> products; 
+		private List<K> products;
 
-		private HistDataService<T,K> service;
+		private HistDataService<T, K> service;
 
 		private MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway;
 
 		private LocalDate start;
 		private LocalDate end;
-		
 
-
-
-		public Task(
-				List<K> products,
-				HistDataService<T, K> service,
-				MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway,
-				LocalDate start, LocalDate end) {
+		public Task(List<K> products, HistDataService<T, K> service, MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway, LocalDate start, LocalDate end) {
 			super();
 			this.products = products;
 			this.service = service;
@@ -154,19 +127,11 @@ public class HistDataJob<T extends MarketData, K extends MarketData> extends Qua
 			this.end = end;
 		}
 
-
-
-
 		public void run() {
-			List<T> data;
-			try {
-				data = service.getHistData(products, start, end);
-				if (data != null && data.size() > 0)
+			List<T> data = service.getHistData(products, start, end);
+			if (data != null && data.size() > 0)
 				publishingGateway.publishMarketData(new MarketDataWrapper<T>(data));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 		}
 	}
 

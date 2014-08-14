@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class FileXlsExchangesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 		Exchange exchange = new Exchange('0', new DateTime(), "XLON",
 				DataType.REF, "L", '1', "LONDON STOCK EXCHANGE", "type",
 				"Europe", "UNITED KINGDOM", "GBP", new LocalTime("11:00:00"),

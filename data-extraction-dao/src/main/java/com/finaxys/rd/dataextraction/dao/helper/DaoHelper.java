@@ -12,13 +12,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.hadoop.hbase.client.Scan;
-import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp;
-import org.apache.hadoop.hbase.filter.PrefixFilter;
-import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
@@ -31,64 +31,33 @@ import com.finaxys.rd.dataextraction.domain.Enum.DataType;
  */
 public class DaoHelper {
 
-	/** The Constant MD5_LENGTH. */
-	public static final int MD5_LENGTH = 16;
-
-	
-
-	public static Scan mkScan() {
-		Scan scan = new Scan();
-		return scan;
-	}
+	static Logger logger = Logger.getLogger(DaoHelper.class);
 
 
-	public static Scan mkScan(byte[] start, byte[] end) {
-		Scan scan = new Scan(start, end);
-		return scan;
-	}
-
-	public static Scan mkScan(String prefix) {
-		Scan scan = new Scan();
-		org.apache.hadoop.hbase.filter.RegexStringComparator prefixFilter = new org.apache.hadoop.hbase.filter.RegexStringComparator(
-				"^" + prefix + "*");
-		RowFilter rowFilter = new RowFilter(CompareOp.EQUAL, prefixFilter);
-		scan.setFilter(rowFilter);
-
-		return scan;
-	}
-
-	public static Scan mkScan(byte[] prefix) {
-		Scan scan = new Scan();
-		PrefixFilter prefixFilter = new org.apache.hadoop.hbase.filter.PrefixFilter(
-				prefix);
-		scan.setFilter(prefixFilter);
-
-		return scan;
-	}
-	
 	public static Object getTypedValue(Field field, byte[] value) {
 
 		if (value != null) {
-	     	if (field.getType().equals(String.class))
+			if (field.getType().equals(String.class))
 				return Bytes.toString(value);
-			else if (field.getType().equals(Long.class))
+			if (field.getType().equals(Long.class))
 				return Bytes.toLong(value);
-			else if (field.getType().equals(Integer.class))
+			if (field.getType().equals(Integer.class))
 				return Bytes.toInt(value);
-			else if (field.getType().equals(LocalTime.class))
-				return new LocalTime(Bytes.toLong(value));
-			else if (field.getType().equals(LocalDate.class))
-				return new LocalDate(Bytes.toLong(value));
-			else if (field.getType().equals(char.class))
-				return (char) value[3];
-			else if (field.getType().equals(DateTime.class))
+			if (field.getType().equals(LocalTime.class))
+				return new DateTime(Bytes.toLong(value)).toLocalTime();
+			if (field.getType().equals(LocalDate.class))
+				return new DateTime(Bytes.toLong(value)).toLocalDate();
+			if (field.getType().equals(char.class))
+				return (char) value[0];
+			if (field.getType().equals(DateTime.class))
 				return new DateTime(Bytes.toLong(value));
-			else if (field.getType().equals(BigDecimal.class))
-				return  Bytes.toBigDecimal(value);
-			else if (field.getType().equals(BigInteger.class))
+			if (field.getType().equals(BigDecimal.class))
+				return Bytes.toBigDecimal(value);
+			if (field.getType().equals(BigInteger.class))
 				return new BigInteger(value);
-			else if (field.getType().equals(DataType.class))
-				return DataType.valueOf(new String(value));
+			if (field.getType().equals(DataType.class))
+				return DataType.valueOf(Bytes.toString(value));
+
 			return value;
 		} else
 			return null;
@@ -100,25 +69,23 @@ public class DaoHelper {
 		if (value != null) {
 			if (field.getType().equals(String.class))
 				return Bytes.toBytes((String) value);
-			else if (field.getType().equals(Long.class))
+			if (field.getType().equals(Long.class))
 				return Bytes.toBytes((Long) value);
-			else if (field.getType().equals(Integer.class))
+			if (field.getType().equals(Integer.class))
 				return Bytes.toBytes((Integer) value);
-			else if (field.getType().equals(LocalTime.class))
-				return Bytes.toBytes(new LocalTime(value).toDateTimeToday()
-						.getMillis());
-			else if (field.getType().equals(LocalDate.class))
-				return Bytes.toBytes(new LocalDate(value)
-						.toDateTimeAtStartOfDay().getMillis());
-			else if (field.getType().equals(char.class))
-				return Bytes.toBytes((Character) value);
-			else if (field.getType().equals(DateTime.class))
+			if (field.getType().equals(LocalTime.class))
+				return Bytes.toBytes(new LocalTime(value).toDateTimeToday().getMillis());
+			if (field.getType().equals(LocalDate.class))
+				return Bytes.toBytes(new LocalDate(value).toDateTimeAtStartOfDay().getMillis());
+			if (field.getType().equals(char.class))
+				return new byte[] { (byte) ((Character) value).charValue() };
+			if (field.getType().equals(DateTime.class))
 				return Bytes.toBytes(((DateTime) value).getMillis());
-			else if (field.getType().equals(BigDecimal.class))
+			if (field.getType().equals(BigDecimal.class))
 				return Bytes.toBytes((BigDecimal) value);
-			else if (field.getType().equals(BigInteger.class))
+			if (field.getType().equals(BigInteger.class))
 				return ((BigInteger) value).toByteArray();
-			else if (field.getType().equals(DataType.class))
+			if (field.getType().equals(DataType.class))
 				return Bytes.toBytes(((DataType) value).getName());
 
 			else {
@@ -190,4 +157,14 @@ public class DaoHelper {
 		return d.digest(Bytes.toBytes(s));
 	}
 
+	public static List<Field> getFields(Class<?> clazz) {
+		List<Field> attributes = new ArrayList<Field>();
+		while (clazz != null) {
+			attributes.addAll(Arrays.asList(clazz.getDeclaredFields()));
+			clazz = clazz.getSuperclass();
+		}
+		return attributes;
+	}
+
+	
 }

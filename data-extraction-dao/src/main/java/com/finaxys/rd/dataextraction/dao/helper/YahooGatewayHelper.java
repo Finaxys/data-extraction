@@ -113,7 +113,8 @@ public class YahooGatewayHelper {
 		return builder.build();
 	}
 
-	public static void signOAuthRequest(Object request, String consumerKey, String consumerSecret) throws OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+	public static void signOAuthRequest(Object request, String consumerKey, String consumerSecret) throws OAuthMessageSignerException, OAuthExpectationFailedException,
+			OAuthCommunicationException {
 		OAuthConsumer consumer = new CommonsHttpOAuthConsumer(consumerKey, consumerSecret);
 		consumer.sign(request);
 	}
@@ -121,8 +122,7 @@ public class YahooGatewayHelper {
 	public static void signOAuthYQLRequest(Object request) throws OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 		signOAuthRequest(request, YQL_CONSUMERKEY, YQL_CONSUMERSECRET);
 	}
-	
-	
+
 	public static String getSymbols(List<? extends MarketData> products) {
 		StringBuilder sb = new StringBuilder();
 		if (products != null && products.size() > 0)
@@ -132,7 +132,7 @@ public class YahooGatewayHelper {
 		return sb.toString().replaceAll(",$", "");
 	}
 
-	public static  String getStocksSymbols(List<Stock> stocks) {
+	public static String getStocksSymbols(List<Stock> stocks) {
 		StringBuilder sb = new StringBuilder();
 		for (Stock stock : stocks) {
 			if (stock.getExchSymb().equals("US"))
@@ -143,7 +143,7 @@ public class YahooGatewayHelper {
 
 		return sb.toString().replaceAll(",$", "");
 	}
-	
+
 	/**
 	 * The Enum Configuration.
 	 */
@@ -219,7 +219,7 @@ public class YahooGatewayHelper {
 						configuration.put(c, properties.getProperty(key));
 				}
 			} catch (IllegalArgumentException | IOException | NullPointerException e) {
-				e.printStackTrace();
+				logger.error("Exception when reading configuration file " + fileName + ": " + e);
 			}
 		}
 

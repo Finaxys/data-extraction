@@ -19,7 +19,7 @@ import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 
 public class DelimeterRowKeyStrategy extends VariableLengthRowKeyStrategy {
 
-	private static final char DELIMETER = '^';
+	private static final char DELIMETER = '~';
 
 	@Override
 	public byte[] createRowKey(TreeSet<RowKeyField> keyFields) {

@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class FileXlsOptionsParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 		DateTimeFormatter inputFormatter = DateTimeFormat.forPattern(
 				inputDateFormat).withLocale(Locale.ENGLISH);
 		DateTimeFormatter expirationFormatter = DateTimeFormat.forPattern(

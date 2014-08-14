@@ -61,9 +61,9 @@ public class JobsInitialiser {
 //				"exchangeDao", "indexDao", "yahooXmlEODIndexQuoteService",
 //				"marketDataPublishingGateway", 100);
 //
-		intradayJobManager.scheduleOQuotesJobs(YAHOO_PROVIDER_SYMBOL,
-				"exchangeDao", "optionDao", "yahooXmlOptionQuoteService",
-				"marketDataPublishingGateway", 100);
+//		intradayJobManager.scheduleOQuotesJobs(YAHOO_PROVIDER_SYMBOL,
+//				"exchangeDao", "optionDao", "yahooXmlOptionQuoteService",
+//				"marketDataPublishingGateway", 100);
 //
 //		eodJobManager.scheduleEODOQuotesJobs(YAHOO_PROVIDER_SYMBOL,
 //				"exchangeDao", "optionDao", "yahooXmlEODOptionQuoteService",
@@ -90,8 +90,8 @@ public class JobsInitialiser {
 //				"marketDataPublishingGateway");
 //		oneTimeJobManager.startRefDataJob("fileXlsInterbankRateService",
 //				"marketDataPublishingGateway");
-//		oneTimeJobManager.startRefDataJob("fileXlsOptionService",
-//				"marketDataPublishingGateway");
+		oneTimeJobManager.startRefDataJob("fileXlsOptionService",
+				"marketDataPublishingGateway");
 //		oneTimeJobManager.startRefDataJob("fileXlsStockService",
 //				"marketDataPublishingGateway");
 		

@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import com.finaxys.rd.dataextraction.domain.Document;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 import com.finaxys.rd.dataextraction.domain.Index;
 
-public class FileXlsIndexInfosParserTest {
+public class FileXlsIndexesParserTest {
 
 	FileXlsIndexesParser target;
 
@@ -30,7 +31,7 @@ public class FileXlsIndexInfosParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 
 		Index index = new Index('0', new DateTime(), "^DJX", DataType.REF, '1',
 				"1/100 DOW JONES INDUSTRIAL AVER", "NY");
@@ -52,13 +53,13 @@ public class FileXlsIndexInfosParserTest {
 		assertEquals(marshall(out), marshall(in));
 	}
 
-	private String marshall(DataWrapper<?> indexInfos) throws JAXBException {
+	private String marshall(DataWrapper<?> indexes) throws JAXBException {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		JAXBContext jaxbContext = JAXBContext.newInstance(DataWrapper.class,
 				Index.class);
 		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-		jaxbMarshaller.marshal(indexInfos, os);
+		jaxbMarshaller.marshal(indexes, os);
 		return new String(os.toByteArray());
 	}
 }

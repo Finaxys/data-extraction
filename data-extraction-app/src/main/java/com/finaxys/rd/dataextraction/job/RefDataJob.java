@@ -32,13 +32,11 @@ public class RefDataJob<T extends MarketData> extends QuartzJobBean {
 		this.service = service;
 	}
 
-
 	public MarketDataPublishingGateway<MarketDataWrapper<T>> getPublishingGateway() {
 		return publishingGateway;
 	}
 
-	public void setPublishingGateway(
-			MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
+	public void setPublishingGateway(MarketDataPublishingGateway<MarketDataWrapper<T>> publishingGateway) {
 		this.publishingGateway = publishingGateway;
 	}
 
@@ -50,17 +48,11 @@ public class RefDataJob<T extends MarketData> extends QuartzJobBean {
 	 * .quartz.JobExecutionContext)
 	 */
 	@Override
-	protected void executeInternal(JobExecutionContext arg0)
-			throws JobExecutionException {
-		try {
-			List<T> data = service.getRefData();
-			if (data != null && data.size() > 0)
-				publishingGateway.publishMarketData(new MarketDataWrapper<T>(data));
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
+
+		List<T> data = service.getRefData();
+		if (data != null && data.size() > 0)
+			publishingGateway.publishMarketData(new MarketDataWrapper<T>(data));
+
 	}
 }

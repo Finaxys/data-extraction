@@ -1,8 +1,7 @@
-package com.finaxys.rd.dataextraction.dao;
 /*
  * 
  */
-
+package com.finaxys.rd.dataextraction.dao;
 
 import java.util.List;
 
@@ -13,15 +12,8 @@ import com.finaxys.rd.dataextraction.domain.Option;
 /**
  * The Interface OptionDao.
  */
-public interface OptionDao {
-
-	public List<Option> list(String prefix) throws DataAccessException;
-	
-	public List<Option> list(byte[] prefix) throws DataAccessException;
-
-	public List<Option> listAll() throws DataAccessException;
+public interface OptionDao extends BasicDao<Option> {
 
 	public List<Option> list(char provider, String exchSymb) throws DataAccessException;
-	
 
 }

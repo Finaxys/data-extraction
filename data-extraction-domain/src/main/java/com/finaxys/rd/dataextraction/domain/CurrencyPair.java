@@ -12,11 +12,14 @@ import javax.xml.bind.annotation.XmlType;
 import org.joda.time.DateTime;
 
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
+import com.finaxys.rd.dataextraction.domain.hbase.HBaseRowKeyStrategy;
+import com.finaxys.rd.dataextraction.domain.hbase.HashRowKeyStrategy;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class CurrencyPair.
  */
+@HBaseRowKeyStrategy(strategy = HashRowKeyStrategy.class)
 @XmlRootElement(name = "currency")
 @XmlType(propOrder = { "symbol", "baseCurrency", "quoteCurrency", "provider" , "source", "inputDate", "dataType"})
 public class CurrencyPair extends ProductData implements Serializable{

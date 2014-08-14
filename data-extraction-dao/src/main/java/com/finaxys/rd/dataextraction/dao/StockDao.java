@@ -1,8 +1,7 @@
-package com.finaxys.rd.dataextraction.dao;
-
 /*
  * 
  */
+package com.finaxys.rd.dataextraction.dao;
 
 import java.util.List;
 
@@ -13,13 +12,9 @@ import com.finaxys.rd.dataextraction.domain.Stock;
 /**
  * The Interface StockDao.
  */
-public interface StockDao {
-
-	public List<Stock> list(byte[] prefix) throws DataAccessException;
-
-	public List<Stock> listAll() throws DataAccessException;
-
+public interface StockDao extends BasicDao<Stock> {
+	
 	public List<Stock> list(char provider, String exchSymb) throws DataAccessException;
-
+	
 	public List<Stock> list(char provider) throws DataAccessException;
 }

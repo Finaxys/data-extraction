@@ -3,6 +3,7 @@ package com.finaxys.rd.dataextraction.dao.integration.parser.file;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class FileXlsInterbankRatesParserTest {
 	}
 
 	@Test
-	public void test_convert() throws Exception {
+	public void test_convert() throws IOException, JAXBException   {
 
 		InterbankRate interbankRate = new InterbankRate('0', new DateTime(),
 				"EONIA", DataType.REF, '1', "EUR");

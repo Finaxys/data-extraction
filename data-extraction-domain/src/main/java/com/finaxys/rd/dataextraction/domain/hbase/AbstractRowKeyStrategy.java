@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 public abstract class AbstractRowKeyStrategy implements RowKeyStrategy {
+
 	protected List<byte[]> convertFieldsToBytes(TreeSet<RowKeyField> fields) {
 		List<byte[]> rowkeyFields = new ArrayList<byte[]>();
 		for (RowKeyField field : fields) {

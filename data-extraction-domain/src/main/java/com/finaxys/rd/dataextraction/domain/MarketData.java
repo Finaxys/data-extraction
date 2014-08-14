@@ -28,7 +28,7 @@ public abstract class MarketData extends ExtractedData implements Serializable{
 			                            @HBaseRowKeyField(className = "InterbankRateData", order = 2),
 			                            @HBaseRowKeyField(className = "OptionChain", order = 2),
 			                            @HBaseRowKeyField(className = "Option", order = 5),
-			                       	    @HBaseRowKeyField(className = "OptionQuote", order = 4),
+			                       	    @HBaseRowKeyField(className = "OptionQuote", order = 3),
 			                       	    @HBaseRowKeyField(className = "Stock", order = 3),
 			                       	 @HBaseRowKeyField(className = "StockQuote", order = 3)})
 	private String symbol;

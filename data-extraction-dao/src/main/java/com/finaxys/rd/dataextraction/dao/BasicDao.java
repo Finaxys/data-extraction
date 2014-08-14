@@ -6,13 +6,18 @@ package com.finaxys.rd.dataextraction.dao;
 import java.util.List;
 
 import com.finaxys.rd.dataextraction.dao.exception.DataAccessException;
-import com.finaxys.rd.dataextraction.domain.CurrencyPair;
+
 
 // TODO: Auto-generated Javadoc
 /**
  * The Interface CurrencyPairDao.
  */
-public interface CurrencyPairDao extends BasicDao<CurrencyPair> {
+public interface BasicDao<T> {
 
-	public List<CurrencyPair> list(char provider) throws DataAccessException;
+	public boolean add(T bean) throws DataAccessException;
+
+	public List<T> list(byte[] prefix) throws DataAccessException;
+
+	public List<T> listAll() throws DataAccessException;
+
 }

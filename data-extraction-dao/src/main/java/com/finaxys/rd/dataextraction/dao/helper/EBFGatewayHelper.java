@@ -84,7 +84,7 @@ public class EBFGatewayHelper {
 	                configuration.put(c, properties.getProperty(key));
 	            }
 	        } catch (IllegalArgumentException | IOException | NullPointerException e) {
-	           e.printStackTrace();
+	           logger.error("Exception when reading configuration file " + fileName + ": " + e);
 	        }
 	    }
 
