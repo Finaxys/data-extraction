@@ -10,6 +10,6 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
 import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface HistOptionQuoteService extends HistDataService<OptionQuote, Option>{
-	public List<OptionQuote> getHistData(List<OptionChain> optionChains, LocalDate expiration, LocalDate startDate, LocalDate endDate) throws ServiceException;
+	 List<OptionQuote> getHistData(List<OptionChain> optionChains, LocalDate expiration, LocalDate startDate, LocalDate endDate) throws ServiceException;
 
 }

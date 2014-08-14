@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import com.finaxys.rd.dataextraction.dao.exception.MD5AlgorithmException;
 import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 
 // TODO: Auto-generated Javadoc
@@ -31,7 +32,7 @@ import com.finaxys.rd.dataextraction.domain.Enum.DataType;
  */
 public class DaoHelper {
 
-	static Logger logger = Logger.getLogger(DaoHelper.class);
+	private static Logger logger = Logger.getLogger(DaoHelper.class);
 
 
 	public static Object getTypedValue(Field field, byte[] value) {
@@ -151,7 +152,7 @@ public class DaoHelper {
 		try {
 			d = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			throw new RuntimeException("MD5 algorithm not available!", e);
+			throw new MD5AlgorithmException("MD5 algorithm not available!", e);
 		}
 
 		return d.digest(Bytes.toBytes(s));

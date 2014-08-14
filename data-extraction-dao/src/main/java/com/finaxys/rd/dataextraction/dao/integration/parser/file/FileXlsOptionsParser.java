@@ -36,7 +36,7 @@ import com.finaxys.rd.dataextraction.domain.Option;
  */
 public class FileXlsOptionsParser implements Parser<Option> {
 
-	static Logger logger = Logger.getLogger(FileXlsOptionsParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsOptionsParser.class);
 
 	/** The expiration date format. */
 	@Value("${parser.file.options.input_date_format}")
@@ -80,13 +80,13 @@ public class FileXlsOptionsParser implements Parser<Option> {
 					option.setInputDate(new DateTime());
 					option.setDataType(document.getDataType());
 					list.add(option);
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

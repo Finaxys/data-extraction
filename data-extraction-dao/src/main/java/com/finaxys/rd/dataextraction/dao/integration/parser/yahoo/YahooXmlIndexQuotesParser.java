@@ -42,7 +42,7 @@ import com.finaxys.rd.dataextraction.domain.IndexQuote;
  */
 public class YahooXmlIndexQuotesParser implements Parser<IndexQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlIndexQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlIndexQuotesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.index_quotes.date_format}")
@@ -108,10 +108,10 @@ public class YahooXmlIndexQuotesParser implements Parser<IndexQuote> {
 						if (a != null && !a.getValue().equals("")) {
 							String[] sp = a.getValue().split("\\.");
 							indexQuote.setSymbol(sp[0]);
-							if (sp.length == 2)
+							if (sp.length == 2){
 								indexQuote.setExchSymb(sp[1]);
-							else
-								indexQuote.setExchSymb("US");
+							}else{
+								indexQuote.setExchSymb("US");}
 						} else
 							isValid = false;
 					} else if (indexQuote != null && isValid) {
@@ -123,16 +123,16 @@ public class YahooXmlIndexQuotesParser implements Parser<IndexQuote> {
 
 						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LASTTRADEDATE_EL)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)){
 								date = evt.asCharacters().getData();
-							else
-								isValid = false;
+							}else{
+								isValid = false;}
 						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LASTTRADETIME_EL)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)){
 								time = evt.asCharacters().getData();
-							else
-								isValid = false;
+							}else{
+								isValid = false;}
 						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
@@ -171,7 +171,7 @@ public class YahooXmlIndexQuotesParser implements Parser<IndexQuote> {
 							}
 						}
 					}
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 					isValid = false;
 					break;
@@ -180,7 +180,7 @@ public class YahooXmlIndexQuotesParser implements Parser<IndexQuote> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

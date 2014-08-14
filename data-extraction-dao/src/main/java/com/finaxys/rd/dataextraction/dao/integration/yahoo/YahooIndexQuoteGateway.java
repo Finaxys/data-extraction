@@ -123,10 +123,11 @@ public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, I
 		StringBuilder sb = new StringBuilder();
 		if (indexes != null && indexes.size() > 0)
 			for (Index index : indexes) {
-				if (index.getExchSymb().equals("US"))
+				if (index.getExchSymb().equals("US")) {
 					sb.append("\"" + index.getSymbol() + "\",");
-				else
+				} else {
 					sb.append("\"" + index.getSymbol() + "." + index.getExchSymb() + "\",");
+				}
 			}
 
 		return sb.toString().replaceAll(",$", "");
@@ -141,13 +142,13 @@ public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, I
 			byte[] data = YahooGatewayHelper.executeYQLQuery(EOD_INDEX_QUOTES_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return eodDataParser.parse(new Document(data, DataType.EOD));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -167,7 +168,7 @@ public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, I
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -179,8 +180,8 @@ public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, I
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
 			Assert.notNull(startDate, "Cannot execute data extraction. Start date is null.");
 			Assert.notNull(endDate, "Cannot execute data extraction. End date is null.");
-			
-			DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+			 DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 			List<String> params = new ArrayList<String>(Arrays.asList(getSymbols(products), dformatter.print(startDate), dformatter.print(endDate)));
 
 			byte[] data = YahooGatewayHelper.executeYQLQuery(HIST_INDEX_QUOTES_QUERY, params, contentType, httpClient, context);
@@ -192,7 +193,7 @@ public class YahooIndexQuoteGateway implements IntradayDataGateway<IndexQuote, I
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

@@ -113,7 +113,6 @@ public class YahooOptionQuoteGateway implements IntradayOptionQuoteGateway, EODO
 		this.eodDataParser = eodDataParser;
 	}
 
-
 	@Override
 	public List<OptionQuote> getCurrentData(List<Option> products) throws GatewayException {
 		try {
@@ -123,13 +122,13 @@ public class YahooOptionQuoteGateway implements IntradayOptionQuoteGateway, EODO
 			byte[] data = YahooGatewayHelper.executeYQLQuery(CURRENT_OQUOTE_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return intradayDataParser.parse(new Document(contentType, DataType.INTRA, DataClass.OptionQuote, YahooGatewayHelper.Y_PROVIDER_SYMB, data));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -139,18 +138,18 @@ public class YahooOptionQuoteGateway implements IntradayOptionQuoteGateway, EODO
 		try {
 			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
-			DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
+			 DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
 			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getSymbols(products), dformatter.print(expiration)));
 			byte[] data = YahooGatewayHelper.executeYQLQuery(CURRENT_OPTION_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return intradayDataParser.parse(new Document(data, DataType.INTRA));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -164,13 +163,13 @@ public class YahooOptionQuoteGateway implements IntradayOptionQuoteGateway, EODO
 			byte[] data = YahooGatewayHelper.executeYQLQuery(EOD_OQUOTE_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return eodDataParser.parse(new Document(data, DataType.EOD));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -180,18 +179,18 @@ public class YahooOptionQuoteGateway implements IntradayOptionQuoteGateway, EODO
 		try {
 			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
-			DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
+			 DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
 			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getSymbols(products), dformatter.print(expiration)));
 			byte[] data = YahooGatewayHelper.executeYQLQuery(EOD_OPTION_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return eodDataParser.parse(new Document(data, DataType.EOD));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

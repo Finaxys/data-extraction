@@ -89,13 +89,13 @@ public class YahooStockGateway implements RefDataGateway<Stock> {
 			byte[] data = YahooGatewayHelper.executeYQLQuery(STOCK_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return parser.parse(new Document(data, DataType.REF));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

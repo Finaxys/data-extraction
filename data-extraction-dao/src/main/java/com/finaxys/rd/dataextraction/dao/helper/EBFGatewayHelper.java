@@ -56,7 +56,7 @@ public class EBFGatewayHelper {
 	    }
 	    
     	/** The Constant logger. */
-    	private final static Logger logger = Logger.getLogger(Configuration.class);
+    	private final static  Logger logger = Logger.getLogger(Configuration.class);
 	    //TODo Share resources (properties files) inter modules
 	    /** The Constant CONFIG_FILE. */
     	private final static String CONFIG_FILE = "/gateway.properties";
@@ -83,7 +83,7 @@ public class EBFGatewayHelper {
 	            	if(c!=null)
 	                configuration.put(c, properties.getProperty(key));
 	            }
-	        } catch (IllegalArgumentException | IOException | NullPointerException e) {
+	        } catch (IllegalArgumentException | IOException  e) {
 	           logger.error("Exception when reading configuration file " + fileName + ": " + e);
 	        }
 	    }

@@ -3,6 +3,7 @@
  */
 package com.finaxys.rd.dataextraction.domain.hbase;
 
+import java.util.Arrays;
 import java.util.TreeSet;
 
 public class RowKey {
@@ -35,7 +36,11 @@ public class RowKey {
 	}
 
 	public void setKey(byte[] key) {
-		this.key = key;
+		if (key == null) {
+			this.key = new byte[0];
+		} else {
+			this.key = Arrays.copyOf(key, key.length);
+		}
 	}
 
 	public TreeSet<RowKeyField> getRowKeyFields() {

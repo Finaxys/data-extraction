@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.domain.MarketData;
 
 public interface RefDataGateway<T extends MarketData> {
 
-	public List<T> getRefData() throws GatewayException;	
+	 List<T> getRefData() throws GatewayException;	
 }

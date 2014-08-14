@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.domain.InterbankRate;
 
 public interface InterbankRateDao extends BasicDao<InterbankRate>{
 	
-	public List<InterbankRate> list(char provider) throws DataAccessException;
+	 List<InterbankRate> list(char provider) throws DataAccessException;
 }

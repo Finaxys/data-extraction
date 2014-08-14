@@ -31,7 +31,7 @@ public class HistDataJob<T extends MarketData, K extends MarketData> extends Qua
 
 	private int bucketSize;
 
-	private DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+	 private DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 
 	public List<K> getProducts() {
 		return products;

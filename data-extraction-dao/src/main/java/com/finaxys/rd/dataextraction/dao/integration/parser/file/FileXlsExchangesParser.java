@@ -33,7 +33,7 @@ import com.finaxys.rd.dataextraction.domain.Exchange;
  */
 public class FileXlsExchangesParser implements Parser<Exchange> {
 
-	static Logger logger = Logger.getLogger(FileXlsExchangesParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsExchangesParser.class);
 
 	public List<Exchange> parse(Document document) throws ParserException {
 		HSSFWorkbook workbook;
@@ -74,13 +74,13 @@ public class FileXlsExchangesParser implements Parser<Exchange> {
 					exchange.setInputDate(new DateTime());
 					exchange.setDataType(document.getDataType());
 					list.add(exchange);
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface RefDataService<T extends MarketData> {
 
-	public List<T> getRefData() throws ServiceException;	
+	 List<T> getRefData() throws ServiceException;	
 }

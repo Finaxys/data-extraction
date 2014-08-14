@@ -14,5 +14,5 @@ import com.finaxys.rd.dataextraction.domain.OptionChain;
  */
 public interface OptionChainDao extends BasicDao<OptionChain>{
 	
-	public List<OptionChain> list(char provider) throws DataAccessException;
+	 List<OptionChain> list(char provider) throws DataAccessException;
 }

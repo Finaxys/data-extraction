@@ -21,7 +21,7 @@ import com.finaxys.rd.dataextraction.domain.Stock;
 public class FileStockGateway implements RefDataGateway<Stock> {
 
 	/** The logger. */
-	static Logger logger = Logger.getLogger(FileStockGateway.class);
+	private static Logger logger = Logger.getLogger(FileStockGateway.class);
 
 	/** The stocks file. */
 	@Value("${gateway.file.stocksFile:stocks}")
@@ -60,9 +60,9 @@ public class FileStockGateway implements RefDataGateway<Stock> {
 			File file = FileGatewayHelper.getResourceFile(FileGatewayHelper.getPath(FileGatewayHelper.DATA_FOLDER, STOCKS_FILE, contentType.getName()));
 			if (file != null && file.length() > 0)
 				return parser.parse(new Document(contentType, DataType.REF, DataClass.Stock, FileGatewayHelper.FILE_PROVIDER_SYMB, FileGatewayHelper.toBytes(file)));
-			else
+			
 				return null;
-		} catch (NullPointerException | IOException | ParserException e) {
+		} catch ( IOException | ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

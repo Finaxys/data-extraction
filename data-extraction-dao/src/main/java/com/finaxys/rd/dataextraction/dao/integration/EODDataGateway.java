@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.domain.MarketData;
 
 public interface EODDataGateway<T extends MarketData, K extends MarketData> {
 
-	public List<T> getEODData(List<K> products) throws GatewayException;	
+	 List<T> getEODData(List<K> products) throws GatewayException;	
 }

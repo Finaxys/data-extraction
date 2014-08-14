@@ -92,7 +92,7 @@ public class EBFInterbankRateDataGateway implements HistDataGateway<InterbankRat
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
 			Assert.notNull(startDate, "Cannot execute data extraction. Start date is null.");
 			Assert.notNull(endDate, "Cannot execute data extraction. End date is null.");
-			
+
 			URI uri = EBFGatewayHelper.contructEBFHistEuriborUri(startDate.getYear(), contentType);
 			HttpGet request = new HttpGet(uri);
 			YahooGatewayHelper.signOAuthYQLRequest(request);
@@ -101,13 +101,13 @@ public class EBFInterbankRateDataGateway implements HistDataGateway<InterbankRat
 
 			if (data.length > 0)
 				return histDataParser.parse(new Document(contentType, DataType.HIST, DataClass.InterbankRatesData, EBFGatewayHelper.EBF_PROVIDER_SYMB, data));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch (ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

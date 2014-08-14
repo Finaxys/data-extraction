@@ -45,7 +45,7 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
  */
 public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlOptionQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlOptionQuotesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.option_quotes.date_format}")
@@ -152,32 +152,32 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 
 					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
 						optionQuote = new OptionQuote();
-						if (ts == null || ts.isEmpty())
+						if (ts == null || ts.isEmpty()){
 							isValid = false;
-						else
-							isValid = true;
+						}else{
+							isValid = true;}
 
 						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
-						if (a != null && !a.getValue().isEmpty())
+						if (a != null && !a.getValue().isEmpty()){
 							optionQuote.setSymbol(a.getValue());
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 
 						a = ((StartElement) ev).getAttributeByName(new QName(OPTION_TYPE_ATT));
-						if (a != null && !a.getValue().isEmpty())
+						if (a != null && !a.getValue().isEmpty()){
 							optionQuote.setOptionType(a.getValue());
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 
-						if (optionsChain != null && !optionsChain.isEmpty())
+						if (optionsChain != null && !optionsChain.isEmpty()){
 							optionQuote.setOptionChain(optionsChain);
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 
-						if (expiration != null && !expiration.isEmpty())
+						if (expiration != null && !expiration.isEmpty()){
 							optionQuote.setExpiration(expirationFormatter.parseDateTime(expiration).toLocalDate());
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 
 					}
 					if (optionQuote != null && isValid) {
@@ -186,7 +186,7 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setChange(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LAST_PRICE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LAST_PRICE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
 								optionQuote.setPrice(new BigDecimal(evt.asCharacters().getData()));
@@ -195,29 +195,29 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 							}
 						}
 
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setBid(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setAsk(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setStrike(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
 								NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
 								optionQuote.setVolume(new BigInteger(nf_us.parse(evt.asCharacters().getData()).toString()));
 							}
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPENINTEREST_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPENINTEREST_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
 
@@ -227,7 +227,7 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 							}
 						}
 
-						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
+						else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
 
 							if (ts != null && !ts.isEmpty()  && document.getDataType() != null) {
 								optionQuote.setQuoteDateTime(new DateTime(ts));
@@ -239,7 +239,7 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 							}
 						}
 					}
-				} catch (NullPointerException | ParseException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( ParseException | UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 
 					break;
@@ -248,7 +248,7 @@ public class YahooXmlOptionQuotesParser implements Parser<OptionQuote> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

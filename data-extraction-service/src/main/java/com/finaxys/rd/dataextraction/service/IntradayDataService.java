@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface IntradayDataService<T extends MarketData, K extends MarketData> {
 
-	public List<T> getCurrentData(List<K> products) throws ServiceException;	
+	 List<T> getCurrentData(List<K> products) throws ServiceException;	
 }

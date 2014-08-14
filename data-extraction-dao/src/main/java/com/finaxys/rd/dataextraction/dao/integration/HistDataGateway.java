@@ -11,5 +11,5 @@ import com.finaxys.rd.dataextraction.domain.MarketData;
 
 public interface HistDataGateway<T extends MarketData, K extends MarketData> {
 
-	public List<T> getHistData(List<K> products, LocalDate startDate, LocalDate endDate) throws GatewayException;	
+	 List<T> getHistData(List<K> products, LocalDate startDate, LocalDate endDate) throws GatewayException;	
 }

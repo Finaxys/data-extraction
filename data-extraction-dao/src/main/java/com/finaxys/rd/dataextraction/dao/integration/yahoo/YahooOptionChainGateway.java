@@ -34,7 +34,7 @@ import com.finaxys.rd.dataextraction.domain.Stock;
 public class YahooOptionChainGateway implements RefOptionChainGateway {
 
 	/** The logger. */
-	static Logger logger = Logger.getLogger(YahooOptionChainGateway.class);
+	private static Logger logger = Logger.getLogger(YahooOptionChainGateway.class);
 
 	/** The yql option chain query. */
 	@Value("${gateway.yahoo.yqlOptionChainQuery}")
@@ -89,8 +89,6 @@ public class YahooOptionChainGateway implements RefOptionChainGateway {
 		this.parser = parser;
 	}
 
-
-
 	@Override
 	public List<OptionChain> getRefData(List<Stock> products) throws GatewayException {
 		try {
@@ -100,15 +98,14 @@ public class YahooOptionChainGateway implements RefOptionChainGateway {
 			byte[] data = YahooGatewayHelper.executeYQLQuery(OPTION_CHAIN_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return parser.parse(new Document(data, DataType.INTRA));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
-
 }

@@ -41,36 +41,36 @@ import com.finaxys.rd.dataextraction.domain.FXRate;
  */
 public class YahooXmlFXRatesParser implements Parser<FXRate> {
 
-	static Logger logger = Logger.getLogger(YahooXmlFXRatesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlFXRatesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.fx_rates.date_format}")
-	private String DATE_FORMAT;
+	private String dateFormat;
 
 	@Value("${parser.yahoo.fx_rates.old.no_data}")
-	private String NO_DATA;
+	private String noData;
 
 	@Value("${parser.yahoo.fx_rates.old.main_rate_el}")
-	private String MAIN_RATE_EL;
+	private String mainRateEl;
 
 	/** The id att. */
 	@Value("${parser.yahoo.fx_rates.old.id_att}")
-	private String ID_ATT;
+	private String idAtt;
 
 	@Value("${parser.yahoo.fx_rates.old.rate_el}")
-	private String RATE_EL;
+	private String rateEl;
 
 	@Value("${parser.yahoo.fx_rates.old.date_el}")
-	private String DATE_EL;
+	private String dateEl;
 
 	@Value("${parser.yahoo.fx_rates.old.time_el}")
-	private String TIME_EL;
+	private String timeEl;
 
 	@Value("${parser.yahoo.fx_rates.old.ask_el}")
-	private String ASK_EL;
+	private String askEl;
 
 	@Value("${parser.yahoo.fx_rates.old.bid_el}")
-	private String BID_EL;
+	private String bidEl;
 
 	public List<FXRate> parse(Document document) throws ParserException {
 		XMLEventReader reader;
@@ -85,7 +85,7 @@ public class YahooXmlFXRatesParser implements Parser<FXRate> {
 			List<FXRate> list = new ArrayList<FXRate>();
 			String date = null;
 			String time = null;
-			DateTimeFormatter formatter = DateTimeFormat.forPattern(DATE_FORMAT);
+			DateTimeFormatter formatter = DateTimeFormat.forPattern(dateFormat);
 
 			FXRate fxRate = null;
 			boolean isValid = true;
@@ -93,45 +93,45 @@ public class YahooXmlFXRatesParser implements Parser<FXRate> {
 				try {
 					XMLEvent ev = reader.nextEvent();
 
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(MAIN_RATE_EL)) {
+					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(mainRateEl)) {
 						fxRate = new FXRate();
 						isValid = true;
-						Attribute a = ((StartElement) ev).getAttributeByName(new QName(ID_ATT));
-						if (a != null && !a.getValue().equals(""))
+						Attribute a = ((StartElement) ev).getAttributeByName(new QName(idAtt));
+						if (a != null && !a.getValue().equals("")){
 							fxRate.setSymbol(a.getValue());
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 					} else if (fxRate != null && isValid) {
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(RATE_EL)) {
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(rateEl)) {
 
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData)){
 								fxRate.setRate(new BigDecimal(evt.asCharacters().getData()));
-							else
-								isValid = false;
-						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
+							}else{
+								isValid = false;}
+						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(askEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								fxRate.setAsk(new BigDecimal(evt.asCharacters().getData()));
 
-						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
+						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(bidEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								fxRate.setBid(new BigDecimal(evt.asCharacters().getData()));
 
-						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DATE_EL)) {
+						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(dateEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData)){
 								date = evt.asCharacters().getData();
-							else
-								isValid = false;
-						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(TIME_EL)) {
+							}else{
+								isValid = false;}
+						} else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(timeEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData)){
 								time = evt.asCharacters().getData();
-							else
-								isValid = false;
-						} else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(MAIN_RATE_EL)) {
+							}else{
+								isValid = false;}
+						} else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(mainRateEl)) {
 
 							if (date != null && time != null  && document.getDataType() != null) {
 								DateTime ts = formatter.parseDateTime(date + " " + time);
@@ -145,7 +145,7 @@ public class YahooXmlFXRatesParser implements Parser<FXRate> {
 						}
 					}
 
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 					isValid = false;
 					break;
@@ -154,7 +154,7 @@ public class YahooXmlFXRatesParser implements Parser<FXRate> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

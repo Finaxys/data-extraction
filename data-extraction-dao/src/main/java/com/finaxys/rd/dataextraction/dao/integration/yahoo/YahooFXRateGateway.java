@@ -34,10 +34,10 @@ import com.finaxys.rd.dataextraction.domain.FXRate;
 public class YahooFXRateGateway implements IntradayDataGateway<FXRate, CurrencyPair>, EODDataGateway<FXRate, CurrencyPair> {
 
 	@Value("${gateway.yahoo.yqlFXRateQuery}")
-	private String CURRENT_FXRATE_QUERY;
+	private String currentFXRateQuery;
 
 	@Value("${gateway.yahoo.yqlEODFXRateQuery}")
-	private String EOD_FXRATE_QUERY;
+	private String eodFXRateQuey;
 
 	@Autowired
 	private CloseableHttpClient httpClient;
@@ -100,26 +100,25 @@ public class YahooFXRateGateway implements IntradayDataGateway<FXRate, CurrencyP
 		this.eodDataParser = eodDataParser;
 	}
 
-
 	@Override
 	public List<FXRate> getEODData(List<CurrencyPair> products) throws GatewayException {
 		try {
 			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
-			
+
 			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getSymbols(products)));
 			byte[] data;
-			data = YahooGatewayHelper.executeYQLQuery(EOD_FXRATE_QUERY, params, contentType, httpClient, context);
+			data = YahooGatewayHelper.executeYQLQuery(eodFXRateQuey, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return eodDataParser.parse(new Document(data, DataType.EOD));
-			else
-				return null;
-		
+
+			return null;
+
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -130,19 +129,19 @@ public class YahooFXRateGateway implements IntradayDataGateway<FXRate, CurrencyP
 		try {
 			Assert.notNull(products, "Cannot execute data extraction. Products list is null.");
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
-			
+
 			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getSymbols(products)));
-			byte[] data = YahooGatewayHelper.executeYQLQuery(CURRENT_FXRATE_QUERY, params, contentType, httpClient, context);
+			byte[] data = YahooGatewayHelper.executeYQLQuery(currentFXRateQuery, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return intradayDataParser.parse(new Document(data, DataType.INTRA));
-			else
-				return null;
-		
+
+			return null;
+
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

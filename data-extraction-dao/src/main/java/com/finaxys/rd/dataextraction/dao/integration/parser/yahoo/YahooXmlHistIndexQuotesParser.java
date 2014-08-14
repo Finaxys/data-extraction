@@ -40,41 +40,41 @@ import com.finaxys.rd.dataextraction.domain.IndexQuote;
  */
 public class YahooXmlHistIndexQuotesParser implements Parser<IndexQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlHistIndexQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlHistIndexQuotesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.hist_index_quotes.date_format}")
-	private String DATE_FORMAT;
+	private String dateFormat;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.no_data}")
-	private String NO_DATA;
+	private String noData;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.quote_el}")
-	private String QUOTE_EL;
+	private String quoteEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.symbol_att}")
-	private String SYMBOL_ATT;
+	private String symbolAtt;
 
-	@Value("${parser.yahoo.hist_index_quotes.old.DATE_EL}")
-	private String DATE_EL;
+	@Value("${parser.yahoo.hist_index_quotes.old.dateEl}")
+	private String dateEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.open_el}")
-	private String OPEN_EL;
+	private String openEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.high_el}")
-	private String HIGH_EL;
+	private String highEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.low_el}")
-	private String LOW_EL;
+	private String lowEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.close_el}")
-	private String CLOSE_EL;
+	private String closeEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.volume_el}")
-	private String VOLUME_EL;
+	private String volumeEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.adj_close_el}")
-	private String ADJ_CLOSE_EL;
+	private String adjCloseEl;
 
 	public List<IndexQuote> parse(Document document) throws ParserException {
 		XMLEventReader reader;
@@ -93,59 +93,59 @@ public class YahooXmlHistIndexQuotesParser implements Parser<IndexQuote> {
 				try {
 					XMLEvent ev = reader.nextEvent();
 
-					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(quoteEl)) {
 						indexQuote = new IndexQuote();
 
-						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
+						Attribute a = ((StartElement) ev).getAttributeByName(new QName(symbolAtt));
 						if (a != null && !a.getValue().equals("")) {
 							String[] sp = a.getValue().split("\\.");
 							indexQuote.setSymbol(sp[0]);
-							if (sp.length == 2)
+							if (sp.length == 2){
 								indexQuote.setExchSymb(sp[1]);
-							else
-								indexQuote.setExchSymb("US");
+							}else{
+								indexQuote.setExchSymb("US");}
 						} else
 							isValid = false;
 					}
 					if (indexQuote != null && isValid) {
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DATE_EL)) {
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(dateEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setQuoteDateTime(new DateTime(evt.asCharacters().getData()));
 
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
+						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(openEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(HIGH_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(highEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setDaysHigh(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LOW_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(lowEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setDaysLow(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CLOSE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(closeEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setClose(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(volumeEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setVolume(new BigInteger(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ADJ_CLOSE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(adjCloseEl)) {
 							XMLEvent evt = reader.nextEvent();
-							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
+							if (evt.isCharacters() && !evt.asCharacters().getData().equals(noData))
 								indexQuote.setAdjClose(new BigDecimal(evt.asCharacters().getData()));
 						}
 
-						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+						else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(quoteEl)) {
 
 							if ( document.getDataType() != null) {
 								indexQuote.setSource(YahooGatewayHelper.Y_PROVIDER_SYMB);
@@ -157,7 +157,7 @@ public class YahooXmlHistIndexQuotesParser implements Parser<IndexQuote> {
 						}
 
 					}
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 					isValid = false;
 					break;
@@ -166,7 +166,7 @@ public class YahooXmlHistIndexQuotesParser implements Parser<IndexQuote> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 

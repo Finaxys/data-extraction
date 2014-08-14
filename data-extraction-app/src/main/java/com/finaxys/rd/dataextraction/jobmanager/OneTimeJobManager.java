@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -29,6 +30,7 @@ import com.finaxys.rd.dataextraction.service.impl.HistDataServiceImpl;
 import com.finaxys.rd.dataextraction.service.integration.gateway.MarketDataPublishingGateway;
 
 public class OneTimeJobManager {
+	private static Logger logger = Logger.getLogger(OneTimeJobManager.class);
 
 	ApplicationContext context;
 
@@ -315,7 +317,7 @@ public class OneTimeJobManager {
 				(OperableTrigger) trigger.getObject(), null, 1);
 		Date firstFireTime = (Date) fireTimes.iterator().next();
 
-		System.out.println("First fire time: " + firstFireTime);
+		logger.info("First fire time: " + firstFireTime);
 
 		return (SimpleTrigger) trigger.getObject();
 

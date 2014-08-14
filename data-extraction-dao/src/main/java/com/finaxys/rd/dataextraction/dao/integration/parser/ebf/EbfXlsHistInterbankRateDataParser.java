@@ -29,7 +29,7 @@ import com.finaxys.rd.dataextraction.domain.InterbankRateData;
 
 public class EbfXlsHistInterbankRateDataParser implements Parser<InterbankRateData> {
 
-	static Logger logger = Logger.getLogger(EbfXlsHistInterbankRateDataParser.class);
+	private static Logger logger = Logger.getLogger(EbfXlsHistInterbankRateDataParser.class);
 
 	@Value("${parser.ebf.hist_interbank_rate_data.euribor_symb}")
 	public String EURIBOR_SYMB;
@@ -55,8 +55,9 @@ public class EbfXlsHistInterbankRateDataParser implements Parser<InterbankRateDa
 			Iterator<Cell> cellIterator = row.cellIterator();
 			cellIterator.next();
 			String date = "";
-			while (cellIterator.hasNext() && !(date = cellIterator.next().toString()).equals(""))
+			while (cellIterator.hasNext() && !(date = cellIterator.next().toString()).equals("")){
 				dates.add(formatter.parseDateTime(date));
+			}
 
 			String bucket = "";
 			while (rowIterator.hasNext() && !(bucket = (cellIterator = (row = rowIterator.next()).cellIterator()).next().toString()).equals("")) {
@@ -76,14 +77,14 @@ public class EbfXlsHistInterbankRateDataParser implements Parser<InterbankRateDa
 						rate.setValue(new BigDecimal(value));
 						rate.setInputDate(new DateTime());
 						list.add(rate);
-					} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+					} catch ( NoSuchElementException | IllegalArgumentException e) {
 						logger.error("Exception when creating a new object by the parser: " + e);
 					}
 				}
 
 			}
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 

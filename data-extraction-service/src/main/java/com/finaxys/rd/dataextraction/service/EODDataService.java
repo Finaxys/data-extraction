@@ -8,5 +8,5 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface EODDataService<T extends MarketData, K extends MarketData> {
 
-	public List<T> getEODData(List<K> products) throws ServiceException;	
+	 List<T> getEODData(List<K> products) throws ServiceException;	
 }

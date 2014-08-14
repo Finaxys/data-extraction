@@ -31,7 +31,7 @@ import com.finaxys.rd.dataextraction.domain.InterbankRate;
  */
 public class FileXlsInterbankRatesParser implements Parser<InterbankRate> {
 
-	static Logger logger = Logger.getLogger(FileXlsInterbankRatesParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsInterbankRatesParser.class);
 
 	public List<InterbankRate> parse(Document document) throws ParserException {
 		HSSFWorkbook workbook;
@@ -63,13 +63,13 @@ public class FileXlsInterbankRatesParser implements Parser<InterbankRate> {
 					interbankRate.setInputDate(new DateTime());
 					interbankRate.setDataType(document.getDataType());
 					list.add(interbankRate);
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

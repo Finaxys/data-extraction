@@ -14,5 +14,5 @@ import com.finaxys.rd.dataextraction.domain.Exchange;
  */
 public interface ExchangeDao extends BasicDao<Exchange>{
 	
-	public List<Exchange> list(char provider) throws DataAccessException;
+	 List<Exchange> list(char provider) throws DataAccessException;
 }

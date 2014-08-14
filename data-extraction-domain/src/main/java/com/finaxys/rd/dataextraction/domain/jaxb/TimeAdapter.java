@@ -8,7 +8,7 @@ import org.joda.time.format.DateTimeFormatter;
  
 public class TimeAdapter
     extends XmlAdapter<String, LocalTime>{
-	DateTimeFormatter dformatter = DateTimeFormat.forPattern("HH:mm:ss");
+	private DateTimeFormatter dformatter = DateTimeFormat.forPattern("HH:mm:ss");
 	
     public LocalTime unmarshal(String v)   {
         return dformatter.parseDateTime(v).toLocalTime();

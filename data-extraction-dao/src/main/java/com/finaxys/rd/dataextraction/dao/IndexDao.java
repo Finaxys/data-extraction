@@ -14,5 +14,5 @@ import com.finaxys.rd.dataextraction.domain.Index;
  */
 public interface IndexDao extends BasicDao<Index> {
 	
-	public List<Index> list(char provider, String exchSymb) throws DataAccessException ;
+	 List<Index> list(char provider, String exchSymb) throws DataAccessException ;
 }

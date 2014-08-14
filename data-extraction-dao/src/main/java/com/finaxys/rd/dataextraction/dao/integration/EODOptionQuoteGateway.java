@@ -11,7 +11,7 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
 
 public interface EODOptionQuoteGateway extends EODDataGateway<OptionQuote, Option>{
 	
-	public List<OptionQuote> getEODData(List<OptionChain> optionChains, LocalDate expiration) throws GatewayException;
+	 List<OptionQuote> getEODData(List<OptionChain> optionChains, LocalDate expiration) throws GatewayException;
 	
 
 }

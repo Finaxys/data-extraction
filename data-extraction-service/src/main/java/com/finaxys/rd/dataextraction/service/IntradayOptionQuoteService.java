@@ -11,6 +11,6 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface IntradayOptionQuoteService extends IntradayDataService<OptionQuote, Option> {
 
-	public List<OptionQuote> getCurrentData(List<OptionChain> optionChains, LocalDate expiration) throws ServiceException;
+	 List<OptionQuote> getCurrentData(List<OptionChain> optionChains, LocalDate expiration) throws ServiceException;
 
 }

@@ -25,7 +25,8 @@ public class HashRowKeyStrategy extends FixedLengthRowKeyStrategy {
 		byte[] rowkey = new byte[bytesSize(rowkeyFields)];
 		int offset = 0;
 		for (byte[] field : rowkeyFields) {
-			if (field == null) throw new IllegalArgumentException();
+			if (field == null)
+				throw new IllegalArgumentException();
 			offset = Bytes.putBytes(rowkey, offset, field, 0, field.length);
 		}
 		return rowkey;
@@ -37,27 +38,26 @@ public class HashRowKeyStrategy extends FixedLengthRowKeyStrategy {
 		Assert.notNull(field);
 		if (field instanceof String)
 			return Helper.md5sum((String) field);
-		else if (field instanceof Long)
+		if (field instanceof Long)
 			return Bytes.toBytes((String) field);
-		else if (field instanceof Integer)
+		if (field instanceof Integer)
 			return Bytes.toBytes((Integer) field);
-		else if (field instanceof LocalTime)
+		if (field instanceof LocalTime)
 			return Bytes.toBytes(new LocalTime(field).toDateTimeToday().getMillis());
-		else if (field instanceof LocalDate)
+		if (field instanceof LocalDate)
 			return Bytes.toBytes(new LocalDate(field).toDateTimeAtStartOfDay().getMillis());
-		else if (field instanceof Character)
-			return new byte[]{(byte)((Character) field).charValue()};
-		else if (field instanceof DateTime)
+		if (field instanceof Character)
+			return new byte[] { (byte) ((Character) field).charValue() };
+		if (field instanceof DateTime)
 			return Bytes.toBytes(((DateTime) field).getMillis());
-		else if (field instanceof BigDecimal)
+		if (field instanceof BigDecimal)
 			return Bytes.toBytes((String) field);
-		else if (field instanceof BigInteger)
+		if (field instanceof BigInteger)
 			return ((BigInteger) field).toByteArray();
-		else if (field instanceof DataType)
+		if (field instanceof DataType)
 			return Bytes.toBytes(((DataType) field).getName());
 
-		else
-			throw new IllegalArgumentException();
+		throw new IllegalArgumentException();
 	}
 
 }

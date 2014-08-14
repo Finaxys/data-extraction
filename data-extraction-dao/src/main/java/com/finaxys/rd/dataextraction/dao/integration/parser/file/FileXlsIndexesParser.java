@@ -31,7 +31,7 @@ import com.finaxys.rd.dataextraction.domain.Index;
  */
 public class FileXlsIndexesParser implements Parser<Index> {
 
-	static Logger logger = Logger.getLogger(FileXlsIndexesParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsIndexesParser.class);
 
 	public List<Index> parse(Document document) throws ParserException {
 		HSSFWorkbook workbook;
@@ -63,13 +63,13 @@ public class FileXlsIndexesParser implements Parser<Index> {
 					index.setDataType(document.getDataType());
 					list.add(index);
 
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

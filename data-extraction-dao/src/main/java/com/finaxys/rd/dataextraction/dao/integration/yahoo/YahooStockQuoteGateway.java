@@ -122,13 +122,13 @@ public class YahooStockQuoteGateway implements IntradayDataGateway<StockQuote, S
 			byte[] data = YahooGatewayHelper.executeYQLQuery(EOD_QUOTE_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return eodDataParser.parse(new Document(data, DataType.EOD));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -142,13 +142,13 @@ public class YahooStockQuoteGateway implements IntradayDataGateway<StockQuote, S
 			byte[] data = YahooGatewayHelper.executeYQLQuery(CURRENT_QUOTE_QUERY, params, contentType, httpClient, context);
 			if (data.length > 0)
 				return intradayDataParser.parse(new Document(data, DataType.INTRA));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}
@@ -160,20 +160,20 @@ public class YahooStockQuoteGateway implements IntradayDataGateway<StockQuote, S
 			Assert.notEmpty(products, "Cannot execute data extraction. Products list is empty.");
 			Assert.notNull(startDate, "Cannot execute data extraction. Start date is null.");
 			Assert.notNull(endDate, "Cannot execute data extraction. End date is null.");
-			
-			DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+			 DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM-dd");
 			List<String> params = new ArrayList<String>(Arrays.asList(YahooGatewayHelper.getStocksSymbols(products), dformatter.print(startDate), dformatter.print(endDate)));
 			byte[] data = YahooGatewayHelper.executeYQLQuery(HIST_QUOTE_QUERY, params, contentType, httpClient, context);
 
 			if (data.length > 0)
 				return histDataParser.parse(new Document(contentType, DataType.HIST, DataClass.StockQuote, YahooGatewayHelper.Y_PROVIDER_SYMB, data));
-			else
-				return null;
+
+			return null;
 		} catch (OAuthMessageSignerException | OAuthExpectationFailedException e) {
 			throw new GatewaySecurityException(e);
 		} catch (OAuthCommunicationException | URISyntaxException | IOException e) {
 			throw new GatewayCommunicationException(e);
-		} catch (NullPointerException | ParserException e) {
+		} catch ( ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

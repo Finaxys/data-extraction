@@ -27,7 +27,7 @@ import com.finaxys.rd.dataextraction.domain.Enum.DataType;
 
 public class FileCurrencyPairGateway implements RefDataGateway<CurrencyPair> {
 	/** The logger. */
-	static Logger logger = Logger.getLogger(FileCurrencyPairGateway.class);
+	private static Logger logger = Logger.getLogger(FileCurrencyPairGateway.class);
 
 	/** The currency pairs file. */
 	@Value("${gateway.file.currencyPairsFile:currency_pairs}")
@@ -72,9 +72,9 @@ public class FileCurrencyPairGateway implements RefDataGateway<CurrencyPair> {
 					DataClass.CurrencyPair,
 					FileGatewayHelper.FILE_PROVIDER_SYMB,
 					FileGatewayHelper.toBytes(file)));
-		else
+		
 			return null;
-		} catch (NullPointerException  | IOException | ParserException e) {
+		} catch ( IOException | ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

@@ -21,7 +21,7 @@ import com.finaxys.rd.dataextraction.domain.Exchange;
 public class FileExchangeGateway implements RefDataGateway<Exchange> {
 
 	/** The logger. */
-	static Logger logger = Logger.getLogger(FileExchangeGateway.class);
+	private static Logger logger = Logger.getLogger(FileExchangeGateway.class);
 
 	/** The exchanges file. */
 	@Value("${gateway.file.exchangesFile:exchanges}")
@@ -60,9 +60,9 @@ public class FileExchangeGateway implements RefDataGateway<Exchange> {
 			File file = FileGatewayHelper.getResourceFile(FileGatewayHelper.getPath(FileGatewayHelper.DATA_FOLDER, EXCHANGES_FILE, contentType.getName()));
 			if (file != null && file.length() > 0)
 				return parser.parse(new Document(contentType, DataType.REF, DataClass.Exchange, FileGatewayHelper.FILE_PROVIDER_SYMB, FileGatewayHelper.toBytes(file)));
-			else
+			
 				return null;
-		} catch (NullPointerException | IOException | ParserException e) {
+		} catch ( IOException | ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

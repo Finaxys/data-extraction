@@ -116,7 +116,7 @@ public class FileGatewayHelper {
 					if (c != null)
 						configuration.put(c, properties.getProperty(key));
 				}
-			} catch (IllegalArgumentException | IOException | NullPointerException e) {
+			} catch (IllegalArgumentException | IOException  e) {
 				logger.error("Exception when reading configuration file " + fileName + ": " + e);
 			}
 		}

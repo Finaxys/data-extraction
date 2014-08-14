@@ -38,7 +38,7 @@ import com.finaxys.rd.dataextraction.domain.InterbankRateData;
 public class FileInterbankRateDataGateway implements HistDataGateway<InterbankRateData, InterbankRate> {
 
 	/** The logger. */
-	static Logger logger = Logger.getLogger(FileInterbankRateDataGateway.class);
+	private static Logger logger = Logger.getLogger(FileInterbankRateDataGateway.class);
 
 	/** The exchanges file. */
 	@Value("${gateway.file.histInterbankRateDataFile:hist_interbank_rate_data_}")
@@ -106,7 +106,7 @@ public class FileInterbankRateDataGateway implements HistDataGateway<InterbankRa
 						&& rate.getRateDateTime().toLocalDate().isBefore(endDate))
 					list.add(rate);
 
-			} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+			} catch ( NoSuchElementException | IllegalArgumentException e) {
 				logger.error("Exception when creating a new object by the parser: " + e);
 			}
 		}
@@ -152,9 +152,9 @@ public class FileInterbankRateDataGateway implements HistDataGateway<InterbankRa
 			byte[] data = filterHistRatesData(file, products, startDate, endDate);
 			if (data != null && data.length > 0)
 				return histDataParser.parse(new Document(contentType, DataType.HIST, DataClass.InterbankRatesData, FileGatewayHelper.FILE_PROVIDER_SYMB, data));
-			else
+			
 				return null;
-		} catch (NullPointerException | IOException | ParserException e) {
+		} catch (  IOException | ParserException e) {
 			throw new GatewayException(e);
 		}
 	}

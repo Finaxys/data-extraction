@@ -20,7 +20,7 @@ import com.finaxys.rd.dataextraction.domain.Index;
  */
 public class IndexDaoImpl extends AbstractBasicDao<Index> implements IndexDao {
 
-	static Logger logger = Logger.getLogger(IndexDaoImpl.class);
+	private static Logger logger = Logger.getLogger(IndexDaoImpl.class);
 
 	public IndexDaoImpl() {
 		super();

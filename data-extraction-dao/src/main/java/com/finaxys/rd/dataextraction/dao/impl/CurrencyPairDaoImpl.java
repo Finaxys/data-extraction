@@ -20,7 +20,7 @@ import com.finaxys.rd.dataextraction.domain.CurrencyPair;
 public class CurrencyPairDaoImpl extends AbstractBasicDao<CurrencyPair> implements CurrencyPairDao {
 
 
-	static Logger logger = Logger.getLogger(CurrencyPairDaoImpl.class);
+	private static Logger logger = Logger.getLogger(CurrencyPairDaoImpl.class);
 	
 	public CurrencyPairDaoImpl() {
 		super();

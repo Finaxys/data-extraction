@@ -45,7 +45,7 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
  */
 public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlOQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlOQuotesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.oquotes.date_format}")
@@ -133,16 +133,16 @@ public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
 
 					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPTION_EL)) {
 						optionQuote = new OptionQuote();
-						if (ts == null || ts.isEmpty())
+						if (ts == null || ts.isEmpty()){
 							isValid = false;
-						else
-							isValid = true;
+						}else{
+							isValid = true;}
 
 						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
-						if (a != null && !a.getValue().equals(""))
+						if (a != null && !a.getValue().equals("")){
 							optionQuote.setSymbol(a.getValue());
-						else
-							isValid = false;
+						}else{
+							isValid = false;}
 					}
 					if (optionQuote != null && isValid) {
 						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
@@ -150,44 +150,44 @@ public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setChange(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PRICE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PRICE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setPrice(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PREVCLOSE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(PREVCLOSE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setPrevClose(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(BID_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setBid(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ASK_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setAsk(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(STRIKE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setStrike(new BigDecimal(evt.asCharacters().getData()));
 						}
 
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(EXPIRATION_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(EXPIRATION_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								optionQuote.setExpiration(expirationFormatter.parseDateTime(evt.asCharacters().getData()).toLocalDate());
 						}
 
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA)) {
 								NumberFormat nf_us = NumberFormat.getInstance(Locale.US);
@@ -222,16 +222,15 @@ public class YahooXmlOQuotesParser implements Parser<OptionQuote> {
 						}
 
 					}
-				} catch (NullPointerException | ParseException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( ParseException | UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
-
 					break;
 				} catch (XMLStreamException | NoSuchElementException e) {
 					throw new DataReadingParserException(e);
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 

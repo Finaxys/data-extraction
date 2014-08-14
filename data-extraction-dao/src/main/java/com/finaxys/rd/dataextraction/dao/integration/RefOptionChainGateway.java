@@ -9,6 +9,6 @@ import com.finaxys.rd.dataextraction.domain.Stock;
 
 public interface RefOptionChainGateway {
 
-	public List<OptionChain> getRefData(List<Stock> stocks) throws GatewayException ;
+	 List<OptionChain> getRefData(List<Stock> stocks) throws GatewayException ;
 		
 }

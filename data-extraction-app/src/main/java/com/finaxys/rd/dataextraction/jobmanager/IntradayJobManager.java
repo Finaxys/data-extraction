@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.log4j.Logger;
 import org.joda.time.LocalTime;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
@@ -35,6 +36,8 @@ import com.finaxys.rd.dataextraction.service.IntradayDataService;
 import com.finaxys.rd.dataextraction.service.integration.gateway.MarketDataPublishingGateway;
 
 public class IntradayJobManager {
+
+	private static Logger logger = Logger.getLogger(IntradayJobManager.class);
 
 	ApplicationContext context;
 
@@ -197,7 +200,7 @@ public class IntradayJobManager {
 			List<?> fireTimes = TriggerUtils.computeFireTimes((OperableTrigger) cronTrigger.getObject(), null, 1);
 			Date firstFireTime = (Date) fireTimes.iterator().next();
 
-			System.out.println("First fire time: " + firstFireTime);
+			logger.info("First fire time: " + firstFireTime);
 
 			triggers.add((CronTrigger) cronTrigger.getObject());
 		}

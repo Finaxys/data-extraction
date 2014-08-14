@@ -33,7 +33,7 @@ import com.finaxys.rd.dataextraction.domain.OptionChain;
 
 public class YahooXmlOptionChainsParser implements Parser<OptionChain> {
 
-	static Logger logger = Logger.getLogger(YahooXmlOptionChainsParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlOptionChainsParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.option_chains.date_format}")
@@ -91,7 +91,7 @@ public class YahooXmlOptionChainsParser implements Parser<OptionChain> {
 						symbol = null;
 					}
 
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 
 					break;
@@ -100,7 +100,7 @@ public class YahooXmlOptionChainsParser implements Parser<OptionChain> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 

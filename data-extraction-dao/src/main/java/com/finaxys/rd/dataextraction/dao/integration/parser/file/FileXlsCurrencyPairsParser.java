@@ -27,7 +27,7 @@ import com.finaxys.rd.dataextraction.domain.Document;
 
 public class FileXlsCurrencyPairsParser implements Parser<CurrencyPair> {
 
-	static Logger logger = Logger.getLogger(FileXlsCurrencyPairsParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsCurrencyPairsParser.class);
 
 	public List<CurrencyPair> parse(Document document) throws ParserException {
 		HSSFWorkbook workbook;
@@ -61,13 +61,13 @@ public class FileXlsCurrencyPairsParser implements Parser<CurrencyPair> {
 						list.add(currencyPair);
 					} else
 						throw new IllegalArgumentException();
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

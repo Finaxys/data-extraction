@@ -31,7 +31,7 @@ import com.finaxys.rd.dataextraction.domain.Stock;
  */
 public class FileXlsStocksParser implements Parser<Stock> {
 
-	static Logger logger = Logger.getLogger(FileXlsStocksParser.class);
+	private static Logger logger = Logger.getLogger(FileXlsStocksParser.class);
 
 	public List<Stock> parse(Document document) throws ParserException {
 		HSSFWorkbook workbook;
@@ -63,13 +63,13 @@ public class FileXlsStocksParser implements Parser<Stock> {
 					stock.setInputDate(new DateTime());
 					stock.setDataType(document.getDataType());
 					list.add(stock);
-				} catch (NullPointerException | NoSuchElementException | IllegalArgumentException e) {
+				} catch ( NoSuchElementException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 				}
 			}
 
 			return list;
-		} catch (NullPointerException | IOException e) {
+		} catch ( IOException e) {
 			throw new DataReadingParserException(e);
 		}
 	}

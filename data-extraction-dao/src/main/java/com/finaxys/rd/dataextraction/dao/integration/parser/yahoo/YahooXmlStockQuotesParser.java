@@ -41,7 +41,7 @@ import com.finaxys.rd.dataextraction.domain.StockQuote;
  */
 public class YahooXmlStockQuotesParser implements Parser<StockQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlStockQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlStockQuotesParser.class);
 
 	/** The date format. */
 	@Value("${parser.yahoo.stock_quotes.date_format}")
@@ -128,21 +128,21 @@ public class YahooXmlStockQuotesParser implements Parser<StockQuote> {
 					if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
 						stockQuote = new StockQuote();
 
-						if (ts == null || ts.isEmpty())
+						if (ts == null || ts.isEmpty()){
 							isValid = false;
-						else
-							isValid = true;
+						}else{
+							isValid = true;}
 
 						Attribute a = ((StartElement) ev).getAttributeByName(new QName(SYMBOL_ATT));
 						if (a != null && !a.getValue().equals("")) {
 							String[] sp = a.getValue().split("\\.");
 							stockQuote.setSymbol(sp[0]);
-							if (sp.length == 2)
+							if (sp.length == 2){
 								stockQuote.setExchSymb(sp[1]);
-							else
-								stockQuote.setExchSymb("US");
-						} else
-							isValid = false;
+							}else{
+								stockQuote.setExchSymb("US");}
+						} else{
+							isValid = false;}
 					}
 					if (stockQuote != null && isValid) {
 						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(AVERAGEDAILYVOLUME_EL)) {
@@ -151,58 +151,58 @@ public class YahooXmlStockQuotesParser implements Parser<StockQuote> {
 								stockQuote.setAverageDailyVolume(new BigInteger(evt.asCharacters().getData()));
 
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CHANGE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setChange(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSLOW_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSLOW_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setDaysLow(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSHIGH_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSHIGH_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setDaysHigh(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(YEARLOW_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(YEARLOW_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setYearLow(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(YEARHIGH_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(YEARHIGH_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setYearHigh(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(MARKETCAPITALIZATION_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(MARKETCAPITALIZATION_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setMarketCapitalization(evt.asCharacters().getData());
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LASTTRADEPRICEONLY_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LASTTRADEPRICEONLY_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setLastTradePriceOnly(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSRANGE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(DAYSRANGE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setDaysRange(evt.asCharacters().getData());
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(NAME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(NAME_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setName(evt.asCharacters().getData());
 						}
 
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setVolume(new BigInteger(evt.asCharacters().getData()));
 						}
-						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+						else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
 
 							if (ts != null && !ts.isEmpty() && document.getDataType() != null) {
 								stockQuote.setQuoteDateTime(new DateTime(ts));
@@ -216,7 +216,7 @@ public class YahooXmlStockQuotesParser implements Parser<StockQuote> {
 						}
 
 					}
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 
 					break;
@@ -225,7 +225,7 @@ public class YahooXmlStockQuotesParser implements Parser<StockQuote> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 

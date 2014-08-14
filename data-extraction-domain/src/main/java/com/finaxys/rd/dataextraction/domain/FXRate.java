@@ -32,10 +32,10 @@ public class FXRate  extends RateData  implements Serializable{
 	private BigDecimal rate;
 	
 	/** The ask. */
-	private BigDecimal ask = new BigDecimal(0); // to delete after scaled risk model update
+	private BigDecimal ask; 
 	
 	/** The bid. */
-	private BigDecimal bid = new BigDecimal(0); // to delete after scaled risk model update
+	private BigDecimal bid; 
 
 
 	/**

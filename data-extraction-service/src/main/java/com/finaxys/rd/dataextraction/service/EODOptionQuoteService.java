@@ -11,7 +11,7 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface EODOptionQuoteService extends EODDataService<OptionQuote, Option>{
 	
-	public List<OptionQuote> getEODData(List<OptionChain> optionChains, LocalDate expiration) throws ServiceException;
+	 List<OptionQuote> getEODData(List<OptionChain> optionChains, LocalDate expiration) throws ServiceException;
 	
 
 }

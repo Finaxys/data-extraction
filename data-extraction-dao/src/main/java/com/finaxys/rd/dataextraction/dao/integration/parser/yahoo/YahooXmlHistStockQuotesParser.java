@@ -40,7 +40,7 @@ import com.finaxys.rd.dataextraction.domain.StockQuote;
  */
 public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 
-	static Logger logger = Logger.getLogger(YahooXmlHistStockQuotesParser.class);
+	private static Logger logger = Logger.getLogger(YahooXmlHistStockQuotesParser.class);
 
 	@Value("${parser.yahoo.hist_stock_quotes.date_format}")
 	private String DATE_FORMAT;
@@ -100,10 +100,10 @@ public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 						if (a != null && !a.getValue().equals("")) {
 							String[] sp = a.getValue().split("\\.");
 							stockQuote.setSymbol(sp[0]);
-							if (sp.length == 2)
+							if (sp.length == 2){
 								stockQuote.setExchSymb(sp[1]);
-							else
-								stockQuote.setExchSymb("US");
+							}else{
+								stockQuote.setExchSymb("US");}
 						} else
 							isValid = false;
 					}
@@ -114,38 +114,38 @@ public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 								stockQuote.setQuoteDateTime(new DateTime(evt.asCharacters().getData()));
 
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(OPEN_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setOpen(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(HIGH_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(HIGH_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setDaysHigh(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LOW_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(LOW_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setDaysLow(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CLOSE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(CLOSE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setClose(new BigDecimal(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(VOLUME_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setVolume(new BigInteger(evt.asCharacters().getData()));
 						}
-						if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ADJ_CLOSE_EL)) {
+						else if (ev.isStartElement() && ((StartElement) ev).getName().getLocalPart().equals(ADJ_CLOSE_EL)) {
 							XMLEvent evt = reader.nextEvent();
 							if (evt.isCharacters() && !evt.asCharacters().getData().equals(NO_DATA))
 								stockQuote.setAdjClose(new BigDecimal(evt.asCharacters().getData()));
 						}
 
-						if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
+						else if (isValid && ev.isEndElement() && ((EndElement) ev).getName().getLocalPart().equals(QUOTE_EL)) {
 
 							if ( document.getDataType() != null) {
 								stockQuote.setSource(YahooGatewayHelper.Y_PROVIDER_SYMB);
@@ -157,7 +157,7 @@ public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 						}
 
 					}
-				} catch (NullPointerException | UnsupportedOperationException | IllegalArgumentException e) {
+				} catch ( UnsupportedOperationException | IllegalArgumentException e) {
 					logger.error("Exception when creating a new object by the parser: " + e);
 					isValid = false;
 					break;
@@ -166,7 +166,7 @@ public class YahooXmlHistStockQuotesParser implements Parser<StockQuote> {
 				}
 			}
 			return list;
-		} catch (NullPointerException | FactoryConfigurationError | XMLStreamException e) {
+		} catch ( FactoryConfigurationError | XMLStreamException e) {
 			throw new DataReadingParserException(e);
 		}
 

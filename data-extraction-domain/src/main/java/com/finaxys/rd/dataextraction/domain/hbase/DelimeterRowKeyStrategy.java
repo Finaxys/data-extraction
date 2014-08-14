@@ -43,26 +43,26 @@ public class DelimeterRowKeyStrategy extends VariableLengthRowKeyStrategy {
 		Assert.notNull(field);
 		if (field instanceof String)
 			return Bytes.toBytes((String) field);
-		else if (field instanceof Long)
+		if (field instanceof Long)
 			return Bytes.toBytes((String) field);
-		else if (field instanceof Integer)
+		if (field instanceof Integer)
 			return Bytes.toBytes((Integer) field);
-		else if (field instanceof LocalTime)
+		if (field instanceof LocalTime)
 			return Bytes.toBytes(new LocalTime(field).toDateTimeToday().getMillis());
-		else if (field instanceof LocalDate)
+		if (field instanceof LocalDate)
 			return Bytes.toBytes(new LocalDate(field).toDateTimeAtStartOfDay().getMillis());
-		else if (field instanceof Character)
-			return new byte[]{(byte)((Character) field).charValue()};
-		else if (field instanceof DateTime)
+		if (field instanceof Character)
+			return new byte[] { (byte) ((Character) field).charValue() };
+		if (field instanceof DateTime)
 			return Bytes.toBytes(((DateTime) field).getMillis());
-		else if (field instanceof BigDecimal)
+		if (field instanceof BigDecimal)
 			return Bytes.toBytes((String) field);
-		else if (field instanceof BigInteger)
+		if (field instanceof BigInteger)
 			return ((BigInteger) field).toByteArray();
-		else if (field instanceof DataType)
+		if (field instanceof DataType)
 			return Bytes.toBytes(((DataType) field).getName());
 
-		else throw new IllegalArgumentException();
+		throw new IllegalArgumentException();
 
 	}
 }

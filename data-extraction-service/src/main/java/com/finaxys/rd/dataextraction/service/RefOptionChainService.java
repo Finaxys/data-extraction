@@ -9,5 +9,5 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface RefOptionChainService{
 
-	public List<OptionChain> getRefData(List<Stock> stocks) throws ServiceException;	
+	 List<OptionChain> getRefData(List<Stock> stocks) throws ServiceException;	
 }

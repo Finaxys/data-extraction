@@ -11,5 +11,5 @@ import com.finaxys.rd.dataextraction.service.exception.ServiceException;
 
 public interface HistDataService<T extends MarketData, K extends MarketData> {
 
-	public List<T> getHistData(List<K> products, LocalDate startDate, LocalDate endDate) throws ServiceException;	
+	 List<T> getHistData(List<K> products, LocalDate startDate, LocalDate endDate) throws ServiceException;	
 }

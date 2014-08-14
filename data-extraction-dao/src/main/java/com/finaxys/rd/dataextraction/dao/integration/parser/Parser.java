@@ -23,5 +23,5 @@ public interface Parser<T> {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public List<T> parse(Document document) throws ParserException;
+	 List<T> parse(Document document) throws ParserException;
 }

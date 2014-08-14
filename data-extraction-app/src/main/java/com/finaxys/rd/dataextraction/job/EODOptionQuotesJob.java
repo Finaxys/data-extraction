@@ -44,7 +44,7 @@ public class EODOptionQuotesJob extends QuartzJobBean {
 
 	private ExecutorService executorService;
 
-	DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
+	private DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
 
 	public EODOptionQuoteService getService() {
 		return service;

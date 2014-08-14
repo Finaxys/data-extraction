@@ -108,16 +108,7 @@ public class Option  extends ProductData  implements Serializable{
 		this.expiration = expiration;
 	}
 
-//
-//	@XmlJavaTypeAdapter(com.finaxys.rd.dataextraction.domain.jaxb.MonthLocalDateAdapter.class)
-//	public LocalDate getInputDate() {
-//		return inputDate;
-//	}
-//
-//
-//	public void setInputDate(LocalDate inputDate) {
-//		this.inputDate = inputDate;
-//	}
+
 
 
 	public String getExchSymb() {

@@ -106,7 +106,7 @@ public class OptionQuotesJob extends QuartzJobBean {
 
 		// Get optionChains that input date isthis month => we should ??
 		// refresh the list every month ??
-		DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
+		 DateTimeFormatter dformatter = DateTimeFormat.forPattern("yyyy-MM");
 		List<OptionChain> optionChains = optionChainDao.list(this.provider);
 		for (OptionChain optionChain : optionChains) {
 			List<OptionChain> list = map.get(optionChain.getExpiration());

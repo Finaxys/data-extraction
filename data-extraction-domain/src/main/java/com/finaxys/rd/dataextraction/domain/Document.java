@@ -4,6 +4,7 @@
 package com.finaxys.rd.dataextraction.domain;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import com.finaxys.rd.dataextraction.domain.Enum.ContentType;
 import com.finaxys.rd.dataextraction.domain.Enum.DataClass;
@@ -47,7 +48,7 @@ public class Document implements Serializable {
 	 * @param content
 	 *            the content
 	 */
-	
+
 	public Document(ContentType contentType, DataType dataType, DataClass dataClass, char source, byte[] content) {
 		super();
 		this.contentType = contentType;
@@ -62,7 +63,7 @@ public class Document implements Serializable {
 		this.content = content;
 	}
 
-	public Document( byte[] content, DataType dataType) {
+	public Document(byte[] content, DataType dataType) {
 		super();
 		this.dataType = dataType;
 		this.content = content;
@@ -164,8 +165,12 @@ public class Document implements Serializable {
 	 *            the new content
 	 */
 	public void setContent(byte[] content) {
-		this.content = content;
+		// defensive copying
+		if (content == null) {
+			this.content = new byte[0];
+		} else {
+			this.content = Arrays.copyOf(content, content.length);
+		}
 	}
 
-	
 }

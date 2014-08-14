@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class Helper {
 
-	static Logger logger = Logger.getLogger(Helper.class);
+	private static Logger logger = Logger.getLogger(Helper.class);
 
 	public static byte[] md5sum(String s) {
 		MessageDigest d;

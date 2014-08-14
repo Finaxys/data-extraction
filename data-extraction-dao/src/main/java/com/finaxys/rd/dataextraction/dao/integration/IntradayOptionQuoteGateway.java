@@ -11,7 +11,7 @@ import com.finaxys.rd.dataextraction.domain.OptionQuote;
 
 public interface IntradayOptionQuoteGateway extends IntradayDataGateway<OptionQuote, Option>{
 	
-	public List<OptionQuote> getCurrentData(List<OptionChain> optionChains, LocalDate expiration) throws GatewayException;
+	 List<OptionQuote> getCurrentData(List<OptionChain> optionChains, LocalDate expiration) throws GatewayException;
 	
 
 }
