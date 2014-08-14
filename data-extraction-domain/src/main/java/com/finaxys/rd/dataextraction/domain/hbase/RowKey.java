@@ -20,7 +20,7 @@ public class RowKey {
 
 	public RowKey(byte[] key) {
 		super();
-		this.key = key;
+		setKey(key);
 	}
 
 	

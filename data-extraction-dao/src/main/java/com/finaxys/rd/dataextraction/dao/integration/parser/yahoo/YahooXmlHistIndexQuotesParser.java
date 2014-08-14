@@ -55,7 +55,7 @@ public class YahooXmlHistIndexQuotesParser implements Parser<IndexQuote> {
 	@Value("${parser.yahoo.hist_index_quotes.old.symbol_att}")
 	private String symbolAtt;
 
-	@Value("${parser.yahoo.hist_index_quotes.old.dateEl}")
+	@Value("${parser.yahoo.hist_index_quotes.old.date_el}")
 	private String dateEl;
 
 	@Value("${parser.yahoo.hist_index_quotes.old.open_el}")

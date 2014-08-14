@@ -66,7 +66,7 @@ public class Document implements Serializable {
 	public Document(byte[] content, DataType dataType) {
 		super();
 		this.dataType = dataType;
-		this.content = content;
+		setContent(content);
 	}
 
 	public Document() {

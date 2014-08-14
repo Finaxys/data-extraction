@@ -53,34 +53,7 @@ public class OneTimeJobManager {
 				jobData);
 	}
 	
-	public void startStocksJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
-
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(com.finaxys.rd.dataextraction.job.StocksJob.class,
-				jobData);
-	}
-
-	public void startOptionsJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
-
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(com.finaxys.rd.dataextraction.job.OptionsJob.class,
-				jobData);
-	}
-
+	
 	public void startOptionChainsJob(char provider, String exchangeDaoBeanName,
 			String stockDaoBeanName, String serviceBeanName,
 			String publishingGatewayBeanName, int bucket) throws IOException,
@@ -217,62 +190,9 @@ public class OneTimeJobManager {
 				jobData);
 	}
 
-	public void startInterbankRatesJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
+	
 
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(
-				com.finaxys.rd.dataextraction.job.InterbankRatesJob.class,
-				jobData);
-	}
-
-	public void startIndexesJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
-
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(com.finaxys.rd.dataextraction.job.IndexesJob.class,
-				jobData);
-	}
-
-	public void startExchangesJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
-
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(com.finaxys.rd.dataextraction.job.ExchangesJob.class,
-				jobData);
-	}
-
-	public void startCurrencyPairsJob(String serviceBeanName,
-			String publishingGatewayBeanName) throws IOException,
-			SchedulerException {
-
-		Map<String, Object> jobData = new HashMap<String, Object>();
-		jobData.put("service",
-				(RefDataService<?>) context.getBean(serviceBeanName));
-		jobData.put("publishingGateway",
-				(MarketDataPublishingGateway<?>) context
-						.getBean(publishingGatewayBeanName));
-		this.startJob(com.finaxys.rd.dataextraction.job.CurrencyPairsJob.class,
-				jobData);
-	}
+	
 
 	private void startJob(Class<?> jobClass, Map<String, Object> jobData)
 			throws SchedulerException {
